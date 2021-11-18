@@ -1,14 +1,10 @@
 import React from 'react';
-const val = 4
-const number = 5
-function sum (a, b) {
-  return a+b;
-}
+
 const Home = () => {
   return (
-    <div>
-      <h1>Welcome to our website!</h1>
-      <table>{sum(val, number)}</table>
+    <div class="question-section">
+      <h1>Welcome home!</h1>
+      <p>Here you will find information about judo which should help you at exam for next belt</p>
     </div>
   );
 };
