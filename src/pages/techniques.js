@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 
 export default function Techniques() {
-    const url = "http://18.188.171.75:8787/techniques";
-    const [error, setError] = useState(null);
+    const url = "http://localhost:8787/techniques";
+    const [setError] = useState(null);
     const [items, setItems] = useState([]);
 
         useEffect(() => {
