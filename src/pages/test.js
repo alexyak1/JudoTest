@@ -1,48 +1,37 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import BeltSelector from "../components/Test/selectBelt"
 
 export default function Test() {
-	const questions = [
-		{
-			questionText: 'What is the technick on picture?',
-			answerOptions: [
-				{ answerText: 'o-soto', isCorrect: false },
-				{ answerText: 'Kuzure-keso', isCorrect: false },
-				{ answerText: 'Morote-seonagi', isCorrect: true },
-				{ answerText: 'Haray-goshi', isCorrect: false },
-			],
-		},
-		{
-			questionText: 'What is the technick on picture?',
-			answerOptions: [
-				{ answerText: 'uchi-mata', isCorrect: false },
-				{ answerText: 'haray-goshi', isCorrect: true },
-				{ answerText: 'thai-otoshi', isCorrect: false },
-				{ answerText: 'o-goshi', isCorrect: false },
-			],
-		},
-		{
-			questionText: 'What is the technick on picture?',
-			answerOptions: [
-				{ answerText: 'ippon-seo-nagi', isCorrect: true },
-				{ answerText: 'morote-seonagi', isCorrect: false },
-				{ answerText: 'o-uchi-gari', isCorrect: false },
-				{ answerText: 'ko-uchi-gari', isCorrect: false },
-			],
-		},
-		{
-			questionText: 'What is the technick on picture?',
-			answerOptions: [
-				{ answerText: 'sasai-tsuri-komi-ashi', isCorrect: false },
-				{ answerText: 'okuri-ashi-barai', isCorrect: false },
-				{ answerText: 'de-ashi-haray', isCorrect: false },
-				{ answerText: 'ko-uchi-makikomi', isCorrect: true },
-			],
-		},
-	];
+	const questionText = 'What is the technick on picture?';
+	const [pageStates, setPageStates] = useState({
+		"selectBelt": true,
+		"color": "yellow",
+	})
+	const url = 'http://localhost:8787/techniques?belt=' + pageStates.color;
+
+    const [items, setItems] = useState([]);
+    const [error, setError] = useState([]);
+	useEffect(() => {
+		fetch(url)
+		.then(res => res.json())
+		.then(
+			(result) => {
+				setItems(result)
+			},
+			(error) => {
+				setError(error);
+			}
+		)
+	}, [])
+
+	const answers = [];
+	for (let i=0; i < 4; i++) {
+		answers.push(items[Object.keys(items)[Math.floor(Math.random() * items.length-1) + 1]])
+	}
 
 	const [currentQuestion, setCurrentQuestion] = useState(0);
-	const [showScore, setShowScore] = useState(false);
 	const [score, setScore] = useState(0);
+
 
 	const handleAnswerOptionClick = (isCorrect) => {
 		if (isCorrect) {
@@ -50,33 +39,58 @@ export default function Test() {
 		}
 
 		const nextQuestion = currentQuestion + 1;
-		if (nextQuestion < questions.length) {
+		if (nextQuestion < items.length) {
 			setCurrentQuestion(nextQuestion);
 		} else {
 			setShowScore(true);
 		}
 	};
+
+	const [showScore, setShowScore] = useState(false);
+
+    const onchange = (data) => {
+		setPageStates(data);
+		setShowScore(false);
+		setScore(0);
+		setCurrentQuestion(0);
+    }
+
 	return (
 		<div className='app'>
 			{showScore ? (
 				<div className='score-section'>
-					You scored {score} out of {questions.length}
+					<div>
+					You scored {score} out of {items.length}
+					<p>ready to practice more?</p>
+					<BeltSelector data={pageStates} onchange={(e) => {onchange(e) }}></BeltSelector>
+					</div>
+
 				</div>
 			) : (
 				<>
-					<div className='question-section'>
-						<div className='question-count'>
-							<span>Question {currentQuestion + 1}</span>/{questions.length}
+				{pageStates.selectBelt ? (
+					<BeltSelector data={pageStates} onchange={(e) => {onchange(e) }}></BeltSelector>
+					) : (
+					<>
+						<div className='question-section'>
+							<div className='question-count'>
+								<span>Question {currentQuestion + 1}</span>/{items.length}
+								<span>For {pageStates.color} belt</span>
+							</div>
+							<div className='question-text'>
+								{questionText}
+
+							</div>
 						</div>
-						<div className='question-text'>{questions[currentQuestion].questionText}</div>
-					</div>
-					<div className='answer-section'>
-						{questions[currentQuestion].answerOptions.map((answerOption) => (
-							<button className={`${answerOption.isCorrect ? 'correct' : 'incorrect'}`} onClick={() => handleAnswerOptionClick(answerOption.isCorrect)}>
-                                {answerOption.answerText}
-                            </button>
-						))}
-					</div>
+						<div className='answer-section'>
+							{answers.map((answerOption) => (
+								<button onClick={() => handleAnswerOptionClick(answerOption.isCorrect)}>
+									{answerOption.name}
+								</button>
+							))}
+						</div>
+					</>
+					)}
 				</>
 			)}
 		</div>
