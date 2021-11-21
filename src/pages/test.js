@@ -3,42 +3,31 @@ import BeltSelector from "../components/Test/selectBelt"
 
 export default function Test() {
 	const questionText = 'What is the technick on picture?';
-	// const url = 'http://localhost:8787/techniques';
-    // const [items, setItems] = useState([]);
+	const [pageStates, setPageStates] = useState({
+		"selectBelt": true,
+		"color": "yellow",
+	})
+	const url = 'http://localhost:8787/techniques?belt=' + pageStates.color;
 
-	// useEffect(() => {
-	// 	fetch(url)
-	// 	.then(res => res.json())
-	// 	.then(
-	// 		(result) => {
-	// 			setItems(result)
-	// 		},
-	// 		(error) => {
-	// 			setError(error);
-	// 		}
-	// 	)
-	// }, [])
+    const [items, setItems] = useState([]);
+    const [error, setError] = useState([]);
+	useEffect(() => {
+		fetch(url)
+		.then(res => res.json())
+		.then(
+			(result) => {
+				setItems(result)
+			},
+			(error) => {
+				setError(error);
+			}
+		)
+	}, [])
 
-	const questions = [
-		{
-			questionText: questionText,
-			answerOptions: [
-				{ answerText: 'uchi-mata', isCorrect: false },
-				{ answerText: 'haray-goshi', isCorrect: false },
-				{ answerText: 'thai-otoshi', isCorrect: false },
-				{ answerText: 'o-goshi', isCorrect: true },
-			],
-		},
-		{
-			questionText: questionText,
-			answerOptions: [
-				{ answerText: 'uchi-mata', isCorrect: false },
-				{ answerText: 'haray-goshi', isCorrect: true },
-				{ answerText: 'thai-otoshi', isCorrect: false },
-				{ answerText: 'o-goshi', isCorrect: false },
-			],
-		},
-	];
+	const answers = [];
+	for (let i=0; i < 4; i++) {
+		answers.push(items[Object.keys(items)[Math.floor(Math.random() * items.length-1) + 1]])
+	}
 
 	const [currentQuestion, setCurrentQuestion] = useState(0);
 	const [score, setScore] = useState(0);
@@ -50,7 +39,7 @@ export default function Test() {
 		}
 
 		const nextQuestion = currentQuestion + 1;
-		if (nextQuestion < questions.length) {
+		if (nextQuestion < items.length) {
 			setCurrentQuestion(nextQuestion);
 		} else {
 			setShowScore(true);
@@ -58,10 +47,6 @@ export default function Test() {
 	};
 
 	const [showScore, setShowScore] = useState(false);
-	const [pageStates, setPageStates] = useState({
-		"selectBelt": true,
-		"color": "",
-	})
 
     const onchange = (data) => {
 		setPageStates(data);
@@ -75,7 +60,7 @@ export default function Test() {
 			{showScore ? (
 				<div className='score-section'>
 					<div>
-					You scored {score} out of {questions.length}
+					You scored {score} out of {items.length}
 					<p>ready to practice more?</p>
 					<BeltSelector data={pageStates} onchange={(e) => {onchange(e) }}></BeltSelector>
 					</div>
@@ -89,18 +74,18 @@ export default function Test() {
 					<>
 						<div className='question-section'>
 							<div className='question-count'>
-								<span>Question {currentQuestion + 1}</span>/{questions.length}
+								<span>Question {currentQuestion + 1}</span>/{items.length}
 								<span>For {pageStates.color} belt</span>
 							</div>
 							<div className='question-text'>
-								{questions[currentQuestion].questionText}
+								{questionText}
 
 							</div>
 						</div>
 						<div className='answer-section'>
-							{questions[currentQuestion].answerOptions.map((answerOption) => (
-								<button className={`${answerOption.isCorrect ? 'correct' : 'incorrect'}`} onClick={() => handleAnswerOptionClick(answerOption.isCorrect)}>
-									{answerOption.answerText}
+							{answers.map((answerOption) => (
+								<button onClick={() => handleAnswerOptionClick(answerOption.isCorrect)}>
+									{answerOption.name}
 								</button>
 							))}
 						</div>
