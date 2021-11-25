@@ -18,6 +18,7 @@ export default function Techniques() {
             )
         }, [])
 
+
         return (
             <div className='app'>
                 <div>
