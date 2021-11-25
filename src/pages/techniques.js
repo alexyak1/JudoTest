@@ -20,20 +20,25 @@ export default function Techniques() {
 
         return (
             <div className='app'>
-                <div
-                    style={{
-                        display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        height: '100vh'
-                    }}
-                >
+                <div>
                     <h1>Here is all techniques:</h1>
                     <ul>
                         {items.map(item => (
-                            <li key={item.id}>
-                                {item.name} belt: {item.belt}
-                            </li>
+                            <div style={
+                                {
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    height: '50vh',
+                                }
+                            } >
+                                <img
+                                    src={"https://lh3.googleusercontent.com/d/" + item.image_url.replaceAll('https://drive.google.com/file/d/','').replaceAll('/view?usp=sharing','') + "?authuser=0"}
+                                    alt="technique"
+                                />
+                                <li style={{marginLeft: '1em'}} key={item.id}>
+                                    {item.name} belt: {item.belt}
+                                </li>
+                            </div>
                         ))}
                     </ul>
                 </div>
