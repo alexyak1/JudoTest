@@ -21,7 +21,7 @@ export default function Techniques() {
         return (
             <div className='app'>
                 <div>
-                    <h1>Here is all techniques:</h1>
+                    <h1>Here is all existing techniques:</h1>
                     <ul>
                         {items.map(item => (
                             <div style={
