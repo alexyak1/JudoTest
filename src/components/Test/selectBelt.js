@@ -2,7 +2,7 @@
 
 import React from "react";
 
-export default function BeltSelector({ childToParent }) {
+export default function BeltSelector({ setBeltColor }) {
 
     const beltColor = '';
 
@@ -10,8 +10,8 @@ export default function BeltSelector({ childToParent }) {
         <>
             <h2>Select belt: </h2>
             <div>
-                <button onClick={() => childToParent('yellow')}>Yellow</button>
-                <button onClick={() => childToParent('orange')}>Orange</button>
+                <button onClick={() => setBeltColor('yellow')}>Yellow</button>
+                <button onClick={() => setBeltColor('orange')}>Orange</button>
             </div>
         </>
     );

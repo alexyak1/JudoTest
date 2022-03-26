@@ -65,10 +65,7 @@ export default function Test() {
 		const [correctAnswerCount, setCorrectAnswerCount] = useState(0)
 		const [quizComplete, setQuizComplete] = useState(false)
 		const [beltColor, setData] = useState('');
-
-		const childToParent = (childdata) => {
-			setData(childdata);
-		}
+		const [techniques, setTechniques] = useState([]);
 
 		useEffect(() => {
 			setAnswerStatus(null)
@@ -79,6 +76,13 @@ export default function Test() {
 				setCorrectAnswerCount(count => count + 1)
 			}
 		}, [answerStatus])
+
+		const setBeltColor = (childdata) => {
+			console.log("childdata")
+			console.log(childdata)
+			setData(childdata);
+			fetchData(childdata); // included setTechniques
+		}
 
 		const onNextClick = () => {
 			if (questionIndex === questions.length - 1) {
@@ -94,6 +98,42 @@ export default function Test() {
 			setCorrectAnswerCount(0)
 		}
 
+		const fetchData = (beltColor) => {
+			return fetch("http://localhost:8787/techniques?belt=" + beltColor)
+				.then((response) => response.json())
+				.then(data => {
+					console.log('data')
+					console.log(data)
+					setTechniques(data);
+				})
+				.catch(error => {
+					console.error("Error fething data", error)
+				})
+		}
+
+		console.log("techniques SHOULD BE LAST")
+		console.log(techniques)
+
+		let quizQuestions = []
+		for (var i = 0; i < techniques.length; i++) {
+			quizQuestions.push({
+				'image': techniques[i].image_url,
+				'correctAnswer': techniques[i].name,
+				'correctAnswerId': i,
+				'wrongAnswers': [
+					techniques[getRandomInt(techniques.length)].name,
+					techniques[getRandomInt(techniques.length)].name,
+					techniques[getRandomInt(techniques.length)].name
+				]
+			})
+		}
+
+		console.log(quizQuestions)
+		console.log(questions)
+
+		function getRandomInt(max) {
+			return Math.floor(Math.random() * max);
+		}
 		if (questionIndex == null) {
 			return (
 				<div className="quiz">
@@ -101,9 +141,9 @@ export default function Test() {
 					<p>This is a simple Judo quiz.</p>
 					<p>Celect belt color to check your knowlage about judo techniques</p>
 					<button className="start" onClick={onNextClick}>Start</button>
-					<BeltSelector childToParent={childToParent}></BeltSelector>
+					<BeltSelector setBeltColor={setBeltColor}></BeltSelector>
 					<p>color is {beltColor}</p>
-				</div>
+				</div >
 			)
 		}
 
@@ -137,7 +177,9 @@ export default function Test() {
 		)
 	}
 
-	var buildQuestion = 'What technique in a build?'
+
+	var buildQuestion = 'What technique on the picture?'
+
 	const questions = [
 		{
 			question: buildQuestion,
