@@ -1,98 +1,152 @@
-import React, { useState, useEffect } from "react";
-import BeltSelector from "../components/Test/selectBelt"
+import React from "react";
+// import BeltSelector from "../components/Test/selectBelt"
+import '../test.css';
 
 export default function Test() {
-	const questionText = 'What is the technick on picture?';
-	const [pageStates, setPageStates] = useState({
-		"selectBelt": true,
-		"color": "yellow",
-	})
-	const url = 'http://localhost:8787/techniques?belt=' + pageStates.color;
+	const { useState, useEffect, Fragment } = React
 
-    const [items, setItems] = useState([]);
-    const [error, setError] = useState([]);
-	useEffect(() => {
-		fetch(url)
-		.then(res => res.json())
-		.then(
-			(result) => {
-				setItems(result)
-			},
-			(error) => {
-				setError(error);
+	const Question = ({ question, setAnswerStatus }) => {
+		const [selectedAnswerIndex, setSelectedAnswerIndex] = useState(null)
+
+		useEffect(() => {
+			if (selectedAnswerIndex != null) {
+				setAnswerStatus(selectedAnswerIndex === question.correctAnswerIndex)
 			}
-		)
-	}, [])
+		}, [selectedAnswerIndex, question.correctAnswerIndex, setAnswerStatus])
 
-	const answers = [];
-	for (let i=0; i < 4; i++) {
-		answers.push(items[Object.keys(items)[Math.floor(Math.random() * items.length-1) + 1]])
+		useEffect(() => {
+			setSelectedAnswerIndex(null)
+		}, [question])
+
+		const getClasses = (index) => {
+			let classes = []
+			if (selectedAnswerIndex != null) {
+				if (selectedAnswerIndex === index) {
+					classes.push("selected")
+				}
+				if (index === question.correctAnswerIndex) {
+					if (selectedAnswerIndex === index) {
+						classes.push("correct")
+					} else {
+						classes.push("incorrect")
+					}
+				}
+			}
+
+			return classes.join(" ")
+		}
+
+		return (
+			<div className="question">
+				<div className="questionText">{question.question}</div>
+				<img src={question.image} alt="Judo technique"></img>
+				{/* <div className="questionText">{question.image}</div> */}
+				<div className="answers">
+					{question.answers.map((answer, index) => {
+						return <div key={index} className={`answer ${getClasses(index)}`} onClick={() => selectedAnswerIndex == null && setSelectedAnswerIndex(index)}>{answer}</div>
+					})}
+				</div>
+			</div>
+		)
 	}
 
-	const [currentQuestion, setCurrentQuestion] = useState(0);
-	const [score, setScore] = useState(0);
+	const ProgressBar = ({ currentQuestionIndex, totalQuestionsCount }) => {
+		const progressPercentage = (currentQuestionIndex / totalQuestionsCount) * 100
 
+		return <div className="progressBar">
+			<div className="text">{currentQuestionIndex} answered ({totalQuestionsCount - currentQuestionIndex} remaining)</div>
+			<div className="inner" style={{ width: `${progressPercentage}%` }} />
+		</div>
+	}
 
-	const handleAnswerOptionClick = (isCorrect) => {
-		if (isCorrect) {
-			setScore(score + 1);
+	const Quiz = ({ questions }) => {
+		const [questionIndex, setQuestionIndex] = useState(null)
+		const [answerStatus, setAnswerStatus] = useState(null)
+		const [correctAnswerCount, setCorrectAnswerCount] = useState(0)
+		const [quizComplete, setQuizComplete] = useState(false)
+
+		useEffect(() => {
+			setAnswerStatus(null)
+		}, [questionIndex])
+
+		useEffect(() => {
+			if (answerStatus) {
+				setCorrectAnswerCount(count => count + 1)
+			}
+		}, [answerStatus])
+
+		const onNextClick = () => {
+			if (questionIndex === questions.length - 1) {
+				setQuizComplete(true)
+			} else {
+				setQuestionIndex(questionIndex == null ? 0 : questionIndex + 1)
+			}
 		}
 
-		const nextQuestion = currentQuestion + 1;
-		if (nextQuestion < items.length) {
-			setCurrentQuestion(nextQuestion);
-		} else {
-			setShowScore(true);
+		const onRestartClick = () => {
+			setQuizComplete(false)
+			setQuestionIndex(null)
+			setCorrectAnswerCount(0)
 		}
-	};
 
-	const [showScore, setShowScore] = useState(false);
+		if (questionIndex == null) {
+			return (
+				<div className="quiz">
+					<h1>Start Quiz</h1>
+					<p>This is a simple Judo quiz.</p>
+					<p>Press start to check your knowlage about judo techniques</p>
+					<button className="start" onClick={onNextClick}>Start</button>
+				</div>
+			)
+		}
 
-    const onchange = (data) => {
-		setPageStates(data);
-		setShowScore(false);
-		setScore(0);
-		setCurrentQuestion(0);
-    }
+		return (
+			<div className="quiz">
+				{quizComplete ? (
+					<Fragment>
+						<h1>Quiz complete!🥳</h1>
+						<p>You answered {correctAnswerCount} questions correctly (out of a total {questions.length} questions)</p>
+					</Fragment>
+				) : (
+					<Fragment>
+						<ProgressBar currentQuestionIndex={questionIndex} totalQuestionsCount={questions.length} />
+						<Question
+							question={questions[questionIndex]}
+							setAnswerStatus={setAnswerStatus}
+						/>
+						{answerStatus != null && (
+							<div>
+								<div className="answerStatus">{!!answerStatus ? "Correct! :)" : "Your answer was incorrect :("}</div>
+								<button className="next" onClick={onNextClick}>
+									{questionIndex === questions.length - 1 ? "See results of this quiz" : "Next Question ->"}
+								</button>
+							</div>
+						)}
+					</Fragment>
+				)}
+
+				{questionIndex != null && <button className="restart" onClick={onRestartClick}>Restart quiz</button>}
+			</div>
+		)
+	}
+
+	var buildQuestion = 'What technique in a build?'
+	const questions = [
+		{
+			question: buildQuestion,
+			image: 'https://drive.google.com/uc?export=view&id=1p3JuGkd533lBv4lrzzUD4BibXy4Jjinz',
+			answers: ["O-uchi-gari", "O-soto-otoshi", "Koshi-guruma", "Mune-gatame"],
+			correctAnswerIndex: 1
+		},
+		{
+			question: buildQuestion,
+			image: 'https://drive.google.com/uc?export=view&id=1APzyii2ibDU82E_OZXilW3fl7_KZMFSr',
+			answers: ["O-goshi", "Ko-soto-gari", "O-uchi-gari", "Koshi-guruma"],
+			correctAnswerIndex: 2
+		},
+	]
 
 	return (
-		<div className='app'>
-			{showScore ? (
-				<div className='score-section'>
-					<div>
-					You scored {score} out of {items.length}
-					<p>ready to practice more?</p>
-					<BeltSelector data={pageStates} onchange={(e) => {onchange(e) }}></BeltSelector>
-					</div>
-
-				</div>
-			) : (
-				<>
-				{pageStates.selectBelt ? (
-					<BeltSelector data={pageStates} onchange={(e) => {onchange(e) }}></BeltSelector>
-					) : (
-					<>
-						<div className='question-section'>
-							<div className='question-count'>
-								<span>Question {currentQuestion + 1}</span>/{items.length}
-								<span>For {pageStates.color} belt</span>
-							</div>
-							<div className='question-text'>
-								{questionText}
-
-							</div>
-						</div>
-						<div className='answer-section'>
-							{answers.map((answerOption) => (
-								<button onClick={() => handleAnswerOptionClick(answerOption.isCorrect)}>
-									{answerOption.name}
-								</button>
-							))}
-						</div>
-					</>
-					)}
-				</>
-			)}
-		</div>
-	);
+		<Quiz questions={questions}> </Quiz>
+	)
 }

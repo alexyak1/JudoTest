@@ -22,7 +22,6 @@ code {
 }
 
 .app {
-  background-color: #ffffff;
   min-height: 50em;
   border-radius: 15px;
   box-shadow: 10px 10px 42px 0px rgba(0, 0, 0, 0.75);
@@ -72,19 +71,6 @@ code {
   flex-direction: column;
 }
 
-button {
-  width: 100%;
-  font-size: 16px;
-  color: #ffffff;
-  background-color: #282c34;
-  border-radius: 15px;
-  display: flex;
-  padding: 2em;
-  justify-content: flex-start;
-  align-items: center;
-  border: 5px solid #ffffff;
-  cursor: pointer;
-}
 
 .correct {
   background-color: #2f922f;
