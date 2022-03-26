@@ -2,20 +2,16 @@
 
 import React from "react";
 
-export default function BeltSelector(props) {
-    const handleChange = (color) => {
-        props.onchange({
-            "color": color,
-            "selectBelt":false,
-        });
-    }
+export default function BeltSelector({ childToParent }) {
+
+    const beltColor = '';
 
     return (
         <>
-           <h2>Select belt: </h2>
-           <div>
-               <button on onClick={() => handleChange("yellow")}>Yellow</button>
-               <button on onClick={() => handleChange("orange")}>Orange</button>
+            <h2>Select belt: </h2>
+            <div>
+                <button onClick={() => childToParent('yellow')}>Yellow</button>
+                <button onClick={() => childToParent('orange')}>Orange</button>
             </div>
         </>
     );
