@@ -86,7 +86,13 @@ export default function Test() {
 
 		const setBeltColor = (childdata) => {
 			setData(childdata);
-			fetchData(childdata); // included setTechniques
+			fetchData(childdata);
+
+			// timeout to beable load techniques from API.
+			// Good to find how to awoid timeout
+			setTimeout(() => {
+				onNextClick()
+			}, 50);
 		}
 
 		const onNextClick = () => {
@@ -146,9 +152,7 @@ export default function Test() {
 					<h1>Start Quiz</h1>
 					<p>This is a simple Judo quiz.</p>
 					<p>Celect belt color to check your knowlage about judo techniques</p>
-					<BeltSelector setBeltColor={setBeltColor} ></BeltSelector>
-					<button className="start" onClick={onNextClick}>Start</button>
-					<p>color is {beltColor}</p>
+					<BeltSelector setBeltColor={setBeltColor}></BeltSelector>
 				</div >
 			)
 		}
