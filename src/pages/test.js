@@ -6,26 +6,26 @@ export default function Test() {
 	const { useState, useEffect, Fragment } = React
 
 	const Question = ({ question, setAnswerStatus }) => {
-		const [selectedAnswerIndex, setSelectedAnswerIndex] = useState(null)
+		const [selectedAnswer, setSelectedAnswer] = useState(null)
 
 		useEffect(() => {
-			if (selectedAnswerIndex != null) {
-				setAnswerStatus(selectedAnswerIndex === question.correctAnswerIndex)
+			if (selectedAnswer != null) {
+				setAnswerStatus(selectedAnswer === question.correctAnswer)
 			}
-		}, [selectedAnswerIndex, question.correctAnswerIndex, setAnswerStatus])
+		}, [selectedAnswer, question.correctAnswer, setAnswerStatus])
 
 		useEffect(() => {
-			setSelectedAnswerIndex(null)
+			setSelectedAnswer(null)
 		}, [question])
 
-		const getClasses = (index) => {
+		const getClasses = (answer) => {
 			let classes = []
-			if (selectedAnswerIndex != null) {
-				if (selectedAnswerIndex === index) {
+			if (selectedAnswer != null) {
+				if (selectedAnswer === answer) {
 					classes.push("selected")
 				}
-				if (index === question.correctAnswerIndex) {
-					if (selectedAnswerIndex === index) {
+				if (answer === question.correctAnswer) {
+					if (selectedAnswer === answer) {
 						classes.push("correct")
 					} else {
 						classes.push("incorrect")
@@ -38,28 +38,31 @@ export default function Test() {
 
 		return (
 			<div className="question">
-				<div className="questionText">{question.question}</div>
+				<div className="questionText">What is technique on the picture?</div>
 				<img src={question.image} alt="Judo technique"></img>
-				{/* <div className="questionText">{question.image}</div> */}
 				<div className="answers">
 					{question.answers.map((answer, index) => {
-						return <div key={index} className={`answer ${getClasses(index)}`} onClick={() => selectedAnswerIndex == null && setSelectedAnswerIndex(index)}>{answer}</div>
+						return <div
+							key={index}
+							className={`answer ${getClasses(answer)}`}
+							onClick={() => selectedAnswer == null && setSelectedAnswer(answer)}>{answer}
+						</div>
 					})}
 				</div>
 			</div>
 		)
 	}
 
-	const ProgressBar = ({ currentQuestionIndex, totalQuestionsCount }) => {
-		const progressPercentage = (currentQuestionIndex / totalQuestionsCount) * 100
+	const ProgressBar = ({ currentQuestion, totalQuestionsCount }) => {
+		const progressPercentage = (currentQuestion / totalQuestionsCount) * 100
 
 		return <div className="progressBar">
-			<div className="text">{currentQuestionIndex} answered ({totalQuestionsCount - currentQuestionIndex} remaining)</div>
+			<div className="text">{currentQuestion} answered ({totalQuestionsCount - currentQuestion} remaining)</div>
 			<div className="inner" style={{ width: `${progressPercentage}%` }} />
 		</div>
 	}
 
-	const Quiz = ({ questions }) => {
+	const Quiz = () => {
 		const [questionIndex, setQuestionIndex] = useState(null)
 		const [answerStatus, setAnswerStatus] = useState(null)
 		const [correctAnswerCount, setCorrectAnswerCount] = useState(0)
@@ -72,20 +75,22 @@ export default function Test() {
 		}, [questionIndex])
 
 		useEffect(() => {
+			fetchData()
+		}, [])
+
+		useEffect(() => {
 			if (answerStatus) {
 				setCorrectAnswerCount(count => count + 1)
 			}
 		}, [answerStatus])
 
 		const setBeltColor = (childdata) => {
-			console.log("childdata")
-			console.log(childdata)
 			setData(childdata);
 			fetchData(childdata); // included setTechniques
 		}
 
 		const onNextClick = () => {
-			if (questionIndex === questions.length - 1) {
+			if (questionIndex === quizQuestions.length - 1) {
 				setQuizComplete(true)
 			} else {
 				setQuestionIndex(questionIndex == null ? 0 : questionIndex + 1)
@@ -102,8 +107,6 @@ export default function Test() {
 			return fetch("http://localhost:8787/techniques?belt=" + beltColor)
 				.then((response) => response.json())
 				.then(data => {
-					console.log('data')
-					console.log(data)
 					setTechniques(data);
 				})
 				.catch(error => {
@@ -111,25 +114,28 @@ export default function Test() {
 				})
 		}
 
-		console.log("techniques SHOULD BE LAST")
-		console.log(techniques)
-
 		let quizQuestions = []
 		for (var i = 0; i < techniques.length; i++) {
+			const start = `file/d/`;
+			const end = `/view`;
+			const imageId = techniques[i].image_url.split(start)[1].split(end)[0]
 			quizQuestions.push({
-				'image': techniques[i].image_url,
+				'image': 'https://drive.google.com/uc?export=view&id=' + imageId,
 				'correctAnswer': techniques[i].name,
 				'correctAnswerId': i,
 				'wrongAnswers': [
 					techniques[getRandomInt(techniques.length)].name,
 					techniques[getRandomInt(techniques.length)].name,
 					techniques[getRandomInt(techniques.length)].name
+				],
+				'answers': [
+					techniques[getRandomInt(techniques.length)].name,
+					techniques[getRandomInt(techniques.length)].name,
+					techniques[getRandomInt(techniques.length)].name,
+					techniques[i].name
 				]
 			})
 		}
-
-		console.log(quizQuestions)
-		console.log(questions)
 
 		function getRandomInt(max) {
 			return Math.floor(Math.random() * max);
@@ -140,8 +146,8 @@ export default function Test() {
 					<h1>Start Quiz</h1>
 					<p>This is a simple Judo quiz.</p>
 					<p>Celect belt color to check your knowlage about judo techniques</p>
+					<BeltSelector setBeltColor={setBeltColor} ></BeltSelector>
 					<button className="start" onClick={onNextClick}>Start</button>
-					<BeltSelector setBeltColor={setBeltColor}></BeltSelector>
 					<p>color is {beltColor}</p>
 				</div >
 			)
@@ -152,20 +158,20 @@ export default function Test() {
 				{quizComplete ? (
 					<Fragment>
 						<h1>Quiz complete!🥳</h1>
-						<p>You answered {correctAnswerCount} questions correctly (out of a total {questions.length} questions)</p>
+						<p>You answered {correctAnswerCount} questions correctly (out of a total {quizQuestions.length} questions)</p>
 					</Fragment>
 				) : (
 					<Fragment>
-						<ProgressBar currentQuestionIndex={questionIndex} totalQuestionsCount={questions.length} />
+						<ProgressBar currentQuestion={questionIndex} totalQuestionsCount={quizQuestions.length} />
 						<Question
-							question={questions[questionIndex]}
+							question={quizQuestions[questionIndex]}
 							setAnswerStatus={setAnswerStatus}
 						/>
 						{answerStatus != null && (
 							<div>
 								<div className="answerStatus">{!!answerStatus ? "Correct! :)" : "Your answer was incorrect :("}</div>
 								<button className="next" onClick={onNextClick}>
-									{questionIndex === questions.length - 1 ? "See results of this quiz" : "Next Question ->"}
+									{questionIndex === quizQuestions.length - 1 ? "See results of this quiz" : "Next Question ->"}
 								</button>
 							</div>
 						)}
@@ -177,41 +183,7 @@ export default function Test() {
 		)
 	}
 
-
-	var buildQuestion = 'What technique on the picture?'
-
-	const questions = [
-		{
-			question: buildQuestion,
-			image: 'https://drive.google.com/uc?export=view&id=1p3JuGkd533lBv4lrzzUD4BibXy4Jjinz',
-			answers: ["O-uchi-gari", "O-soto-otoshi", "Koshi-guruma", "Mune-gatame"],
-			correctAnswerIndex: 1,
-			color: 'yellow',
-		},
-		{
-			question: buildQuestion,
-			image: 'https://drive.google.com/uc?export=view&id=1APzyii2ibDU82E_OZXilW3fl7_KZMFSr',
-			answers: ["O-goshi", "Ko-soto-gari", "O-uchi-gari", "Koshi-guruma"],
-			correctAnswerIndex: 2,
-			color: 'yellow',
-		},
-		{
-			question: buildQuestion,
-			image: 'https://drive.google.com/uc?export=view&id=1zD67DXdh8AqLsdXXuuoiTcU7z0fkn3Gz',
-			answers: ["Tsuri-komi-goshi", "Kubi-nage", "O-soto-gari", "Harai-goshi"],
-			correctAnswerIndex: 3,
-			color: 'orange',
-		},
-		{
-			question: buildQuestion,
-			image: 'https://drive.google.com/uc?export=view&id=10v5XIdURJXmAFAQC-Mg65RbsFfHPKLWT',
-			answers: ["Kubi-nage", "Morote-seoi-nage", "Koshi-guruma", "Kata-juji-jime"],
-			correctAnswerIndex: 0,
-			color: 'orange',
-		},
-	]
-
 	return (
-		<Quiz questions={questions}> </Quiz>
+		<Quiz> </Quiz>
 	)
 }
