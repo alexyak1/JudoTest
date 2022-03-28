@@ -4,6 +4,42 @@ import '../test.css';
 
 export default function Test() {
 	const { useState, useEffect, Fragment } = React
+	const quizQuestions = [];
+
+	function getTechniques(beltColor) {
+		fetch("http://localhost:8787/techniques?belt=" + beltColor)
+			.then((response) => response.json())
+			.then(data => {
+				quizQuestions = setTechniques(data);
+			})
+			.catch(error => {
+				console.error("Error fething data", error)
+			})
+		return quizQuestions
+	}
+	function setTechniques(techniques) {
+		for (var i = 0; i < techniques.length; i++) {
+			const start = `file/d/`;
+			const end = `/view`;
+			const imageId = techniques[i].image_url.split(start)[1].split(end)[0]
+			const answers = [
+				techniques[getRandomInt(techniques.length)].name,
+				techniques[getRandomInt(techniques.length)].name,
+				techniques[getRandomInt(techniques.length)].name,
+				techniques[i].name
+			]
+			quizQuestions.push({
+				'image': 'https://drive.google.com/uc?export=view&id=' + imageId,
+				'correctAnswer': techniques[i].name,
+				'correctAnswerId': i,
+				'answers': answers.sort(() => Math.random() - 0.5)
+			})
+		}
+		return quizQuestions
+	}
+	function getRandomInt(max) {
+		return Math.floor(Math.random() * max);
+	}
 
 	const Question = ({ question, setAnswerStatus }) => {
 		const [selectedAnswer, setSelectedAnswer] = useState(null)
@@ -68,15 +104,11 @@ export default function Test() {
 		const [correctAnswerCount, setCorrectAnswerCount] = useState(0)
 		const [quizComplete, setQuizComplete] = useState(false)
 		const [beltColor, setData] = useState('');
-		const [techniques, setTechniques] = useState([]);
+		const [quizQuestions, setQuizQuestions] = useState([])
 
 		useEffect(() => {
 			setAnswerStatus(null)
 		}, [questionIndex])
-
-		useEffect(() => {
-			fetchData()
-		}, [])
 
 		useEffect(() => {
 			if (answerStatus) {
@@ -86,10 +118,8 @@ export default function Test() {
 
 		const setBeltColor = (childdata) => {
 			setData(childdata);
-			fetchData(childdata);
-
-			// timeout to beable load techniques from API.
-			// Good to find how to awoid timeout
+			let quizQuestions = getTechniques(childdata)
+			setQuizQuestions(quizQuestions)
 			setTimeout(() => {
 				onNextClick()
 			}, 50);
@@ -109,43 +139,7 @@ export default function Test() {
 			setCorrectAnswerCount(0)
 		}
 
-		const fetchData = (beltColor) => {
-			return fetch("http://localhost:8787/techniques?belt=" + beltColor)
-				.then((response) => response.json())
-				.then(data => {
-					setTechniques(data);
-				})
-				.catch(error => {
-					console.error("Error fething data", error)
-				})
-		}
 
-		let quizQuestions = []
-		for (var i = 0; i < techniques.length; i++) {
-			const start = `file/d/`;
-			const end = `/view`;
-			const imageId = techniques[i].image_url.split(start)[1].split(end)[0]
-			quizQuestions.push({
-				'image': 'https://drive.google.com/uc?export=view&id=' + imageId,
-				'correctAnswer': techniques[i].name,
-				'correctAnswerId': i,
-				'wrongAnswers': [
-					techniques[getRandomInt(techniques.length)].name,
-					techniques[getRandomInt(techniques.length)].name,
-					techniques[getRandomInt(techniques.length)].name
-				],
-				'answers': [
-					techniques[getRandomInt(techniques.length)].name,
-					techniques[getRandomInt(techniques.length)].name,
-					techniques[getRandomInt(techniques.length)].name,
-					techniques[i].name
-				]
-			})
-		}
-
-		function getRandomInt(max) {
-			return Math.floor(Math.random() * max);
-		}
 		if (questionIndex == null) {
 			return (
 				<div className="quiz">
