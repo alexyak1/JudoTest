@@ -119,10 +119,14 @@ export default function Test() {
 		const setBeltColor = (childdata) => {
 			setData(childdata);
 			let quizQuestions = getTechniques(childdata)
-			setQuizQuestions(quizQuestions)
-			setTimeout(() => {
-				onNextClick()
-			}, 50);
+			if (quizQuestions.length > 0) {
+				setQuizQuestions(quizQuestions)
+				setTimeout(() => {
+					onNextClick()
+				}, 50);
+			} else {
+				alert('Problem with fetching techniques. Sorry for that');
+			}
 		}
 
 		const onNextClick = () => {
