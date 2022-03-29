@@ -8,7 +8,12 @@ export default function Test() {
 
 	function getTechniques(beltColor) {
 		fetch("http://localhost:8787/techniques?belt=" + beltColor)
-			.then((response) => response.json())
+			.then(response => {
+				if (!response.ok) {
+					throw new Error(response.statusText)
+				}
+				response.json()
+			})
 			.then(data => {
 				quizQuestions = setTechniques(data);
 			})
@@ -125,7 +130,11 @@ export default function Test() {
 					onNextClick()
 				}, 50);
 			} else {
-				alert('Problem with fetching techniques. Sorry for that');
+				return (
+					<div>
+						problem
+					</div>
+				)
 			}
 		}
 
