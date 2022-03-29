@@ -91,3 +91,14 @@ button:focus {
 button svg {
   margin-right: 5px;
 }
+
+.alert {
+  color: #df3636;
+}
+.alert-message {
+  margin-left: 20%;
+  margin-right: 20%;
+  border-style: solid;
+  border-color: #df3636;
+  text-align: center;
+}

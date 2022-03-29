@@ -21,8 +21,8 @@ export default function Techniques() {
 
     if (items.length == 0) {
         return (
-            <div class="quiz">
-                <h1>Something went wrong</h1>
+            <div class="alert-message">
+                <h1 class="alert">Something went wrong</h1>
                 <p>Could not load judo techniques.
                     We have a problem with DataBase
                 </p>

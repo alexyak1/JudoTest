@@ -1,3 +1,4 @@
+import { render } from "@testing-library/react";
 import React from "react";
 import BeltSelector from "../components/Test/selectBelt"
 import '../test.css';
@@ -19,6 +20,7 @@ export default function Test() {
 			})
 			.catch(error => {
 				console.error("Error fething data", error)
+				return (<>XYU</>)
 			})
 		return quizQuestions
 	}
@@ -125,14 +127,18 @@ export default function Test() {
 			setData(childdata);
 			let quizQuestions = getTechniques(childdata)
 			if (quizQuestions.length > 0) {
+				console.log('not here')
 				setQuizQuestions(quizQuestions)
 				setTimeout(() => {
 					onNextClick()
 				}, 50);
 			} else {
-				return (
-					<div>
-						problem
+				render(
+					<div class="alert-message">
+						<h1 class="alert">Something went wrong</h1>
+						<p>Could not load judo techniques.
+							We have a problem with DataBase
+						</p>
 					</div>
 				)
 			}
@@ -162,6 +168,12 @@ export default function Test() {
 					<BeltSelector setBeltColor={setBeltColor}></BeltSelector>
 				</div >
 			)
+		}
+		console.log("setBeltColor")
+		console.log(setBeltColor)
+		if (setBeltColor == '') {
+			console.log('shouldnt be here')
+			return (<><p>problem</p></>)
 		}
 
 		return (
