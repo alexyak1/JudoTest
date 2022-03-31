@@ -5,17 +5,21 @@ import '../test.css';
 
 export default function Test() {
 	const { useState, useEffect, Fragment } = React
-	const quizQuestions = [];
+	let quizQuestions = [];
 
 	function getTechniques(beltColor) {
-		fetch("http://localhost:8787/techniques?belt=" + beltColor)
+		fetch("https://quiz-judo.herokuapp.com//techniques?belt=" + beltColor)
 			.then(response => {
+				console.log("response")
+				console.log(response)
 				if (!response.ok) {
 					throw new Error(response.statusText)
 				}
 				response.json()
 			})
 			.then(data => {
+				console.log('row data')
+				console.log(data)
 				quizQuestions = setTechniques(data);
 			})
 			.catch(error => {
@@ -25,6 +29,8 @@ export default function Test() {
 		return quizQuestions
 	}
 	function setTechniques(techniques) {
+		console.log("techniques")
+		console.log(techniques)
 		for (var i = 0; i < techniques.length; i++) {
 			const start = `file/d/`;
 			const end = `/view`;
@@ -125,7 +131,11 @@ export default function Test() {
 
 		const setBeltColor = (childdata) => {
 			setData(childdata);
+			console.log("belt collor selected as" + beltColor)
+			console.log(childdata)
 			let quizQuestions = getTechniques(childdata)
+			console.log("quizQuestions")
+			console.log(quizQuestions)
 			if (quizQuestions.length > 0) {
 				console.log('not here')
 				setQuizQuestions(quizQuestions)
@@ -134,8 +144,8 @@ export default function Test() {
 				}, 50);
 			} else {
 				render(
-					<div class="alert-message">
-						<h1 class="alert">Something went wrong</h1>
+					<div className="alert-message">
+						<h1 className="alert">Something went wrong</h1>
 						<p>Could not load judo techniques.
 							We have a problem with DataBase
 						</p>
@@ -171,7 +181,7 @@ export default function Test() {
 		}
 		console.log("setBeltColor")
 		console.log(setBeltColor)
-		if (setBeltColor == '') {
+		if (setBeltColor === '') {
 			console.log('shouldnt be here')
 			return (<><p>problem</p></>)
 		}

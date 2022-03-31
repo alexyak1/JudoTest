@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 
 export default function Techniques() {
-    const url = "http://localhost:8787/techniques";
+    const url = "https://quiz-judo.herokuapp.com/techniques";
     const [items, setItems] = useState([]);
 
     useEffect((setError) => {
@@ -19,10 +19,10 @@ export default function Techniques() {
     }, [])
 
 
-    if (items.length == 0) {
+    if (items.length === 0) {
         return (
-            <div class="alert-message">
-                <h1 class="alert">Something went wrong</h1>
+            <div className="alert-message">
+                <h1 className="alert">Something went wrong</h1>
                 <p>Could not load judo techniques.
                     We have a problem with DataBase
                 </p>
