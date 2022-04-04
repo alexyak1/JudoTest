@@ -18,8 +18,6 @@ export default function Test() {
 				response.json()
 			})
 			.then(data => {
-				console.log('row data')
-				console.log(data)
 				quizQuestions = setTechniques(data);
 			})
 			.catch(error => {
