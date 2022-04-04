@@ -22,12 +22,11 @@ code {
 }
 
 .app {
-  min-height: 50em;
-  border-radius: 15px;
-  box-shadow: 10px 10px 42px 0px rgba(0, 0, 0, 0.75);
-  display: flex;
+  height: 100%;
   align-items: center;
-  justify-content: space-evenly;
+  text-align: center;
+  box-shadow: 10px 10px 42px 0px rgba(0, 0, 0, 0.75);
+  display: block;
 }
 
 .score-section {
@@ -38,9 +37,9 @@ code {
 
 /* QUESTION/TIMER/LEFT SECTION */
 .question-section {
-  width: 100%;
+  width: 90%;
   position: relative;
-  padding-left: 10em;
+  padding-left: 10%;
 }
 
 .question-count {
