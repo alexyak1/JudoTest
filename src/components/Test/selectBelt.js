@@ -4,6 +4,8 @@ import React from "react";
 
 export default function BeltSelector({ setBeltColor }) {
 
+    const beltColor = '';
+
     return (
         <>
             <h2>Select belt: </h2>

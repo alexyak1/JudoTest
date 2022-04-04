@@ -10,26 +10,26 @@ import logo from './../../../src/logo.png'
 const Navbar = () => {
     return (
         <>
-            <Nav>
-                <NavLogo to="/">
-                    <img src={logo} className="App-logo" alt="logo" />
-                </NavLogo>
+           <Nav>
+            <NavLogo to="/">
+                <img src={logo} className="App-logo" alt="logo" />
+            </NavLogo>
 
-                <NavMenu>
-                    <NavLink to="/home" activeStyle>
-                        Home
-                    </NavLink>
-                    <NavLink to="/about" activeStyle>
-                        About
-                    </NavLink>
-                    <NavLink to="/test" activeStyle>
-                        Test
-                    </NavLink>
-                    <NavLink to="/techniques" activeStyle>
-                        Techniques
-                    </NavLink>
-                </NavMenu>
-            </Nav>
+            <NavMenu>
+                <NavLink to="/" activeStyle>
+                    Home
+                </NavLink>
+                <NavLink to="/about" activeStyle>
+                    About
+                </NavLink>
+                <NavLink to="/test" activeStyle>
+                    Test
+                </NavLink>
+                <NavLink to="/techniques" activeStyle>
+                    Techniques
+                </NavLink>
+            </NavMenu>
+           </Nav>
         </>
     );
 };

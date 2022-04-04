@@ -1,34 +1,23 @@
-import { render } from "@testing-library/react";
 import React from "react";
 import BeltSelector from "../components/Test/selectBelt"
 import '../test.css';
 
 export default function Test() {
 	const { useState, useEffect, Fragment } = React
-	let quizQuestions = [];
+	const quizQuestions = [];
 
 	function getTechniques(beltColor) {
-		fetch("https://quiz-judo.herokuapp.com//techniques?belt=" + beltColor)
-			.then(response => {
-				console.log("response")
-				console.log(response)
-				if (!response.ok) {
-					throw new Error(response.statusText)
-				}
-				response.json()
-			})
+		fetch("https://quiz-judo.herokuapp.com/techniques?belt=" + beltColor)
+			.then((response) => response.json())
 			.then(data => {
 				quizQuestions = setTechniques(data);
 			})
 			.catch(error => {
 				console.error("Error fething data", error)
-				return (<>XYU</>)
 			})
 		return quizQuestions
 	}
 	function setTechniques(techniques) {
-		console.log("techniques")
-		console.log(techniques)
 		for (var i = 0; i < techniques.length; i++) {
 			const start = `file/d/`;
 			const end = `/view`;
@@ -59,7 +48,7 @@ export default function Test() {
 			if (selectedAnswer != null) {
 				setAnswerStatus(selectedAnswer === question.correctAnswer)
 			}
-		}, [selectedAnswer, question.correctAnswer, setAnswerStatus])
+		}, [selectedAnswer])
 
 		useEffect(() => {
 			setSelectedAnswer(null)
@@ -83,21 +72,23 @@ export default function Test() {
 			return classes.join(" ")
 		}
 
-		return (
-			<div className="question">
-				<div className="questionText">What is technique on the picture?</div>
-				<img src={question.image} alt="Judo technique"></img>
-				<div className="answers">
-					{question.answers.map((answer, index) => {
-						return <div
-							key={index}
-							className={`answer ${getClasses(answer)}`}
-							onClick={() => selectedAnswer == null && setSelectedAnswer(answer)}>{answer}
-						</div>
-					})}
+		if (question) {
+			return (
+				<div className="question">
+					<div className="questionText">What is technique on the picture?</div>
+					<img src={question.image} alt="Judo technique"></img>
+					<div className="answers">
+						{question.answers.map((answer, index) => {
+							return <div
+								key={index}
+								className={`answer ${getClasses(answer)}`}
+								onClick={() => selectedAnswer == null && setSelectedAnswer(answer)}>{answer}
+							</div>
+						})}
+					</div>
 				</div>
-			</div>
-		)
+			)
+		} else { return (<>Could not load techniques. Please restart the quiz </>) }
 	}
 
 	const ProgressBar = ({ currentQuestion, totalQuestionsCount }) => {
@@ -129,27 +120,11 @@ export default function Test() {
 
 		const setBeltColor = (childdata) => {
 			setData(childdata);
-			console.log("belt collor selected as" + beltColor)
-			console.log(childdata)
 			let quizQuestions = getTechniques(childdata)
-			console.log("quizQuestions")
-			console.log(quizQuestions)
-			if (quizQuestions.length > 0) {
-				console.log('not here')
-				setQuizQuestions(quizQuestions)
-				setTimeout(() => {
-					onNextClick()
-				}, 50);
-			} else {
-				render(
-					<div className="alert-message">
-						<h1 className="alert">Something went wrong</h1>
-						<p>Could not load judo techniques.
-							We have a problem with DataBase
-						</p>
-					</div>
-				)
-			}
+			setQuizQuestions(quizQuestions)
+			setTimeout(() => {
+				onNextClick()
+			}, 400);
 		}
 
 		const onNextClick = () => {
@@ -176,12 +151,6 @@ export default function Test() {
 					<BeltSelector setBeltColor={setBeltColor}></BeltSelector>
 				</div >
 			)
-		}
-		console.log("setBeltColor")
-		console.log(setBeltColor)
-		if (setBeltColor === '') {
-			console.log('shouldnt be here')
-			return (<><p>problem</p></>)
 		}
 
 		return (
