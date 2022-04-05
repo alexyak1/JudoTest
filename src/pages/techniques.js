@@ -22,7 +22,8 @@ export default function Techniques() {
                 {items.map(item => (
                     <div>
                         <p key={item.id}>
-                            <h5>{item.name} belt: {item.belt}</h5>
+                            <h3>{item.name}</h3>
+                            <p>belt: {item.belt}</p>
                         </p>
                         <img
                             src={"https://lh3.googleusercontent.com/d/" + item.image_url.replaceAll('https://drive.google.com/file/d/', '').replaceAll('/view?usp=sharing', '') + "?authuser=0"}
