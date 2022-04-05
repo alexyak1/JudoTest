@@ -5,12 +5,13 @@
 .App-logo {
   height: 40vmin;
   pointer-events: none;
+  padding-left: 2em;
 }
 
 @media (prefers-reduced-motion: no-preference) {
   .App-logo {
-    width: 4%;
-    height: 10%;
+    width: 1.7em;
+    height: 4em;
   }
 }
 
