@@ -2,15 +2,6 @@ html {
   font-family: sans-serif;
 }
 
-h1 {
-  margin: 20px 0;
-}
-
-p {
-  line-height: 1.5em;
-  margin: 0 0 6px 0;
-}
-
 .quiz {
   display: flex;
   flex-direction: column;
