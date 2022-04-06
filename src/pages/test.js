@@ -4,9 +4,10 @@ import '../test.css';
 
 export default function Test() {
 	const { useState, useEffect, Fragment } = React
-	const quizQuestions = [];
+	let quizQuestions = [];
 
 	function getTechniques(beltColor) {
+		quizQuestions.length = 0; //reset quizQuestions before fetch new
 		fetch("https://quiz-judo.herokuapp.com/techniques?belt=" + beltColor)
 			.then((response) => response.json())
 			.then(data => {
