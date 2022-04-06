@@ -10,6 +10,12 @@ body {
   align-items: center;
   min-height: 100vh;
 }
+p, h1 {
+  padding: 0.5em;
+  text-align: left;
+  padding-left:10%;
+  padding-right:10%;
+}
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
@@ -42,7 +48,7 @@ img{
 /* QUESTION/TIMER/LEFT SECTION */
 .question-section {
   width: 90%;
-  position: relative;
+  /* position: relative; */
   padding-left: 10%;
 }
 

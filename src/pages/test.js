@@ -75,7 +75,7 @@ export default function Test() {
 		if (question) {
 			return (
 				<div className="question">
-					<div className="questionText">What is technique on the picture?</div>
+					<div className="questionText">What technique is on the picture?</div>
 					<img src={question.image} alt="Judo technique"></img>
 					<div className="answers">
 						{question.answers.map((answer, index) => {
@@ -147,7 +147,7 @@ export default function Test() {
 				<div className="quiz">
 					<h1>Start Quiz</h1>
 					<p>This is a simple Judo quiz.</p>
-					<p>Celect belt color to check your knowlage about judo techniques</p>
+					<p>Select belt color to check your knowledge about judo techniques</p>
 					<BeltSelector setBeltColor={setBeltColor}></BeltSelector>
 				</div >
 			)
@@ -169,7 +169,6 @@ export default function Test() {
 						/>
 						{answerStatus != null && (
 							<div>
-								<div className="answerStatus">{!!answerStatus ? "Correct! :)" : "Your answer was incorrect :("}</div>
 								<button className="next" onClick={onNextClick}>
 									{questionIndex === quizQuestions.length - 1 ? "See results of this quiz" : "Next Question ->"}
 								</button>
