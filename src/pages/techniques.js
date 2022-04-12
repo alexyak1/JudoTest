@@ -4,7 +4,7 @@ import Select from 'react-select';
 export default function Techniques() {
     const url = "https://quiz-judo.herokuapp.com/techniques";
     const [items, setItems] = useState([]);
-    const [filterParam, setFilterColor] = useState(['yellow']);
+    const [filterParam, setFilterColor] = useState('yellow');
 
     const options = [
         { value: 'yellow', label: 'yellow' },
