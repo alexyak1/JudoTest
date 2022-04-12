@@ -106,7 +106,6 @@ export default function Test() {
 		const [answerStatus, setAnswerStatus] = useState(null)
 		const [correctAnswerCount, setCorrectAnswerCount] = useState(0)
 		const [quizComplete, setQuizComplete] = useState(false)
-		const [beltColor, setData] = useState('');
 		const [quizQuestions, setQuizQuestions] = useState([])
 
 		useEffect(() => {
@@ -120,7 +119,6 @@ export default function Test() {
 		}, [answerStatus])
 
 		const setBeltColor = (childdata) => {
-			setData(childdata);
 			let quizQuestions = getTechniques(childdata)
 			setQuizQuestions(quizQuestions)
 			setTimeout(() => {

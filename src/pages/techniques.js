@@ -40,7 +40,7 @@ export default function Techniques() {
                     </div>
                 </div>
 
-                {items.filter(item => item.belt == filterParam).map(filteredItem => (
+                {items.filter(item => item.belt === filterParam).map(filteredItem => (
                     <div>
                         <p key={filteredItem.id}>
                             <h3>{filteredItem.name}</h3>
