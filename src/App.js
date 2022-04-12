@@ -4,7 +4,7 @@ import Navbar from "./components/Navbar";
 
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Home from './pages';
-import Test from './pages/test';
+import Quiz from './pages/quiz';
 import Techniques from './pages/techniques';
 
 function App() {
@@ -13,7 +13,7 @@ function App() {
       <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/test" element={<Test />} />
+        <Route path="/quiz" element={<Quiz />} />
         <Route path="/techniques" element={<Techniques />} />
       </Routes>
     </Router>
