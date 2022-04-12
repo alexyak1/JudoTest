@@ -46,7 +46,7 @@ export default function Techniques() {
                             <h3>{filteredItem.name}</h3>
                             <p>belt: {filteredItem.belt}</p>
                         </p>
-                        <img
+                        <img className="img-technique"
                             src={"https://lh3.googleusercontent.com/d/" + filteredItem.image_url.replaceAll('https://drive.google.com/file/d/', '').replaceAll('/view?usp=sharing', '') + "?authuser=0"}
                             alt="technique"
                         />
