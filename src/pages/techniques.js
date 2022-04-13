@@ -31,13 +31,12 @@ export default function Techniques() {
         <div className='app'>
             <div>
                 <h2>Here is all techniques:</h2>
-                <div><p>Select belt color</p>
-                    <div className="abc">
-                        <Select
-                            defaultValue={options[0]}
-                            onChange={applyFilter}
-                            options={options} />
-                    </div>
+                <div className="filter-select">
+                    <p>Select belt color</p>
+                    <Select
+                        defaultValue={options[0]}
+                        onChange={applyFilter}
+                        options={options} />
                 </div>
 
                 {items.filter(item => item.belt === filterParam).map(filteredItem => (
