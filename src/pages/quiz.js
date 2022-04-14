@@ -1,5 +1,6 @@
 import React from "react";
 import BeltSelector from "../components/Test/selectBelt"
+import ProgressBar from "../components/Test/progressBar"
 import '../test.css';
 
 export default function Test() {
@@ -90,15 +91,6 @@ export default function Test() {
 				</div>
 			)
 		} else { return (<>Could not load techniques. Please restart the quiz </>) }
-	}
-
-	const ProgressBar = ({ currentQuestion, totalQuestionsCount }) => {
-		const progressPercentage = (currentQuestion / totalQuestionsCount) * 100
-
-		return <div className="progressBar">
-			<div className="text">{currentQuestion} answered ({totalQuestionsCount - currentQuestion} remaining)</div>
-			<div className="inner" style={{ width: `${progressPercentage}%` }} />
-		</div>
 	}
 
 	const Quiz = () => {
