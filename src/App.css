@@ -35,8 +35,6 @@
 
 @media only screen and (min-width: 1024px) {
   .filter-select{
-    /* display: flex; */
-    /* max-width: 60%; */
     padding-left: 30%;
     padding-right: 30%;
   }

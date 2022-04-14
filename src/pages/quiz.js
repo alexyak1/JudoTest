@@ -49,7 +49,7 @@ export default function Test() {
 			if (selectedAnswer != null) {
 				setAnswerStatus(selectedAnswer === question.correctAnswer)
 			}
-		}, [selectedAnswer, question.correctAnswer, setAnswerStatus])
+		}, [selectedAnswer])
 
 		useEffect(() => {
 			setSelectedAnswer(null)
