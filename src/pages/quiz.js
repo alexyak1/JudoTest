@@ -46,10 +46,10 @@ export default function Test() {
 		const [selectedAnswer, setSelectedAnswer] = useState(null)
 
 		useEffect(() => {
-			if (selectedAnswer != null) {
+			if (selectedAnswer != null && question != null) {
 				setAnswerStatus(selectedAnswer === question.correctAnswer)
 			}
-		}, [selectedAnswer])
+		}, [selectedAnswer, setAnswerStatus, question])
 
 		useEffect(() => {
 			setSelectedAnswer(null)
