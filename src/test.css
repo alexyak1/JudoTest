@@ -93,6 +93,15 @@ html {
     align-items: center;
     border-radius: 3px;
   }
+  @media only screen and (min-width: 1024px) {
+    .answers{
+      padding-left: 30%;
+      padding-right: 30%;
+    }
+    .progressBar {
+      width: 55%;
+    }
+  }
 
   .progressBar .inner {
     background: #6ad85c;
