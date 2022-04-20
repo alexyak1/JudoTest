@@ -115,7 +115,7 @@ export default function Test() {
 			setQuizQuestions(quizQuestions)
 			setTimeout(() => {
 				onNextClick()
-			}, 500);
+			}, 600);
 		}
 
 		const onNextClick = () => {
