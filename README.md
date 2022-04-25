@@ -1,3 +1,4 @@
+http://localhost:3000/techniques
 # How to start App
 
 In the project directory, you can run:
