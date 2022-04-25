@@ -9,7 +9,8 @@ export default function Techniques() {
     const options = [
         { value: 'yellow', label: 'yellow' },
         { value: 'orange', label: 'orange' },
-        { value: 'green', label: 'green' }
+        { value: 'green', label: 'green' },
+        { value: 'blue', label: 'blue' },
     ]
 
     const applyFilter = (e) => {
