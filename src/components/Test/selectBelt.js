@@ -12,6 +12,7 @@ export default function BeltSelector({ setBeltColor }) {
                 <button onClick={() => setBeltColor('orange')}>Orange</button>
                 <button onClick={() => setBeltColor('green')}>Green</button>
                 <button onClick={() => setBeltColor('blue')}>Blue</button>
+                <button onClick={() => setBeltColor('brown')}>Brown</button>
             </div>
         </>
     );

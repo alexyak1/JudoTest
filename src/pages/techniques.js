@@ -11,6 +11,7 @@ export default function Techniques() {
         { value: 'orange', label: 'orange' },
         { value: 'green', label: 'green' },
         { value: 'blue', label: 'blue' },
+        { value: 'brown', label: 'brown' },
     ]
 
     const applyFilter = (e) => {
