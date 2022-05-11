@@ -31,7 +31,7 @@ export default function Test() {
 				techniques[i].name
 			]
 			quizQuestions.push({
-				'image': 'https://drive.google.com/uc?export=view&id=' + imageId,
+				'image': './judo_techniques/' + techniques[i].belt + '/' + techniques[i].name + '.gif',
 				'correctAnswer': techniques[i].name,
 				'correctAnswerId': i,
 				'answers': answers.sort(() => Math.random() - 0.5)
@@ -78,7 +78,10 @@ export default function Test() {
 			return (
 				<div className="question">
 					<div className="questionText">What technique is on the picture?</div>
-					<img src={question.image} alt="Judo technique"></img>
+					<img
+						src={require(`${question.image}`).default}
+						alt="Judo technique">
+					</img>
 					<div className="answers">
 						{question.answers.map((answer, index) => {
 							return <div
