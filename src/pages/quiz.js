@@ -21,8 +21,6 @@ export default function Test() {
 	}
 	function setTechniques(techniques) {
 		for (var i = 0; i < techniques.length; i++) {
-			const start = `file/d/`;
-			const end = `/view`;
 			const answers = [
 				techniques[getRandomInt(techniques.length)].name,
 				techniques[getRandomInt(techniques.length)].name,
