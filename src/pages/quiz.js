@@ -23,7 +23,6 @@ export default function Test() {
 		for (var i = 0; i < techniques.length; i++) {
 			const start = `file/d/`;
 			const end = `/view`;
-			const imageId = techniques[i].image_url.split(start)[1].split(end)[0]
 			const answers = [
 				techniques[getRandomInt(techniques.length)].name,
 				techniques[getRandomInt(techniques.length)].name,
