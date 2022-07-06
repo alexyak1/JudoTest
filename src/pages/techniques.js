@@ -20,7 +20,7 @@ export default function Techniques() {
             // borderBottom: '1px dotted pink',
             backgroundColor: state.isSelected ? '#55555e' : '#f3f3f3',
             color: state.isSelected ? 'white' : '#222',
-            padding: 10,
+            padding: 15,
         }),
     };
 
