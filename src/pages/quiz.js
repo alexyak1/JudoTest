@@ -1,7 +1,7 @@
 import React from "react";
 import BeltSelector from "../components/Test/selectBelt"
 import ProgressBar from "../components/Test/progressBar"
-import '../test.css';
+import '../quiz.css';
 
 export default function Test() {
 	const { useState, useEffect, Fragment } = React

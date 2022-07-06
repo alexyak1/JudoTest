@@ -14,6 +14,16 @@ export default function Techniques() {
         { value: 'brown', label: 'brown' },
     ]
 
+    const colourStyles = {
+
+        option: (provided, state) => ({
+            // borderBottom: '1px dotted pink',
+            backgroundColor: state.isSelected ? '#55555e' : '#f3f3f3',
+            color: state.isSelected ? 'white' : '#222',
+            padding: 15,
+        }),
+    };
+
     const applyFilter = (e) => {
         setFilterColor(e.value)
     }
@@ -38,7 +48,8 @@ export default function Techniques() {
                     <Select
                         defaultValue={options[0]}
                         onChange={applyFilter}
-                        options={options} />
+                        options={options}
+                        styles={colourStyles} />
                 </div>
 
                 {items.filter(item => item.belt === filterParam).map(filteredItem => (
