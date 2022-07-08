@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Select from 'react-select';
+import { GrFormUp } from "react-icons/gr";
+import { useMediaQuery } from 'react-responsive';
 
 export default function Techniques() {
     const url = "https://quiz-judo.herokuapp.com/techniques";
@@ -27,6 +29,7 @@ export default function Techniques() {
     const applyFilter = (e) => {
         setFilterColor(e.value)
     }
+    const isMobile = useMediaQuery({ query: `(max-width: 632px)` });
 
     useEffect(() => {
         fetch(url)
@@ -37,7 +40,6 @@ export default function Techniques() {
                 }
             )
     }, [])
-
 
     return (
         <div className='app'>
@@ -58,12 +60,22 @@ export default function Techniques() {
                             <h3>{filteredItem.name}</h3>
                             <p>belt: {filteredItem.belt}</p>
                         </p>
-                        <img className="img-technique"
+                        <img
+                            className="img-technique"
                             src={"https://lh3.googleusercontent.com/d/" + filteredItem.image_url.replaceAll('https://drive.google.com/file/d/', '').replaceAll('/view?usp=sharing', '') + "?authuser=0"}
                             alt="technique"
                         />
                     </div>
                 ))}
+                <div
+                    className="button-to-top"
+                    onClick={() => {
+                        window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+                    }}
+                >
+
+                    {isMobile ? <GrFormUp /> : <button className="button-to-top">Scroll to top</button>}
+                </div>
             </div>
         </div>
     );

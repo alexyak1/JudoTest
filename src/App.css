@@ -33,18 +33,34 @@
   color: #61dafb;
 }
 
+/* screen */
 @media only screen and (min-width: 1024px) {
   .filter-select{
     padding-left: 30%;
     padding-right: 30%;
   }
+
+  .button-to-top {
+    position: fixed;
+    font-size: 15px;
+    bottom: 50px;
+    right: 20%;
+  }
 }
 
+/* phone */
 @media screen and (max-width:632px) {
   .filter-select{
     width: 80%;
     padding-left: 10%;
     padding-right: 10%;
+  }
+
+  .button-to-top {
+    position: fixed;
+    font-size: 30px;
+    bottom: 15px;
+    right: 5%;
   }
 }
 
