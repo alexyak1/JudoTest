@@ -17,7 +17,7 @@ html {
     justify-content: center;
     align-items: center;
     text-align: center;
-    width: 90%;
+    width: 100%;
     margin: auto;
   }
 
@@ -85,7 +85,7 @@ html {
 
   .progressBar {
     width: 100%;
-    background: #f3f3f3;
+    background: gainsboro;
     height: 20px;
     position: relative;
     display: flex;

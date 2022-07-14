@@ -62,7 +62,7 @@ export default function Techniques() {
                         </p>
                         <img
                             className="img-technique"
-                            src={"https://lh3.googleusercontent.com/d/" + filteredItem.image_url.replaceAll('https://drive.google.com/file/d/', '').replaceAll('/view?usp=sharing', '') + "?authuser=0"}
+                            src={require("./judo_techniques/" + filteredItem.belt + "/" + filteredItem.name + ".gif").default}
                             alt="technique"
                         />
                     </div>

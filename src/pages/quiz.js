@@ -76,6 +76,7 @@ export default function Test() {
 				<div className="question">
 					<div className="questionText">What technique is on the picture?</div>
 					<img
+						className="img-technique"
 						src={require(`${question.image}`).default}
 						alt="Judo technique">
 					</img>
@@ -135,7 +136,7 @@ export default function Test() {
 
 		if (questionIndex == null) {
 			return (
-				<div className="quiz">
+				<div className='app'>
 					<h1>Start Quiz</h1>
 					<p>This is a simple Judo quiz.</p>
 					<p>Select belt color to check your knowledge about judo techniques</p>
@@ -145,7 +146,7 @@ export default function Test() {
 		}
 
 		return (
-			<div className="quiz">
+			<div className="quiz app">
 				{quizComplete ? (
 					<Fragment>
 						<h1>Quiz complete!🥳</h1>

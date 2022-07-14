@@ -14,9 +14,6 @@
     height: 4em;
   }
 }
-.img-technique{
-  padding-bottom: 3em;
-}
 
 .App-header {
   background-color: #282c34;
@@ -46,6 +43,10 @@
     bottom: 50px;
     right: 20%;
   }
+  .img-technique{
+    padding-bottom: 3em;
+    width: 40%;
+  }
 }
 
 /* phone */
@@ -59,8 +60,12 @@
   .button-to-top {
     position: fixed;
     font-size: 30px;
-    bottom: 15px;
+    bottom: 10%;
     right: 5%;
+  }
+  .img-technique{
+    padding-bottom: 3em;
+    width: 80%;
   }
 }
 
