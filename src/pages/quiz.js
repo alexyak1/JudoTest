@@ -137,9 +137,8 @@ export default function Test() {
 		if (questionIndex == null) {
 			return (
 				<div className='app'>
-					<h1>Start Quiz</h1>
-					<p>This is a simple Judo quiz.</p>
-					<p>Select belt color to check your knowledge about judo techniques</p>
+					<h1>Start judo quiz</h1>
+					<p>Select belt color to check your knowledge about judo techniques.</p>
 					<BeltSelector setBeltColor={setBeltColor}></BeltSelector>
 				</div >
 			)
