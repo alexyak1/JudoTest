@@ -11,12 +11,12 @@ const Navbar = () => {
     return (
         <div className="navbar">
             <Nav>
-                <NavLogo to="/">
+                <NavLogo to="/home">
                     <img src={logo} className="App-logo" alt="logo" />
                 </NavLogo>
 
                 <NavMenu>
-                    <NavLink to="/">
+                    <NavLink to="/home">
                         Home
                     </NavLink>
                     <NavLink to="/quiz">

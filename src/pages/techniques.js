@@ -39,8 +39,36 @@ export default function Techniques() {
                         options={options}
                         styles={colourStyles} />
                 </div>
+<<<<<<< HEAD
                 <ShowTechniques belt={filterParam} />
                 <ToTop></ToTop>
+=======
+
+                {items.filter(item => item.belt === filterParam).map(filteredItem => (
+                    <div>
+                        <p key={filteredItem.id}>
+                            <h3>{filteredItem.name}</h3>
+                            <p>belt: {filteredItem.belt}</p>
+                        </p>
+                        {console.log("here we are")}
+                        {console.log(filteredItem)}
+                        <img
+                            className="img-technique"
+                            src={"https://drive.google.com/uc?export=view&id=" + "16jwcEta9nsCRQIZqrgxGtQam0mX31EoD"}
+                            alt="technique"
+                        />
+                    </div>
+                ))}
+                <div
+                    className="button-to-top"
+                    onClick={() => {
+                        window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+                    }}
+                >
+
+                    {isMobile ? <GrFormUp /> : <button className="button-to-top">Scroll to top</button>}
+                </div>
+>>>>>>> 607e2e57... idea of main page
             </div>
         </div>
     );
