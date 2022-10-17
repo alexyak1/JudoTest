@@ -1,11 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Select from 'react-select';
-import { GrFormUp } from "react-icons/gr";
-import { useMediaQuery } from 'react-responsive';
+import { ShowTechniques } from "../components/ShowTechniques";
+import { ToTop } from "../components/NavigationComponents/toTop";
 
 export default function Techniques() {
-    const url = "https://quiz-judo.herokuapp.com/techniques";
-    const [items, setItems] = useState([]);
     const [filterParam, setFilterColor] = useState('yellow');
 
     const options = [
@@ -18,8 +16,7 @@ export default function Techniques() {
 
     const colourStyles = {
 
-        option: (provided, state) => ({
-            // borderBottom: '1px dotted pink',
+        option: (state) => ({
             backgroundColor: state.isSelected ? '#55555e' : '#f3f3f3',
             color: state.isSelected ? 'white' : '#222',
             padding: 15,
@@ -29,17 +26,6 @@ export default function Techniques() {
     const applyFilter = (e) => {
         setFilterColor(e.value)
     }
-    const isMobile = useMediaQuery({ query: `(max-width: 632px)` });
-
-    useEffect(() => {
-        fetch(url)
-            .then(res => res.json())
-            .then(
-                (result) => {
-                    setItems(result)
-                }
-            )
-    }, [])
 
     return (
         <div className='app'>
@@ -53,29 +39,8 @@ export default function Techniques() {
                         options={options}
                         styles={colourStyles} />
                 </div>
-
-                {items.filter(item => item.belt === filterParam).map(filteredItem => (
-                    <div>
-                        <p key={filteredItem.id}>
-                            <h3>{filteredItem.name}</h3>
-                            <p>belt: {filteredItem.belt}</p>
-                        </p>
-                        <img
-                            className="img-technique"
-                            src={require("./judo_techniques/" + filteredItem.belt + "/" + filteredItem.name + ".gif").default}
-                            alt="technique"
-                        />
-                    </div>
-                ))}
-                <div
-                    className="button-to-top"
-                    onClick={() => {
-                        window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
-                    }}
-                >
-
-                    {isMobile ? <GrFormUp /> : <button className="button-to-top">Scroll to top</button>}
-                </div>
+                <ShowTechniques belt={filterParam} />
+                <ToTop></ToTop>
             </div>
         </div>
     );
