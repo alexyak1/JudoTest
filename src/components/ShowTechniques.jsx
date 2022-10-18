@@ -15,7 +15,6 @@ function ShowTechniques({belt}) {
 
     return (
         <div>
-            {console.log(items)}
             {items.length} techniques for {belt} belt
 
             {items.map(filteredItem => (
@@ -25,7 +24,7 @@ function ShowTechniques({belt}) {
                         </p>
                         <img
                             className="img-technique"
-                            src={require("./judo_techniques/" + filteredItem.belt + "/" + filteredItem.name + ".gif").default}
+                            src={require("../pages/judo_techniques/" + filteredItem.belt + "/" + filteredItem.name + ".gif").default}
                             alt="technique"
                         />
                     </div>
