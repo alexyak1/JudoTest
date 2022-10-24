@@ -7,18 +7,15 @@ export default function Test() {
 	const { useState, useEffect, Fragment } = React
 	let quizQuestions = [];
 
-	function getTechniques(beltColor) {
+	async function getTechniques(beltColor) {
 		quizQuestions.length = 0; //reset quizQuestions before fetch new
-		fetch("https://quiz-judo.herokuapp.com/techniques?belt=" + beltColor)
-			.then((response) => response.json())
-			.then(data => {
-				quizQuestions = setTechniques(data);
-			})
-			.catch(error => {
-				console.error("Error fething data", error)
-			})
+		const response = await fetch("https://quiz-judo.herokuapp.com/techniques?belt=" + beltColor)
+		const data = await response.json()
+
+		setTechniques(data)
 		return quizQuestions
 	}
+
 	function setTechniques(techniques) {
 		for (var i = 0; i < techniques.length; i++) {
 			const answers = [
@@ -36,6 +33,7 @@ export default function Test() {
 		}
 		return quizQuestions
 	}
+
 	function getRandomInt(max) {
 		return Math.floor(Math.random() * max);
 	}
@@ -111,12 +109,10 @@ export default function Test() {
 			}
 		}, [answerStatus])
 
-		const setBeltColor = (childdata) => {
-			let quizQuestions = getTechniques(childdata)
+		async function setBeltColor(childdata) {
+			let quizQuestions = await getTechniques(childdata)
 			setQuizQuestions(quizQuestions)
-			setTimeout(() => {
-				onNextClick()
-			}, 600);
+			onNextClick()
 		}
 
 		const onNextClick = () => {
