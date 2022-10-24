@@ -1,3 +1,7 @@
+# Judo quiz
+
+Collection of judo techniques
+
 # How to start App
 
 In the project directory, you can run:
