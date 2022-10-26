@@ -18,10 +18,8 @@ function ShowTechniques({belt}) {
             {items.length} techniques for {belt} belt
 
             {items.map(filteredItem => (
-                    <div>
-                        <p key={filteredItem.id}>
-                            <h3>{filteredItem.name}</h3>
-                        </p>
+                    <div key={filteredItem.id}>
+                        <h3>{filteredItem.name}</h3>
                         <img
                             className="img-technique"
                             src={require("../pages/judo_techniques/" + filteredItem.belt + "/" + filteredItem.name + ".gif").default}
