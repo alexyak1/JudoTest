@@ -78,11 +78,6 @@ html {
     font-weight: bold;
   }
 
-  .answerStatus {
-    font-weight: bold;
-    margin-bottom: 20px;
-  }
-
   .progressBar {
     width: 100%;
     background: gainsboro;
