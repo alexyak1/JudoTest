@@ -1,115 +1,126 @@
-html {
-    font-family: sans-serif;
-  }
-
-  h1 {
-    margin: 20px 0;
-  }
-
-  p {
-    line-height: 1.5em;
-    margin: 0 0 6px 0;
-  }
-
-  .quiz {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    width: 100%;
-    margin: auto;
-  }
-
-  button {
-    background: #f3f3f3;
-    border: 0;
-    padding: 10px 20px;
-    cursor: pointer;
-    border-bottom: 3px solid #c9c9c9;
-    border-radius: 3px;
-  }
-
-  button.next {
-    background: #6ad85c;
-    border-bottom: 3px solid #5abc4e;
-  }
-
-  button.start,
-  button.restart {
-    margin-top: 20px;
-  }
-
-  .question {
-    width: 100%;
-  }
-
-  .questionText {
-    font-size: 1.2em;
-    margin: 20px 0;
-  }
-
+@media only screen and (min-width: 1024px) {
   .answers {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     margin-bottom: 20px;
+    padding-left: 30%;
+    padding-right: 30%;
   }
 
-  .answer {
-    height: 2em;
-    padding: 2px;
-    text-align: center;
-    background: #f3f3f3;
-    margin-bottom: 4px;
-    border-radius: 3px;
-    cursor: pointer;
-    padding-top: 1em;
-  }
-
-  .answer.selected {
-    background: gainsboro;
-  }
-
-  .answer.correct {
-    background: #6ad85c;
-    font-weight: bold;
-  }
-
-  .answer.incorrect {
-    background: #df3636;
-    font-weight: bold;
+  .vote-answers {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    padding-left: 25%;
   }
 
   .progressBar {
-    width: 100%;
-    background: gainsboro;
-    height: 20px;
-    position: relative;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: 3px;
+    width: 55%;
   }
-  @media only screen and (min-width: 1024px) {
-    .answers{
-      padding-left: 30%;
-      padding-right: 30%;
-    }
-    .progressBar {
-      width: 55%;
-    }
-  }
+}
 
-  .progressBar .inner {
-    background: #6ad85c;
-    position: absolute;
-    height: 100%;
-    top: 0;
-    left: 0;
-    transition: ease all 0.5s;
-    border-radius: 3px;
-  }
+html {
+  font-family: sans-serif;
+}
 
-  .progressBar .text {
-    font-size: 0.7em;
-    position: absolute;
-    z-index: 10;
-  }
+h1 {
+  margin: 20px 0;
+}
+
+p {
+  line-height: 1.5em;
+  margin: 0 0 6px 0;
+}
+
+.quiz {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  width: 100%;
+  margin: auto;
+}
+
+button {
+  background: #f3f3f3;
+  border: 0;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-bottom: 3px solid #c9c9c9;
+  border-radius: 3px;
+}
+
+button.next {
+  background: #6ad85c;
+  border-bottom: 3px solid #5abc4e;
+}
+
+button.start,
+button.restart {
+  margin-top: 20px;
+}
+
+.question {
+  width: 100%;
+}
+
+.questionText {
+  font-size: 1.2em;
+  margin: 20px 0;
+}
+
+.answer {
+  height: 2em;
+  padding: 2px;
+  text-align: center;
+  background: #f3f3f3;
+  margin-bottom: 4px;
+  border-radius: 3px;
+  cursor: pointer;
+  padding-top: 1em;
+}
+
+.answer.selected {
+  background: gainsboro;
+}
+.answer:hover {
+  background: gainsboro;
+}
+
+.answer.correct {
+  background: #6ad85c;
+  font-weight: bold;
+}
+
+.answer.incorrect {
+  background: #df3636;
+  font-weight: bold;
+}
+
+.progressBar {
+  width: 100%;
+  background: gainsboro;
+  height: 20px;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 3px;
+}
+
+
+.progressBar .inner {
+  background: #6ad85c;
+  position: absolute;
+  height: 100%;
+  top: 0;
+  left: 0;
+  transition: ease all 0.5s;
+  border-radius: 3px;
+}
+
+.progressBar .text {
+  font-size: 0.7em;
+  position: absolute;
+  z-index: 10;
+}

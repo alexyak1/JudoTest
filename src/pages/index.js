@@ -1,13 +1,23 @@
 import React from 'react';
+import { VoteTechnique } from '../components/VoteTechnique';
+import YoutubeEmbed from '../components/YoutubeEmbed';
+
+const title = "KRAKOW WORLD CHAMPIONSHIPS VETERANS"
+const date = "2022 Poland September 8-11"
+const embedId = "eNS8lVEuFEw"
+
+const quizQuestions = ['tomoe-nage', 'o-soto-o-toshi', 'kuzure-keso-gatame', 'ippon-seo-nage']
+
 
 const Home = () => {
   return (
-    <div className="homePageText app">
-      <h1 className="homePageText">Welcome 柔道家</h1>
-      <p className="homePageText">Juudouka, 柔 juu (mjuk) + 道 dou (väg) + 家 ka (person).</p>
-      <p className="homePageText">In this website you will find information about judo which should help you at exam for next belt</p>
-      <p className="homePageText">Under Quiz tab you can practice in judo quiz</p>
-      <p className="homePageText">Techniques tab collected all techniques which needed for selected belt</p>
+    <div>
+      <h2 className='title'>{title}</h2>
+      <p className='title'>{date}</p>
+
+      <YoutubeEmbed embedId={embedId} />
+      <h4 className='title'>Vote which thow it was</h4>
+      <VoteTechnique voteСandidate={quizQuestions} />
     </div >
   );
 };
