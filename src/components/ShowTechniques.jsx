@@ -22,7 +22,7 @@ function ShowTechniques({belt}) {
                         <h3>{filteredItem.name}</h3>
                         <img
                             className="img-technique"
-                            src={require("../pages/judo_techniques/" + filteredItem.belt + "/" + filteredItem.name + ".gif").default}
+                            src={require("../pages/judo_techniques/" + filteredItem.belt + "/" + filteredItem.name + ".gif")}
                             alt="technique"
                         />
                     </div>

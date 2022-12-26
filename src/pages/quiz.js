@@ -75,7 +75,7 @@ export default function Test() {
 					<div className="questionText">What technique is on the picture?</div>
 					<img
 						className="img-technique"
-						src={require(`${question.image}`).default}
+						src={require(`${question.image}`)}
 						alt="Judo technique">
 					</img>
 					<div className="answers">
