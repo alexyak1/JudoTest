@@ -50,7 +50,7 @@
 }
 
 /* phone */
-@media screen and (max-width:632px) {
+@media screen and (max-width:1020px) {
   .filter-select{
     width: 80%;
     padding-left: 10%;
