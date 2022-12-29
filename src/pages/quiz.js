@@ -5,10 +5,8 @@ import '../quiz.css';
 
 export default function Test() {
 	const { useState, useEffect, Fragment } = React
-	// let quizQuestions = [];
 
 	async function getTechniques(beltColor) {
-		// quizQuestions.length = 0; //reset quizQuestions before fetch new
 		const response = await fetch("https://quiz-judo.herokuapp.com/techniques?belt=" + beltColor)
 		const data = await response.json()
 
