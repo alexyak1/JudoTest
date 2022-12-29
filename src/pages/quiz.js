@@ -5,18 +5,18 @@ import '../quiz.css';
 
 export default function Test() {
 	const { useState, useEffect, Fragment } = React
-	let quizQuestions = [];
+	// let quizQuestions = [];
 
 	async function getTechniques(beltColor) {
-		quizQuestions.length = 0; //reset quizQuestions before fetch new
+		// quizQuestions.length = 0; //reset quizQuestions before fetch new
 		const response = await fetch("https://quiz-judo.herokuapp.com/techniques?belt=" + beltColor)
 		const data = await response.json()
 
-		setTechniques(data)
-		return quizQuestions
+		return setTechniques(data)
 	}
 
 	function setTechniques(techniques) {
+		let quizQuestions = [];
 		for (var i = 0; i < techniques.length; i++) {
 			const answers = [
 				techniques[getRandomInt(techniques.length)].name,
