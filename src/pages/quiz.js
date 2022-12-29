@@ -16,10 +16,11 @@ export default function Test() {
 	function setTechniques(techniques) {
 		let quizQuestions = [];
 		for (var i = 0; i < techniques.length; i++) {
+			let threeRandomNumbers = getRandom3Int(techniques.length, i)
 			const answers = [
-				techniques[getRandomInt(techniques.length)].name,
-				techniques[getRandomInt(techniques.length)].name,
-				techniques[getRandomInt(techniques.length)].name,
+				techniques[threeRandomNumbers[0]].name,
+				techniques[threeRandomNumbers[1]].name,
+				techniques[threeRandomNumbers[2]].name,
 				techniques[i].name
 			]
 			quizQuestions.push({
@@ -32,8 +33,16 @@ export default function Test() {
 		return quizQuestions
 	}
 
-	function getRandomInt(max) {
-		return Math.floor(Math.random() * max);
+	function getRandom3Int(max, exeption) {
+
+		let first = Math.floor(Math.random() * max)
+		first = exeption === first ?  Math.floor(Math.random() * max) : first
+		let second = Math.floor(Math.random() * max)
+		second = second === first || second === exeption ?  Math.floor(Math.random() * max) : second
+		let third = Math.floor(Math.random() * max)
+		third = third === first || third === second || third === exeption ? Math.floor(Math.random() * max) : third
+
+		return [first, second, third]
 	}
 
 	const Question = ({ question, setAnswerStatus }) => {
