@@ -46,6 +46,7 @@
   .img-technique{
     padding-bottom: 3em;
     width: 40%;
+    max-height: 432px;
   }
 }
 
@@ -66,6 +67,7 @@
   .img-technique{
     padding-bottom: 3em;
     width: 80%;
+    max-height: 432px;
   }
 }
 
