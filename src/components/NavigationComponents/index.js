@@ -25,6 +25,9 @@ const Navbar = () => {
                     <NavLink to="/techniques">
                         Techniques
                     </NavLink>
+                    <NavLink to="/kata">
+                        Kata<sub style={{color:'red', fontSize: 10, marginTop:-15}}>beta</sub>
+                    </NavLink>
                 </NavMenu>
             </Nav>
         </div>
