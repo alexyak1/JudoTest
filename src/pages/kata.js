@@ -42,6 +42,14 @@ export default function Kata() {
                 {kata_series.map(kata_serie => (
                     <div>
                         <h2>{kata_serie}</h2>
+                        <hr
+                            style={{
+                            background: "black",
+                            height: "1px",
+                            width: "40%",
+                            border: "none",
+                            }}
+                        />
                         <ShowKataTechniques kataType={kata_serie} />
                     </div>
                 ))}
