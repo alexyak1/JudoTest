@@ -9,16 +9,13 @@ import logo from './../../../src/logo.png'
 
 const Navbar = () => {
     return (
-        <div className="navbar">
+        <div>
             <Nav>
                 <NavLogo to="/techniques">
                     <img src={logo} className="App-logo" alt="logo" />
                 </NavLogo>
 
                 <NavMenu>
-                    <NavLink to="/quiz">
-                        Home
-                    </NavLink>
                     <NavLink to="/quiz">
                         Quiz
                     </NavLink>

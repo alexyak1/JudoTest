@@ -1,6 +1,7 @@
 import React from "react";
 import './App.css';
 import Navbar from "./components/NavigationComponents";
+import Footer from "./components/NavigationComponents/footer";
 
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Quiz from './pages/quiz';
@@ -17,6 +18,7 @@ function App() {
         <Route path="/techniques" element={<Techniques />} />
         <Route path="/kata" element={<Kata />} />
       </Routes>
+      <Footer/>
     </Router>
   );
 }
