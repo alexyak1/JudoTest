@@ -8,7 +8,7 @@ const Footer = () => {
                 padding: "3%",
                 textAlign: "center",
             }}>
-             For ideas and feedback please rich me out via email: iakimchuk.a@gmail.com </p>
+             For ideas and feedback please reach me out via email: iakimchuk.a@gmail.com </p>
         </div>
     );
 };
