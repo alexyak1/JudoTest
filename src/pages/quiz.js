@@ -177,6 +177,9 @@ export default function Test() {
 	}
 
 	return (
-		<Quiz> </Quiz>
+		<div>
+			<title>Judo quiz | Quiz </title>
+			<Quiz> </Quiz>
+		</div>
 	)
 }

@@ -29,6 +29,7 @@ export default function Techniques() {
 
     return (
         <div className='app'>
+            <title>Judo quiz | Techniques </title>
             <div>
                 <h2>Here is all techniques:</h2>
                 <div className="filter-select">

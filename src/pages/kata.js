@@ -28,6 +28,7 @@ export default function Kata() {
 
     return (
         <div className='app'>
+        <title>Judo quiz | Kata</title>
             <div>
                 <h2>Techniques for {filterParam}:</h2>
                 <div className="filter-select">
