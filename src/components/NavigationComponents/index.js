@@ -23,7 +23,7 @@ const Navbar = () => {
                         Techniques
                     </NavLink>
                     <NavLink to="/kata">
-                        Kata<sub style={{color:'red', fontSize: 10, marginTop:-15}}>New</sub>
+                        Kata
                     </NavLink>
                 </NavMenu>
             </Nav>
