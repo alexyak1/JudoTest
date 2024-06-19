@@ -7,7 +7,7 @@ export default function Test() {
 	const { useState, useEffect, Fragment } = React
 
 	async function getTechniques(beltColor) {
-		const response = await fetch("https://quiz-judo.herokuapp.com/techniques?belt=" + beltColor)
+		const response = await fetch("http://35.228.96.180:8787/techniques?belt=" + beltColor)
 		const data = await response.json()
 
 		return setTechniques(data)

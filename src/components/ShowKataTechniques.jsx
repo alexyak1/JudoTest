@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 function ShowKataTechniques({kataType}) {
     const [items, setItems] = useState([]);
     useEffect(() => {
-        fetch("https://quiz-judo.herokuapp.com/kata?type="+kataType)
+        fetch("http://35.228.96.180:8787/kata?type="+kataType)
             .then(res => res.json())
             .then(
                 (result) => {
