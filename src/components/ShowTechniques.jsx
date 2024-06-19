@@ -4,7 +4,7 @@ function ShowTechniques({belt}) {
     const [items, setItems] = useState([]);
 
     useEffect(() => {
-        fetch("https://35.228.96.180:8787/techniques?belt="+belt)
+        fetch("http://35.228.96.180:8787/techniques?belt="+belt)
             .then(res => res.json())
             .then(
                 (result) => {
