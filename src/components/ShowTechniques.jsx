@@ -4,7 +4,7 @@ function ShowTechniques({belt}) {
     const [items, setItems] = useState([]);
 
     useEffect(() => {
-        fetch("https://judoquiz.com/techniques?belt="+belt)
+        fetch("https://35.228.96.180:8787/techniques?belt="+belt)
             .then(res => res.json())
             .then(
                 (result) => {
