@@ -1,34 +1,20 @@
-@media only screen and (min-width: 1024px) {
-  .answers {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    margin-bottom: 20px;
-    padding-left: 30%;
-    padding-right: 30%;
-  }
-
-  .vote-answers {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    padding-left: 25%;
-  }
-
-  .progressBar {
-    width: 55%;
-  }
-}
-
+/* Global Settings */
 html {
-  font-family: sans-serif;
+  font-family: 'Roboto', sans-serif;
+  line-height: 1.6;
+  background-color: #f4f7fb;
+  color: #333;
 }
 
 h1 {
+  font-size: 2.5em;
+  color: #4A90E2;
   margin: 20px 0;
 }
 
 p {
-  line-height: 1.5em;
-  margin: 0 0 6px 0;
+  line-height: 1.8em;
+  margin: 0 0 16px 0;
 }
 
 .quiz {
@@ -38,26 +24,60 @@ p {
   align-items: center;
   text-align: center;
   width: 100%;
+  max-width: 1200px;
   margin: auto;
+  padding: 20px;
 }
 
+/* Button Styling */
 button {
-  background: #f3f3f3;
-  border: 0;
-  padding: 10px 20px;
+  background: linear-gradient(145deg, #f3f3f3, #e2e2e2);
+  border: none;
+  padding: 12px 30px;
   cursor: pointer;
-  border-bottom: 3px solid #c9c9c9;
-  border-radius: 3px;
+  border-radius: 8px;
+  font-weight: 600;
+  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease-in-out;
+}
+
+button:hover {
+  background: linear-gradient(145deg, #e2e2e2, #f3f3f3);
+  transform: translateY(-2px);
+}
+
+button:active {
+  transform: translateY(1px);
 }
 
 button.next {
-  background: #6ad85c;
-  border-bottom: 3px solid #5abc4e;
+  background: linear-gradient(145deg, #6ad85c, #5abc4e);
+  border-bottom: 4px solid #4f9e42;
 }
 
 button.start,
 button.restart {
   margin-top: 20px;
+  background: linear-gradient(145deg, #ff9800, #f57c00);
+  border-bottom: 4px solid #e65100;
+}
+
+/* Layout and Responsiveness */
+@media only screen and (min-width: 1024px) {
+
+  .answers,
+  .vote-answers {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+    padding-left: 15%;
+    padding-right: 15%;
+  }
+
+  .progressBar {
+    width: 70%;
+  }
 }
 
 .question {
@@ -65,62 +85,77 @@ button.restart {
 }
 
 .questionText {
-  font-size: 1.2em;
+  font-size: 1.4em;
+  font-weight: 500;
   margin: 20px 0;
+  color: #333;
 }
 
+/* Answer Style */
 .answer {
-  height: 2em;
-  padding: 2px;
+  height: 3em;
+  padding: 10px;
   text-align: center;
-  background: #f3f3f3;
-  margin-bottom: 4px;
-  border-radius: 3px;
+  background: #f4f7fb;
+  margin-bottom: 10px;
+  border-radius: 8px;
   cursor: pointer;
-  padding-top: 1em;
+  transition: background 0.3s ease, transform 0.3s ease;
+}
+
+.answer:hover {
+  background: #eaeaea;
+  transform: scale(1.03);
 }
 
 .answer.selected {
-  background: gainsboro;
-}
-.answer:hover {
-  background: gainsboro;
+  background: #c8c8c8;
 }
 
 .answer.correct {
   background: #6ad85c;
   font-weight: bold;
+  transform: scale(1.05);
 }
 
 .answer.incorrect {
   background: #df3636;
   font-weight: bold;
+  transform: scale(1.05);
 }
 
+/* Progress Bar Styling */
 .progressBar {
   width: 100%;
-  background: gainsboro;
-  height: 20px;
+  background: #eaeaea;
+  height: 18px;
   position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border-radius: 3px;
+  border-radius: 8px;
+  overflow: hidden;
 }
-
 
 .progressBar .inner {
   background: #6ad85c;
-  position: absolute;
   height: 100%;
+  position: absolute;
   top: 0;
   left: 0;
-  transition: ease all 0.5s;
-  border-radius: 3px;
+  transition: width 0.5s ease;
+  border-radius: 8px;
 }
 
 .progressBar .text {
-  font-size: 0.7em;
+  font-size: 0.8em;
   position: absolute;
   z-index: 10;
+  color: #fff;
+  font-weight: 600;
+  padding: 0 10px;
+}
+
+/* Modernize the layout on larger screens */
+@media only screen and (min-width: 768px) {
+  .quiz {
+    width: 80%;
+  }
 }
