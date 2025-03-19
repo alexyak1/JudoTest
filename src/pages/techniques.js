@@ -12,36 +12,44 @@ export default function Techniques() {
         { value: 'green', label: 'green' },
         { value: 'blue', label: 'blue' },
         { value: 'brown', label: 'brown' },
-    ]
+    ];
 
     const colourStyles = {
-
         option: (state) => ({
             backgroundColor: state.isSelected ? '#55555e' : '#f3f3f3',
             color: state.isSelected ? 'white' : '#222',
             padding: 15,
         }),
+        control: (base) => ({
+            ...base,
+            width: '100%',
+            minHeight: '36px',
+            padding: '5px 10px',
+        }),
     };
 
     const applyFilter = (e) => {
-        setFilterColor(e.value)
-    }
+        setFilterColor(e.value);
+    };
 
     return (
         <div className='app'>
-            <title>Judo quiz | Techniques </title>
+            <title>Judo quiz | Techniques</title>
             <div>
-                <h2>Here is all techniques:</h2>
+                <h2>Here are all techniques:</h2>
                 <div className="filter-select">
-                    <p>Select belt color</p>
+                    <label htmlFor="belt-select" className="sr-only">Select belt color</label>
                     <Select
-                        defaultValue={options[0]}
+                        id="belt-select"
+                        value={options.find(option => option.value === filterParam)}  // Ensures the selected value is reflected
                         onChange={applyFilter}
                         options={options}
-                        styles={colourStyles} />
+                        styles={colourStyles}
+                        aria-labelledby="belt-select"
+                    />
                 </div>
                 <ShowTechniques belt={filterParam} />
-                <ToTop></ToTop>
+                <ToTop />
             </div>
         </div>
     );
