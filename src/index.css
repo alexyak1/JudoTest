@@ -1,33 +1,45 @@
-
 /* screen */
 @media only screen and (min-width: 1024px) {
   .homePageText {
     padding: 0.5em;
     text-align: left;
-    padding-left:13%;
+    padding-left: 13%;
+    font-size: 1.1em;
+    line-height: 1.6;
+    color: #333;
   }
 }
 
 /* phone */
-@media screen and (max-width:632px) {
+@media screen and (max-width: 632px) {
   .homePageText {
     padding: 0.5em;
     text-align: left;
-    padding-left:5%;
+    padding-left: 5%;
+    font-size: 1.0em;
+    line-height: 1.5;
+    color: #444;
   }
 
   .video-responsive iframe {
     width: 100%;
+    height: auto;
     position: relative;
   }
 }
 
 .video-responsive iframe {
   padding-bottom: 3em;
+  border: none;
+  border-radius: 8px;
 }
 
 .title {
   text-align: center;
+  font-size: 1.5em;
+  font-weight: 600;
+  color: #444;
+  margin: 1em 0;
 }
 
 body {
@@ -38,6 +50,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: #f7f8f9;
+  display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
@@ -46,6 +59,7 @@ body {
 * {
   font-family: "Verdana", cursive, sans-serif;
   color: #222;
+  box-sizing: border-box;
 }
 
 .app {
@@ -56,24 +70,50 @@ body {
   padding-top: 4px;
   padding-bottom: 40px;
   display: block;
+  background: white;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 1200px;
 }
 
 /* ANSWERS/RIGHT SECTION */
 .answer-section {
   width: 100%;
   flex-direction: column;
+  padding: 1em;
+  display: flex;
+  justify-content: center;
 }
 
 .correct {
   background-color: #2f922f;
+  color: white;
+  font-weight: bold;
+  padding: 0.5em;
+  border-radius: 5px;
 }
 
 .incorrect {
   background-color: #ff3333;
+  color: white;
+  font-weight: bold;
+  padding: 0.5em;
+  border-radius: 5px;
+}
+
+button {
+  background-color: #f3f3f3;
+  border: 0;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 3px;
+  margin: 10px 0;
+  transition: background-color 0.3s ease;
 }
 
 button:hover {
   background-color: #55555e;
+  color: white;
 }
 
 button svg {
