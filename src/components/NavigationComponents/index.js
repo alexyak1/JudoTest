@@ -5,29 +5,35 @@ import {
     NavLink,
     NavMenu,
 } from "./NavbarElements.js";
-import logo from './../../../src/logo.png'
+import styled from "styled-components";
+import logo from "./../../../src/logo.png";
+
+const LogoImage = styled.img`
+    height: 50px;
+    width: auto;
+    max-width: 150px;
+`;
 
 const Navbar = () => {
     return (
-        <div>
-            <Nav>
-                <NavLogo to="/techniques">
-                    <img src={logo} className="App-logo" alt="logo" />
-                </NavLogo>
+        <Nav>
+            <NavLogo to="/techniques" aria-label="Go to Techniques Page">
+                <LogoImage src={logo} alt="Judo Techniques Logo" />
+            </NavLogo>
 
-                <NavMenu>
-                    <NavLink to="/quiz">
-                        Quiz
-                    </NavLink>
-                    <NavLink to="/techniques">
-                        Techniques
-                    </NavLink>
-                    <NavLink to="/kata">
-                        Kata
-                    </NavLink>
-                </NavMenu>
-            </Nav>
-        </div>
+            <NavMenu>
+                <NavLink to="/quiz">
+                    Quiz
+                </NavLink>
+                <NavLink to="/techniques">
+                    Techniques
+                </NavLink>
+                <NavLink to="/kata">
+                    Kata
+                </NavLink>
+            </NavMenu>
+        </Nav>
     );
 };
+
 export default Navbar;
