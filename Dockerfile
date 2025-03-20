@@ -1,5 +1,5 @@
-# Use the official Node.js 14 image
-FROM node:14
+# Use the official Node.js 18 image
+FROM node:18
 
 # Create and change to the app directory
 WORKDIR /app
