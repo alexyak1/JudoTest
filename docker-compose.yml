@@ -4,6 +4,10 @@ services:
   react-app:
     build: .
     ports:
-      - "80:3000" # Expose port 80 on the host and map it to port 3000 inside the container
+      - "80:3000" # only for HTTP
+      - "443:3000" # Expose HTTPS port
     environment:
       - CHOKIDAR_USEPOLLING=true
+    volumes:
+      - /etc/letsencrypt:/etc/letsencrypt:ro # Mount the SSL certificates directory
+    command: [ "npm", "run", "start:https" ]
