@@ -9,9 +9,8 @@ import Kata from "./pages/kata";
 
 function App() {
   useEffect(() => {
-    // Redirect HTTPS to HTTP if the protocol is HTTPS
     if (window.location.protocol === "https:") {
-      window.location.href = "http://" + window.location.hostname + window.location.pathname + window.location.search;
+      window.location.replace("http://" + window.location.hostname + window.location.pathname + window.location.search);
     }
   }, []);
 
