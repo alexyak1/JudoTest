@@ -10,4 +10,3 @@ services:
       - CHOKIDAR_USEPOLLING=true
     volumes:
       - /etc/letsencrypt:/etc/letsencrypt:ro # Mount the SSL certificates directory
-    command: [ "npm", "run", "start:https" ]
