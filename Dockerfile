@@ -16,5 +16,10 @@ COPY . .
 # Expose the port your app runs on
 EXPOSE 3000
 
-# Start the React development server
+# Set the environment variable to run the React app over HTTPS
+ENV HTTPS=true
+ENV SSL_CRT_FILE=/etc/letsencrypt/live/judoquiz.com/fullchain.pem
+ENV SSL_KEY_FILE=/etc/letsencrypt/live/judoquiz.com/privkey.pem
+
+# Run React app
 CMD ["npm", "start"]
