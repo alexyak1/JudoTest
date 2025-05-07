@@ -12,7 +12,7 @@ function ShowTechniques({ belt }) {
         setLoading(true);
         setError(null);
 
-        fetch(`http://35.228.96.180:8787/techniques?belt=${belt}`)
+        fetch(`http://localhost:8787/techniques?belt=${belt}`)
             .then((res) => {
                 if (!res.ok) {
                     throw new Error('Failed to fetch data');
