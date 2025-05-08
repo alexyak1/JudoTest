@@ -5,10 +5,13 @@ import '../quiz.css';
 
 export default function Test() {
 	const { useState, useEffect, Fragment } = React
+	const host = window.location.hostname;
+	const baseUrl = `http://${host}:8787`;
 
 	async function getTechniques(beltColor) {
-		const response = await fetch("http://localhost:8787/techniques?belt=" + beltColor)
+		const response = await fetch(`${baseUrl}/techniques?belt=${beltColor}`);
 		const data = await response.json()
+
 
 		return setTechniques(data)
 	}
@@ -36,9 +39,9 @@ export default function Test() {
 	function getRandom3Int(max, exeption) {
 
 		let first = Math.floor(Math.random() * max)
-		first = exeption === first ?  Math.floor(Math.random() * max) : first
+		first = exeption === first ? Math.floor(Math.random() * max) : first
 		let second = Math.floor(Math.random() * max)
-		second = second === first || second === exeption ?  Math.floor(Math.random() * max) : second
+		second = second === first || second === exeption ? Math.floor(Math.random() * max) : second
 		let third = Math.floor(Math.random() * max)
 		third = third === first || third === second || third === exeption ? Math.floor(Math.random() * max) : third
 

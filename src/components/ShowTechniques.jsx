@@ -8,11 +8,13 @@ function ShowTechniques({ belt }) {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
+    const host = window.location.hostname;
+
     useEffect(() => {
         setLoading(true);
         setError(null);
 
-        fetch(`http://localhost:8787/techniques?belt=${belt}`)
+        fetch(`http://${host}:8787/techniques?belt=${belt}`)
             .then((res) => {
                 if (!res.ok) {
                     throw new Error('Failed to fetch data');
