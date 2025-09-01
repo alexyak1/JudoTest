@@ -75,6 +75,10 @@
     max-height: 432px;
     margin: 0 auto;
     display: block;
+    aspect-ratio: 16/9;
+    object-fit: contain;
+    min-height: 200px;
+    background: #f8f9fa;
   }
 }
 
@@ -110,7 +114,41 @@
     max-height: 432px;
     margin: 0 auto;
     display: block;
+    aspect-ratio: 16/9;
+    object-fit: contain;
+    min-height: 200px;
+    background: #f8f9fa;
   }
+}
+
+/* Add placeholder for images while loading */
+.technique-container {
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Prevent layout shifts on technique items */
+.technique-item {
+  min-height: 400px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Add loading state */
+.loading-placeholder {
+  width: 90%;
+  height: 300px;
+  background: #f8f9fa;
+  border: 2px dashed #dee2e6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6c757d;
+  font-style: italic;
 }
 
 @keyframes App-logo-spin {

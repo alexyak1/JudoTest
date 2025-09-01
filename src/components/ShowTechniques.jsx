@@ -33,8 +33,17 @@ function ShowTechniques({ belt }) {
             );
     }, [belt]);
 
-    if (loading) return <div>Loading...</div>;
-    if (error) return <div>Error: {error}</div>;
+    if (loading) return (
+        <div className="loading-placeholder">
+            Loading techniques...
+        </div>
+    );
+    
+    if (error) return (
+        <div className="loading-placeholder">
+            Error: {error}
+        </div>
+    );
 
     return (
         <div>
@@ -52,13 +61,22 @@ function ShowTechniques({ belt }) {
                     }
 
                     return (
-                        <div key={filteredItem.id}>
+                        <div key={filteredItem.id} className="technique-item">
                             <h3>{filteredItem.name}</h3>
-                            {imageSrc ? (
-                                <img className="img-technique" src={imageSrc} alt={filteredItem.name} />
-                            ) : (
-                                <p>Image not available</p>
-                            )}
+                            <div className="technique-container">
+                                {imageSrc ? (
+                                    <img 
+                                        className="img-technique" 
+                                        src={imageSrc} 
+                                        alt={filteredItem.name}
+                                        loading="lazy"
+                                    />
+                                ) : (
+                                    <div className="loading-placeholder">
+                                        Image not available
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     );
                 })
