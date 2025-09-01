@@ -47,41 +47,47 @@ function ShowTechniques({ belt }) {
 
     return (
         <div>
-            {items.length} techniques for {belt} belt
+            <h2 style={{ textAlign: 'center', marginBottom: '30px', color: '#333' }}>
+                {items.length} techniques for {belt} belt
+            </h2>
             {items.length > 0 ? (
-                items.map((filteredItem) => {
-                    let imagePath = `./${filteredItem.belt}/${filteredItem.name}.gif`;
-                    let imageSrc;
+                <div className="techniques-grid">
+                    {items.map((filteredItem) => {
+                        let imagePath = `./${filteredItem.belt}/${filteredItem.name}.gif`;
+                        let imageSrc;
 
-                    try {
-                        imageSrc = images(imagePath);
-                    } catch (err) {
-                        console.error(`Image not found: ${imagePath}`);
-                        imageSrc = null;
-                    }
+                        try {
+                            imageSrc = images(imagePath);
+                        } catch (err) {
+                            console.error(`Image not found: ${imagePath}`);
+                            imageSrc = null;
+                        }
 
-                    return (
-                        <div key={filteredItem.id} className="technique-item">
-                            <h3>{filteredItem.name}</h3>
-                            <div className="technique-container">
-                                {imageSrc ? (
-                                    <img 
-                                        className="img-technique" 
-                                        src={imageSrc} 
-                                        alt={filteredItem.name}
-                                        loading="lazy"
-                                    />
-                                ) : (
-                                    <div className="loading-placeholder">
-                                        Image not available
-                                    </div>
-                                )}
+                        return (
+                            <div key={filteredItem.id} className="technique-item">
+                                <h3>{filteredItem.name}</h3>
+                                <div className="technique-container">
+                                    {imageSrc ? (
+                                        <img 
+                                            className="img-technique" 
+                                            src={imageSrc} 
+                                            alt={filteredItem.name}
+                                            loading="lazy"
+                                        />
+                                    ) : (
+                                        <div className="loading-placeholder">
+                                            Image not available
+                                        </div>
+                                    )}
+                                </div>
                             </div>
-                        </div>
-                    );
-                })
+                        );
+                    })}
+                </div>
             ) : (
-                <div>No techniques available for this belt.</div>
+                <div style={{ textAlign: 'center', padding: '40px', color: '#666' }}>
+                    No techniques available for this belt.
+                </div>
             )}
         </div>
     );
