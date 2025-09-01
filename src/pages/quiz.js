@@ -1,66 +1,7 @@
-import React, { memo } from "react";
+import React from "react";
 import BeltSelector from "../components/Test/selectBelt"
 import ProgressBar from "../components/Test/progressBar"
-import OptimizedImage from "../components/OptimizedImage";
 import '../quiz.css';
-
-const Question = memo(({ question, setAnswerStatus }) => {
-	const { useState, useEffect } = React;
-	const [selectedAnswer, setSelectedAnswer] = useState(null)
-
-	useEffect(() => {
-		if (selectedAnswer != null && question != null) {
-			setAnswerStatus(selectedAnswer === question.correctAnswer)
-		}
-	}, [selectedAnswer, setAnswerStatus, question])
-
-	useEffect(() => {
-		setSelectedAnswer(null)
-	}, [question])
-
-	const getClasses = (answer) => {
-		let classes = []
-		if (selectedAnswer != null) {
-			if (selectedAnswer === answer) {
-				classes.push("selected")
-			}
-			if (answer === question.correctAnswer) {
-				if (selectedAnswer === answer) {
-					classes.push("correct")
-				} else {
-					classes.push("incorrect")
-				}
-			}
-		}
-
-		return classes.join(" ")
-	}
-
-	if (question) {
-		return (
-			<div className="question">
-				<div className="questionText">What technique is on the picture?</div>
-				<OptimizedImage
-					className="img-technique"
-					src={question.image}
-					alt="Judo technique"
-					fallbackSrc="/placeholder-technique.png"
-				/>
-				<div className="answers">
-					{question.answers.map((answer, index) => {
-						return <div
-							key={index}
-							className={`answer ${getClasses(answer)}`}
-							onClick={() => selectedAnswer == null && setSelectedAnswer(answer)}>{answer}
-						</div>
-					})}
-				</div>
-			</div>
-		)
-	} else { return (<>Could not load techniques. Please restart the quiz </>) }
-});
-
-Question.displayName = 'Question';
 
 export default function Test() {
 	const { useState, useEffect, Fragment } = React
@@ -85,7 +26,7 @@ export default function Test() {
 				techniques[i].name
 			]
 			quizQuestions.push({
-				'image': `/judo_techniques/${techniques[i].belt}/${techniques[i].name}.gif`,
+				'image': './judo_techniques/' + techniques[i].belt + '/' + techniques[i].name + '.gif',
 				'correctAnswer': techniques[i].name,
 				'correctAnswerId': i,
 				'answers': answers.sort(() => Math.random() - 0.5)
@@ -103,6 +44,60 @@ export default function Test() {
 		third = third === first || third === second || third === exeption ? Math.floor(Math.random() * max) : third
 
 		return [first, second, third]
+	}
+
+	const Question = ({ question, setAnswerStatus }) => {
+		const [selectedAnswer, setSelectedAnswer] = useState(null)
+
+		useEffect(() => {
+			if (selectedAnswer != null && question != null) {
+				setAnswerStatus(selectedAnswer === question.correctAnswer)
+			}
+		}, [selectedAnswer, setAnswerStatus, question])
+
+		useEffect(() => {
+			setSelectedAnswer(null)
+		}, [question])
+
+		const getClasses = (answer) => {
+			let classes = []
+			if (selectedAnswer != null) {
+				if (selectedAnswer === answer) {
+					classes.push("selected")
+				}
+				if (answer === question.correctAnswer) {
+					if (selectedAnswer === answer) {
+						classes.push("correct")
+					} else {
+						classes.push("incorrect")
+					}
+				}
+			}
+
+			return classes.join(" ")
+		}
+
+		if (question) {
+			return (
+				<div className="question">
+					<div className="questionText">What technique is on the picture?</div>
+					<img
+						className="img-technique"
+						src={require(`${question.image}`)}
+						alt="Judo technique">
+					</img>
+					<div className="answers">
+						{question.answers.map((answer, index) => {
+							return <div
+								key={index}
+								className={`answer ${getClasses(answer)}`}
+								onClick={() => selectedAnswer == null && setSelectedAnswer(answer)}>{answer}
+							</div>
+						})}
+					</div>
+				</div>
+			)
+		} else { return (<>Could not load techniques. Please restart the quiz </>) }
 	}
 
 	const Quiz = () => {
