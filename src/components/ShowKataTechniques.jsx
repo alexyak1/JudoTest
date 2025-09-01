@@ -1,37 +1,54 @@
-import React, { useState, useEffect } from 'react';
+import React, { memo } from 'react';
+import { useApiCache } from '../hooks/useApiCache';
+import OptimizedImage from './OptimizedImage';
 
-function ShowKataTechniques({ kataType }) {
-    const [items, setItems] = useState([]);
+const ShowKataTechniques = memo(({ kataType }) => {
     const host = window.location.hostname;
     const baseUrl = `http://${host}:8787`;
+    const { data: items, loading, error } = useApiCache(`${baseUrl}/kata?type=${kataType}`);
 
-    useEffect(() => {
-        fetch(`${baseUrl}/kata?type=${kataType}`)
-            .then(res => res.json())
-            .then(result => {
-                setItems(result);
-            })
-            .catch(error => {
-                console.error("Error fetching kata techniques:", error);
-            });
-    }, [kataType]);
+    if (loading) {
+        return (
+            <div className="loading-container">
+                <div className="loading-spinner"></div>
+                <p>Loading kata techniques...</p>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="error-container">
+                <p>Error loading kata techniques: {error}</p>
+                <button onClick={() => window.location.reload()}>Retry</button>
+            </div>
+        );
+    }
+
+    if (!items || items.length === 0) {
+        return <div>No kata techniques available for {kataType}.</div>;
+    }
 
     return (
-        <div>
-            {items.length} techniques for {kataType}
-
-            {items.map(filteredItem => (
-                <div key={filteredItem.id}>
-                    <h3>{filteredItem.name}</h3>
-                    <img
-                        className="img-technique"
-                        src={require("../pages/kata_techniques/" + filteredItem.kata_name + "/" + filteredItem.name + ".gif")}
-                        alt="technique"
-                    />
-                </div>
-            ))}
+        <div className="kata-techniques-grid">
+            <p className="techniques-count">{items.length} techniques for {kataType}</p>
+            <div className="kata-techniques-list">
+                {items.map(filteredItem => (
+                    <div key={filteredItem.id} className="technique-item">
+                        <h3>{filteredItem.name}</h3>
+                        <OptimizedImage
+                            src={`/kata_techniques/${filteredItem.kata_name}/${filteredItem.name}.gif`}
+                            alt={filteredItem.name}
+                            className="img-technique"
+                            fallbackSrc="/placeholder-technique.png"
+                        />
+                    </div>
+                ))}
+            </div>
         </div>
     );
-}
+});
+
+ShowKataTechniques.displayName = 'ShowKataTechniques';
 
 export { ShowKataTechniques };

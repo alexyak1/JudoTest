@@ -6,6 +6,8 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Quiz from './pages/quiz';
 import Techniques from './pages/techniques';
 import Kata from "./pages/kata";
+import PerformanceMonitor from "./components/PerformanceMonitor";
+import PerformanceDashboard from "./components/PerformanceDashboard";
 
 function App() {
   useEffect(() => {
@@ -17,6 +19,8 @@ function App() {
 
   return (
     <Router>
+      <PerformanceMonitor />
+      <PerformanceDashboard />
       <Navbar />
       <Routes>
         <Route path="/" element={<Quiz />} />
