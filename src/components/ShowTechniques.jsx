@@ -46,7 +46,7 @@ function ShowTechniques({ belt }) {
             Loading techniques...
         </div>
     );
-    
+
     if (error) return (
         <div className="loading-placeholder">
             Error: {error}
@@ -70,7 +70,7 @@ function ShowTechniques({ belt }) {
             <h2 style={{ textAlign: 'center', marginBottom: '20px', color: '#333' }}>
                 {items.length} techniques for {belt} belt
             </h2>
-            
+
             {/* Search Filter */}
             <div style={{ textAlign: 'center', marginBottom: '30px' }}>
                 <input
@@ -100,11 +100,12 @@ function ShowTechniques({ belt }) {
 
                         return (
                             <div key={filteredItem.id} className="technique-card" onClick={() => openCard(filteredItem.name, imagePath)}>
+                                <h3>{filteredItem.name}</h3>
                                 <div className="technique-container">
                                     {imageSrc ? (
-                                        <img 
-                                            className="img-technique" 
-                                            src={imageSrc} 
+                                        <img
+                                            className="img-technique"
+                                            src={imageSrc}
                                             alt={filteredItem.name}
                                             loading="lazy"
                                         />
@@ -114,7 +115,6 @@ function ShowTechniques({ belt }) {
                                         </div>
                                     )}
                                 </div>
-                                <h3>{filteredItem.name}</h3>
                             </div>
                         );
                     })}
