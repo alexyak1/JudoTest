@@ -9,6 +9,7 @@ function ShowTechniques({ belt }) {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [modal, setModal] = useState({ open: false, title: '', src: '' });
+    const [searchTerm, setSearchTerm] = useState('');
 
     const host = window.location.hostname;
 
@@ -34,6 +35,11 @@ function ShowTechniques({ belt }) {
                 }
             );
     }, [belt]);
+
+    // Filter techniques based on search term
+    const filteredItems = items.filter(item =>
+        item.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
     if (loading) return (
         <div className="loading-placeholder">
@@ -61,12 +67,29 @@ function ShowTechniques({ belt }) {
 
     return (
         <div>
-            <h2 style={{ textAlign: 'center', marginBottom: '30px', color: '#333' }}>
+            <h2 style={{ textAlign: 'center', marginBottom: '20px', color: '#333' }}>
                 {items.length} techniques for {belt} belt
             </h2>
-            {items.length > 0 ? (
+            
+            {/* Search Filter */}
+            <div style={{ textAlign: 'center', marginBottom: '30px' }}>
+                <input
+                    type="text"
+                    className="search-input"
+                    placeholder="Search techniques (e.g., o-goshi, seoi-nage)..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                />
+                {searchTerm && (
+                    <div className="search-results">
+                        Showing {filteredItems.length} of {items.length} techniques
+                    </div>
+                )}
+            </div>
+
+            {filteredItems.length > 0 ? (
                 <div className="techniques-grid">
-                    {items.map((filteredItem) => {
+                    {filteredItems.map((filteredItem) => {
                         const imagePath = `./${filteredItem.belt}/${filteredItem.name}.gif`;
                         let imageSrc;
                         try {
@@ -95,6 +118,10 @@ function ShowTechniques({ belt }) {
                             </div>
                         );
                     })}
+                </div>
+            ) : searchTerm ? (
+                <div style={{ textAlign: 'center', padding: '40px', color: '#666' }}>
+                    No techniques found matching "{searchTerm}"
                 </div>
             ) : (
                 <div style={{ textAlign: 'center', padding: '40px', color: '#666' }}>

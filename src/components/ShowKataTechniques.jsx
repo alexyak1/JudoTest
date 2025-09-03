@@ -5,6 +5,7 @@ function ShowKataTechniques({ kataType }) {
     const [items, setItems] = useState([]);
     const [loading, setLoading] = useState(true);
     const [modal, setModal] = useState({ open: false, title: '', src: '' });
+    const [searchTerm, setSearchTerm] = useState('');
     const host = window.location.hostname;
     const baseUrl = `http://${host}:8787`;
 
@@ -22,6 +23,11 @@ function ShowKataTechniques({ kataType }) {
             });
     }, [kataType]);
 
+    // Filter techniques based on search term
+    const filteredItems = items.filter(item =>
+        item.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
     if (loading) return (
         <div className="loading-placeholder">
             Loading kata techniques...
@@ -33,11 +39,29 @@ function ShowKataTechniques({ kataType }) {
 
     return (
         <div>
-            <h2 style={{ textAlign: 'center', marginBottom: '30px', color: '#333' }}>
+            <h2 style={{ textAlign: 'center', marginBottom: '20px', color: '#333' }}>
                 {items.length} techniques for {kataType}
             </h2>
-            <div className="techniques-grid">
-                {items.map(filteredItem => {
+            
+            {/* Search Filter */}
+            <div style={{ textAlign: 'center', marginBottom: '30px' }}>
+                <input
+                    type="text"
+                    className="search-input"
+                    placeholder="Search kata techniques..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                />
+                {searchTerm && (
+                    <div className="search-results">
+                        Showing {filteredItems.length} of {items.length} techniques
+                    </div>
+                )}
+            </div>
+
+            {filteredItems.length > 0 ? (
+                <div className="techniques-grid">
+                    {filteredItems.map(filteredItem => {
                     const imgSrc = require("../pages/kata_techniques/" + filteredItem.kata_name + "/" + filteredItem.name + ".gif");
                     return (
                         <div key={filteredItem.id} className="technique-card" onClick={() => openCard(filteredItem.name, imgSrc)}>
@@ -54,6 +78,11 @@ function ShowKataTechniques({ kataType }) {
                     )
                 })}
             </div>
+            ) : searchTerm ? (
+                <div style={{ textAlign: 'center', padding: '40px', color: '#666' }}>
+                    No techniques found matching "{searchTerm}"
+                </div>
+            ) : null}
 
             <ImageModal
                 isOpen={modal.open}
