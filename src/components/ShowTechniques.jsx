@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import ImageModal from './ImageModal';
 
 // Import all images at build time
 const images = require.context('../pages/judo_techniques', true, /\.gif$/);
@@ -7,6 +8,7 @@ function ShowTechniques({ belt }) {
     const [items, setItems] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [modal, setModal] = useState({ open: false, title: '', src: '' });
 
     const host = window.location.hostname;
 
@@ -45,6 +47,18 @@ function ShowTechniques({ belt }) {
         </div>
     );
 
+    const openCard = (title, imagePath) => {
+        let imageSrc = '';
+        try {
+            imageSrc = images(imagePath);
+        } catch (e) {
+            imageSrc = '';
+        }
+        setModal({ open: true, title, src: imageSrc });
+    };
+
+    const closeCard = () => setModal({ open: false, title: '', src: '' });
+
     return (
         <div>
             <h2 style={{ textAlign: 'center', marginBottom: '30px', color: '#333' }}>
@@ -53,19 +67,16 @@ function ShowTechniques({ belt }) {
             {items.length > 0 ? (
                 <div className="techniques-grid">
                     {items.map((filteredItem) => {
-                        let imagePath = `./${filteredItem.belt}/${filteredItem.name}.gif`;
+                        const imagePath = `./${filteredItem.belt}/${filteredItem.name}.gif`;
                         let imageSrc;
-
                         try {
                             imageSrc = images(imagePath);
                         } catch (err) {
-                            console.error(`Image not found: ${imagePath}`);
                             imageSrc = null;
                         }
 
                         return (
-                            <div key={filteredItem.id} className="technique-item">
-                                <h3>{filteredItem.name}</h3>
+                            <div key={filteredItem.id} className="technique-card" onClick={() => openCard(filteredItem.name, imagePath)}>
                                 <div className="technique-container">
                                     {imageSrc ? (
                                         <img 
@@ -80,6 +91,7 @@ function ShowTechniques({ belt }) {
                                         </div>
                                     )}
                                 </div>
+                                <h3>{filteredItem.name}</h3>
                             </div>
                         );
                     })}
@@ -89,6 +101,14 @@ function ShowTechniques({ belt }) {
                     No techniques available for this belt.
                 </div>
             )}
+
+            <ImageModal
+                isOpen={modal.open}
+                onClose={closeCard}
+                title={modal.title}
+                imageSrc={modal.src}
+                altText={modal.title}
+            />
         </div>
     );
 }
