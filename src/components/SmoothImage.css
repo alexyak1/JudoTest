@@ -1,0 +1,55 @@
+/* Smooth image loading styles */
+.smooth-image-container {
+  position: relative;
+  overflow: hidden;
+}
+
+.smooth-image-placeholder {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.smooth-image {
+  transition: opacity 0.3s ease-in-out, transform 0.2s ease-in-out;
+}
+
+.smooth-image:hover {
+  transform: scale(1.02);
+}
+
+.smooth-image-error {
+  transition: all 0.3s ease-in-out;
+}
+
+.smooth-image-error:hover {
+  background-color: #f8f9fa;
+  border-color: #dee2e6;
+}
+
+/* Technique card enhancements */
+.technique-card {
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.technique-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.technique-container {
+  min-height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

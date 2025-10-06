@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import ImageModal from './ImageModal';
+import { SmoothImage } from './SmoothImage';
+import '../utils/imagePreloader';
 
 function ShowKataTechniques({ kataType }) {
     const [items, setItems] = useState([]);
@@ -15,6 +17,14 @@ function ShowKataTechniques({ kataType }) {
             .then(result => {
                 setItems(result);
                 setLoading(false);
+                
+                // Preload images in background for faster future loading
+                setTimeout(() => {
+                    const imageUrls = result.map(item => 
+                        require("../pages/kata_techniques/" + item.kata_name + "/" + item.name + ".gif")
+                    );
+                    window.imagePreloader?.preloadBatch(imageUrls);
+                }, 100);
             })
             .catch(error => {
                 console.error("Error fetching kata techniques:", error);
@@ -45,11 +55,11 @@ function ShowKataTechniques({ kataType }) {
                     return (
                         <div key={filteredItem.id} className="technique-card" onClick={() => openCard(filteredItem.name, imgSrc)}>
                             <div className="technique-container">
-                                <img
-                                    className="img-technique"
+                                <SmoothImage
                                     src={imgSrc}
                                     alt={filteredItem.name}
-                                    loading="lazy"
+                                    className="img-technique"
+                                    style={{ width: '100%', height: '200px' }}
                                 />
                             </div>
                             <h3>{filteredItem.name}</h3>
