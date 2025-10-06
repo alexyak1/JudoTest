@@ -30,7 +30,7 @@ function ShowKataTechniques({ kataType }) {
                 console.error("Error fetching kata techniques:", error);
                 setLoading(false);
             });
-    }, [kataType]);
+    }, [kataType, baseUrl]);
 
 
     if (loading) return (

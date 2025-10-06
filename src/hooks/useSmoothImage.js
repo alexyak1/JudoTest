@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 
 // Simple hook for smooth image loading
 export const useSmoothImage = (src) => {

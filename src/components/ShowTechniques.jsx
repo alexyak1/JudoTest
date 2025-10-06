@@ -34,7 +34,7 @@ function ShowTechniques({ belt }) {
                     setLoading(false);
                 }
             );
-    }, [belt]);
+    }, [belt, host]);
 
     // Filter techniques based on search term
     const filteredItems = items.filter(item =>
