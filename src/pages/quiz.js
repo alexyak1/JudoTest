@@ -139,9 +139,16 @@ export default function Test() {
 
 		if (questionIndex == null) {
 			return (
-				<div className='app'>
-					<h1>Start judo quiz</h1>
-					<p>Select belt color to check your knowledge about judo techniques.</p>
+				<div className='quiz-landing'>
+					<div className="quiz-header">
+						<h1 className="quiz-title">
+							<span className="gradient-text-1">Technique</span>
+							<span className="gradient-text-2">Quiz</span>
+						</h1>
+						<p className="quiz-description">
+							Test your knowledge and perfect your understanding of judo techniques across all belt levels
+						</p>
+					</div>
 					<BeltSelector setBeltColor={setBeltColor}></BeltSelector>
 				</div >
 			)

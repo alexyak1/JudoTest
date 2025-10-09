@@ -67,7 +67,7 @@ function ShowTechniques({ belt }) {
 
     return (
         <div>
-            <h2 style={{ textAlign: 'center', marginBottom: '20px', color: '#333' }}>
+            <h2 style={{ textAlign: 'center', marginBottom: '20px', color: '#ffffff', fontSize: '1.5rem', fontWeight: '600', fontFamily: 'Inter, sans-serif' }}>
                 {items.length} techniques for {belt} belt
             </h2>
 
@@ -120,11 +120,11 @@ function ShowTechniques({ belt }) {
                     })}
                 </div>
             ) : searchTerm ? (
-                <div style={{ textAlign: 'center', padding: '40px', color: '#666' }}>
+                <div style={{ textAlign: 'center', padding: '40px', color: '#b8b8b8', fontSize: '1.1rem', fontFamily: 'Inter, sans-serif' }}>
                     No techniques found matching "{searchTerm}"
                 </div>
             ) : (
-                <div style={{ textAlign: 'center', padding: '40px', color: '#666' }}>
+                <div style={{ textAlign: 'center', padding: '40px', color: '#b8b8b8', fontSize: '1.1rem', fontFamily: 'Inter, sans-serif' }}>
                     No techniques available for this belt.
                 </div>
             )}

@@ -2,6 +2,9 @@
   text-align: center;
   width: 100%;
   box-sizing: border-box;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f0f23 100%);
+  min-height: 100vh;
+  color: #ffffff;
 }
 
 .App-logo {
@@ -19,7 +22,7 @@
 }
 
 .App-header {
-  background-color: #282c34;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f0f23 100%);
   min-height: 10vh;
   display: flex;
   flex-direction: column;
@@ -167,15 +170,16 @@
 .loading-placeholder {
   width: 90%;
   height: 300px;
-  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-  border: 2px dashed #dee2e6;
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px dashed rgba(255, 255, 255, 0.2);
   border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #6c757d;
+  color: #a0a0a0;
   font-style: italic;
   font-size: 1.1em;
+  backdrop-filter: blur(10px);
 }
 
 /* Techniques grid layout */
@@ -222,27 +226,30 @@
 
 /* Card styles with full-width images */
 .technique-card {
-  background: white;
+  background: rgba(255, 255, 255, 0.05);
   border-radius: 16px;
   padding: 0;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   cursor: pointer;
   display: flex;
   flex-direction: column;
   align-items: center;
   overflow: hidden;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .technique-card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .technique-card h3 {
   margin: 15px 0;
   padding: 0 15px;
-  color: #333;
+  color: #ffffff;
   font-size: 1.1em;
   font-weight: 600;
   text-align: center;
@@ -261,13 +268,15 @@
 }
 
 .modal-content {
-  background: #fff;
+  background: rgba(26, 26, 46, 0.95);
   width: min(900px, 92vw);
   max-height: 92vh;
   border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.5);
   animation: modalIn 150ms ease-out;
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .modal-header {
@@ -275,13 +284,13 @@
   align-items: center;
   justify-content: space-between;
   padding: 12px 16px;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .modal-title {
   margin: 0;
   font-size: 1.2rem;
-  color: #333;
+  color: #ffffff;
 }
 
 .modal-close {
@@ -290,11 +299,11 @@
   font-size: 24px;
   line-height: 1;
   cursor: pointer;
-  color: #666;
+  color: #a0a0a0;
 }
 
 .modal-close:hover {
-  color: #000;
+  color: #ffffff;
 }
 
 .modal-body {
@@ -319,21 +328,29 @@
 .search-input {
   padding: 12px 16px;
   font-size: 16px;
-  border: 2px solid #ddd;
+  border: 2px solid rgba(255, 255, 255, 0.2);
   border-radius: 8px;
   width: 400px;
   max-width: 90%;
   outline: none;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  backdrop-filter: blur(10px);
+}
+
+.search-input::placeholder {
+  color: #a0a0a0;
 }
 
 .search-input:focus {
-  border-color: #007bff;
-  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+  background: rgba(255, 255, 255, 0.15);
 }
 
 .search-results {
   margin-top: 10px;
-  color: #666;
+  color: #a0a0a0;
   font-size: 14px;
 }

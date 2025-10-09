@@ -36,7 +36,7 @@ export default function Techniques() {
         <div className='app'>
             <title>Judo quiz | Techniques</title>
             <div>
-                <h2>Here are all techniques:</h2>
+                <h2 style={{ color: '#ffffff', fontSize: '1.8rem', fontWeight: '600', fontFamily: 'Inter, sans-serif', textAlign: 'center', marginBottom: '2rem' }}>Here are all techniques:</h2>
                 <div className="filter-select">
                     <label htmlFor="belt-select" className="sr-only">Select belt color</label>
                     <Select
