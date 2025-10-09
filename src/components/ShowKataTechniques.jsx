@@ -3,34 +3,48 @@ import ImageModal from './ImageModal';
 import { SmoothImage } from './SmoothImage';
 import '../utils/imagePreloader';
 
-function ShowKataTechniques({ kataType }) {
-    const [items, setItems] = useState([]);
-    const [loading, setLoading] = useState(true);
+function ShowKataTechniques({ kataType, preloadedData }) {
+    const [items, setItems] = useState(preloadedData || []);
+    const [loading, setLoading] = useState(!preloadedData);
     const [modal, setModal] = useState({ open: false, title: '', src: '' });
     const host = window.location.hostname;
     const baseUrl = `http://${host}:8787`;
 
     useEffect(() => {
-        setLoading(true);
-        fetch(`${baseUrl}/kata?type=${kataType}`)
-            .then(res => res.json())
-            .then(result => {
-                setItems(result);
-                setLoading(false);
-                
-                // Preload images in background for faster future loading
-                setTimeout(() => {
-                    const imageUrls = result.map(item => 
-                        require("../pages/kata_techniques/" + item.kata_name + "/" + item.name + ".gif")
-                    );
-                    window.imagePreloader?.preloadBatch(imageUrls);
-                }, 100);
-            })
-            .catch(error => {
-                console.error("Error fetching kata techniques:", error);
-                setLoading(false);
-            });
-    }, [kataType, baseUrl]);
+        // Only fetch if we don't have preloaded data
+        if (!preloadedData) {
+            setLoading(true);
+            fetch(`${baseUrl}/kata?type=${kataType}`)
+                .then(res => res.json())
+                .then(result => {
+                    setItems(result);
+                    setLoading(false);
+                    
+                    // Preload images in background for faster future loading
+                    setTimeout(() => {
+                        const imageUrls = result.map(item => 
+                            require("../pages/kata_techniques/" + item.kata_name + "/" + item.name + ".gif")
+                        );
+                        window.imagePreloader?.preloadBatch(imageUrls);
+                    }, 100);
+                })
+                .catch(error => {
+                    console.error("Error fetching kata techniques:", error);
+                    setLoading(false);
+                });
+        } else {
+            // Use preloaded data and preload images
+            setItems(preloadedData);
+            setLoading(false);
+            
+            setTimeout(() => {
+                const imageUrls = preloadedData.map(item => 
+                    require("../pages/kata_techniques/" + item.kata_name + "/" + item.name + ".gif")
+                );
+                window.imagePreloader?.preloadBatch(imageUrls);
+            }, 100);
+        }
+    }, [kataType, baseUrl, preloadedData]);
 
 
     if (loading) return (

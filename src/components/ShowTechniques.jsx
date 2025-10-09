@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import ImageModal from './ImageModal';
+import { SmoothImage } from './SmoothImage';
+import '../utils/imagePreloader';
 
 // Import all images at build time
 const images = require.context('../pages/judo_techniques', true, /\.gif$/);
@@ -28,6 +30,22 @@ function ShowTechniques({ belt }) {
                 (result) => {
                     setItems(result);
                     setLoading(false);
+                    
+                    // Preload images in background for faster future loading
+                    setTimeout(() => {
+                        const imageUrls = result.map(item => {
+                            const imagePath = `./${item.belt}/${item.name}.gif`;
+                            try {
+                                return images(imagePath);
+                            } catch (e) {
+                                return null;
+                            }
+                        }).filter(Boolean);
+                        
+                        if (imageUrls.length > 0) {
+                            window.imagePreloader?.preloadBatch(imageUrls);
+                        }
+                    }, 100);
                 },
                 (error) => {
                     setError(error.message);
@@ -103,11 +121,11 @@ function ShowTechniques({ belt }) {
                                 <h3>{filteredItem.name}</h3>
                                 <div className="technique-container">
                                     {imageSrc ? (
-                                        <img
-                                            className="img-technique"
+                                        <SmoothImage
                                             src={imageSrc}
                                             alt={filteredItem.name}
-                                            loading="lazy"
+                                            className="img-technique"
+                                            placeholder="🥋"
                                         />
                                     ) : (
                                         <div className="loading-placeholder">
