@@ -56,7 +56,7 @@ export const SmoothImage = ({
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            backgroundColor: '#f8f9fa',
+            backgroundColor: 'transparent',
             border: '2px dashed #e9ecef',
             borderRadius: '8px',
             zIndex: 1

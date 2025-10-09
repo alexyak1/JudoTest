@@ -33,7 +33,7 @@
 }
 
 .smooth-image-error:hover {
-  background-color: #f8f9fa;
+  background-color: transparent;
   border-color: #dee2e6;
 }
 

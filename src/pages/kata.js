@@ -30,15 +30,6 @@ export default function Kata() {
         <div className='app'>
         <title>Judo quiz | Kata</title>
             <div>
-                <h2>Techniques for {filterParam}:</h2>
-                <div className="filter-select">
-                    <p>Select Kata</p>
-                    <Select
-                        defaultValue={options[0]}
-                        onChange={applyFilter}
-                        options={options}
-                        styles={colourStyles} />
-                </div>
                 
                 {kata_series.map(kata_serie => (
                     <div>
