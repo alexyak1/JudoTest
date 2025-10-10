@@ -16,7 +16,12 @@ function App() {
   }, []);  // Empty dependency array ensures this runs only once, on component mount
 
   return (
-    <Router>
+    <Router
+      future={{
+        v7_startTransition: true,
+        v7_relativeSplatPath: true
+      }}
+    >
       <Navbar />
       <Routes>
         <Route path="/" element={<Quiz />} />
