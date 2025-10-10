@@ -2,11 +2,10 @@ import React, { useState, useEffect, useCallback } from "react";
 import Select from 'react-select';
 import { ShowKataTechniques } from "../components/ShowKataTechniques";
 import { ToTop } from "../components/NavigationComponents/toTop";
+import { useAllKataCache } from "../hooks/useGlobalCache";
 
 export default function Kata() {
     const [filterParam, setFilterColor] = useState('nage-no-kata');
-    const [loadingStates, setLoadingStates] = useState({});
-    const [allKataData, setAllKataData] = useState({});
 
     const options = [
         { value: 'nage-no-kata', label: 'nage-no-kata' },
@@ -28,43 +27,8 @@ export default function Kata() {
         "Te-waza", "Koshi-waza", "Ashi-Waza", "Masutemi-Waza", "Yoko-stemi-Waza"
     ];
 
-    // Preload all kata data efficiently
-    useEffect(() => {
-        const host = window.location.hostname;
-        const baseUrl = `http://${host}:8787`;
-        
-        // Initialize loading states
-        const initialLoadingStates = {};
-        kata_series.forEach(series => {
-            initialLoadingStates[series] = true;
-        });
-        setLoadingStates(initialLoadingStates);
-
-        // Load data for each series with staggered timing to avoid overwhelming the server
-        kata_series.forEach((series, index) => {
-            setTimeout(() => {
-                fetch(`${baseUrl}/kata?type=${series}`)
-                    .then(res => res.json())
-                    .then(result => {
-                        setAllKataData(prev => ({
-                            ...prev,
-                            [series]: result
-                        }));
-                        setLoadingStates(prev => ({
-                            ...prev,
-                            [series]: false
-                        }));
-                    })
-                    .catch(error => {
-                        console.error(`Error fetching ${series}:`, error);
-                        setLoadingStates(prev => ({
-                            ...prev,
-                            [series]: false
-                        }));
-                    });
-            }, index * 200); // Stagger requests by 200ms
-        });
-    }, []);
+    // Use global cache for all kata data
+    const { data: allKataData, loadingStates, error } = useAllKataCache(kata_series);
 
     return (
         <div className='app'>

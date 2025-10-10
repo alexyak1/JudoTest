@@ -2,50 +2,31 @@ import React, { useState, useEffect, useCallback, memo } from 'react';
 import ImageModal from './ImageModal';
 import { SmoothImage } from './SmoothImage';
 import { KataTechniqueCard } from './KataTechniqueCard';
+import { useKataCache } from '../hooks/useGlobalCache';
 import '../utils/imagePreloader';
 
 const ShowKataTechniques = memo(({ kataType, preloadedData }) => {
-    const [items, setItems] = useState(preloadedData || []);
-    const [loading, setLoading] = useState(!preloadedData);
     const [modal, setModal] = useState({ open: false, title: '', src: '' });
-    const host = window.location.hostname;
-    const baseUrl = `http://${host}:8787`;
+    
+    // Use global cache for kata data, but prefer preloaded data if available
+    const { data: cachedData, loading: cacheLoading, error: cacheError } = useKataCache(kataType);
+    
+    // Use preloaded data if available, otherwise use cached data
+    const items = preloadedData || cachedData || [];
+    const loading = preloadedData ? false : cacheLoading;
+    const error = preloadedData ? null : cacheError;
 
+    // Preload images when data changes
     useEffect(() => {
-        // Only fetch if we don't have preloaded data
-        if (!preloadedData) {
-            setLoading(true);
-            fetch(`${baseUrl}/kata?type=${kataType}`)
-                .then(res => res.json())
-                .then(result => {
-                    setItems(result);
-                    setLoading(false);
-                    
-                    // Preload images in background for faster future loading
-                    setTimeout(() => {
-                        const imageUrls = result.map(item => 
-                            require("../pages/kata_techniques/" + item.kata_name + "/" + item.name + ".gif")
-                        );
-                        window.imagePreloader?.preloadBatch(imageUrls);
-                    }, 100);
-                })
-                .catch(error => {
-                    console.error("Error fetching kata techniques:", error);
-                    setLoading(false);
-                });
-        } else {
-            // Use preloaded data and preload images
-            setItems(preloadedData);
-            setLoading(false);
-            
+        if (items && items.length > 0) {
             setTimeout(() => {
-                const imageUrls = preloadedData.map(item => 
+                const imageUrls = items.map(item => 
                     require("../pages/kata_techniques/" + item.kata_name + "/" + item.name + ".gif")
                 );
                 window.imagePreloader?.preloadBatch(imageUrls);
             }, 100);
         }
-    }, [kataType, baseUrl, preloadedData]);
+    }, [items]);
 
     const openCard = useCallback((title, src) => setModal({ open: true, title, src }), []);
     const closeCard = useCallback(() => setModal({ open: false, title: '', src: '' }), []);
@@ -53,6 +34,12 @@ const ShowKataTechniques = memo(({ kataType, preloadedData }) => {
     if (loading) return (
         <div className="loading-placeholder">
             Loading kata techniques...
+        </div>
+    );
+
+    if (error) return (
+        <div className="loading-placeholder">
+            Error: {error}
         </div>
     );
 

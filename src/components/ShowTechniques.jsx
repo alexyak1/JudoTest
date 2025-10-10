@@ -3,15 +3,13 @@ import ImageModal from './ImageModal';
 import { SmoothImage } from './SmoothImage';
 import { TechniqueCard } from './TechniqueCard';
 import { useDebouncedResize } from '../hooks/useDebouncedResize';
+import { useTechniquesCache } from '../hooks/useGlobalCache';
 import '../utils/imagePreloader';
 
 // Import all images at build time
 const images = require.context('../pages/judo_techniques', true, /\.gif$/);
 
 const ShowTechniques = memo(({ belt }) => {
-    const [items, setItems] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
     const [modal, setModal] = useState({ open: false, title: '', src: '' });
     const [searchTerm, setSearchTerm] = useState('');
     
@@ -19,11 +17,12 @@ const ShowTechniques = memo(({ belt }) => {
     const searchFilterRef = useRef(null);
     const isMobile = useDebouncedResize(150, 768);
 
-    const host = window.location.hostname;
+    // Use global cache for techniques data
+    const { data: items, loading, error } = useTechniquesCache(belt);
 
     // Auto-scroll to techniques on mobile when belt changes
     useEffect(() => {
-        if (isMobile && items.length > 0 && !loading) {
+        if (isMobile && items && items.length > 0 && !loading) {
             // Wait for the techniques grid to be rendered
             const scrollToTechniques = () => {
                 if (techniquesGridRef.current && searchFilterRef.current) {
@@ -45,69 +44,31 @@ const ShowTechniques = memo(({ belt }) => {
             
             setTimeout(scrollToTechniques, 300); // Initial delay to ensure DOM is ready
         }
-    }, [belt, items.length, isMobile, loading]);
+    }, [belt, items?.length, isMobile, loading]);
 
+    // Preload images when data changes
     useEffect(() => {
-        setLoading(true);
-        setError(null);
-
-        const fetchTechniques = async () => {
-            try {
-                let result;
+        if (items && items.length > 0) {
+            setTimeout(() => {
+                const imageUrls = items.map(item => {
+                    const imagePath = `./${item.belt}/${item.name}.gif`;
+                    try {
+                        return images(imagePath);
+                    } catch (e) {
+                        return null;
+                    }
+                }).filter(Boolean);
                 
-                if (belt === 'all') {
-                    // Fetch techniques from all belts
-                    const allBelts = ['yellow', 'orange', 'green', 'blue', 'brown'];
-                    const allTechniques = [];
-                    
-                    for (const beltColor of allBelts) {
-                        const response = await fetch(`http://${host}:8787/techniques?belt=${beltColor}`);
-                        if (!response.ok) {
-                            throw new Error(`Failed to fetch data for ${beltColor} belt`);
-                        }
-                        const beltData = await response.json();
-                        allTechniques.push(...beltData);
-                    }
-                    
-                    result = allTechniques;
-                } else {
-                    // Fetch techniques from specific belt
-                    const response = await fetch(`http://${host}:8787/techniques?belt=${belt}`);
-                    if (!response.ok) {
-                        throw new Error('Failed to fetch data');
-                    }
-                    result = await response.json();
+                if (imageUrls.length > 0) {
+                    window.imagePreloader?.preloadBatch(imageUrls);
                 }
-
-                setItems(result);
-                setLoading(false);
-                
-                // Preload images in background for faster future loading
-                setTimeout(() => {
-                    const imageUrls = result.map(item => {
-                        const imagePath = `./${item.belt}/${item.name}.gif`;
-                        try {
-                            return images(imagePath);
-                        } catch (e) {
-                            return null;
-                        }
-                    }).filter(Boolean);
-                    
-                    if (imageUrls.length > 0) {
-                        window.imagePreloader?.preloadBatch(imageUrls);
-                    }
-                }, 100);
-            } catch (error) {
-                setError(error.message);
-                setLoading(false);
-            }
-        };
-
-        fetchTechniques();
-    }, [belt, host]);
+            }, 100);
+        }
+    }, [items]);
 
     // Memoized filtered items to prevent unnecessary recalculations
     const filteredItems = useMemo(() => {
+        if (!items) return [];
         return items.filter(item =>
             item.name.toLowerCase().includes(searchTerm.toLowerCase())
         );
@@ -143,7 +104,7 @@ const ShowTechniques = memo(({ belt }) => {
     return (
         <div>
             <h2 style={{ textAlign: 'center', marginBottom: '20px', color: '#ffffff', fontSize: '1.5rem', fontWeight: '600', fontFamily: 'Inter, sans-serif' }}>
-                {belt === 'all' ? `${items.length} techniques from all belts` : `${items.length} techniques for ${belt} belt`}
+                {belt === 'all' ? `${items?.length || 0} techniques from all belts` : `${items?.length || 0} techniques for ${belt} belt`}
             </h2>
 
             {/* Search Filter */}
@@ -161,7 +122,7 @@ const ShowTechniques = memo(({ belt }) => {
                 />
                 {searchTerm && (
                     <div className="search-results">
-                        Showing {filteredItems.length} of {items.length} techniques
+                        Showing {filteredItems.length} of {items?.length || 0} techniques
                     </div>
                 )}
             </div>
