@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, memo } from 'react';
 import ImageModal from './ImageModal';
 import { SmoothImage } from './SmoothImage';
+import { KataTechniqueCard } from './KataTechniqueCard';
 import '../utils/imagePreloader';
 
-function ShowKataTechniques({ kataType, preloadedData }) {
+const ShowKataTechniques = memo(({ kataType, preloadedData }) => {
     const [items, setItems] = useState(preloadedData || []);
     const [loading, setLoading] = useState(!preloadedData);
     const [modal, setModal] = useState({ open: false, title: '', src: '' });
@@ -46,6 +47,8 @@ function ShowKataTechniques({ kataType, preloadedData }) {
         }
     }, [kataType, baseUrl, preloadedData]);
 
+    const openCard = useCallback((title, src) => setModal({ open: true, title, src }), []);
+    const closeCard = useCallback(() => setModal({ open: false, title: '', src: '' }), []);
 
     if (loading) return (
         <div className="loading-placeholder">
@@ -53,26 +56,18 @@ function ShowKataTechniques({ kataType, preloadedData }) {
         </div>
     );
 
-    const openCard = (title, src) => setModal({ open: true, title, src });
-    const closeCard = () => setModal({ open: false, title: '', src: '' });
-
     return (
         <div>
             <div className="techniques-grid">
                 {items.map(filteredItem => {
                     const imgSrc = require("../pages/kata_techniques/" + filteredItem.kata_name + "/" + filteredItem.name + ".gif");
                     return (
-                        <div key={filteredItem.id} className="technique-card" onClick={() => openCard(filteredItem.name, imgSrc)}>
-                            <div className="technique-container">
-                                <SmoothImage
-                                    src={imgSrc}
-                                    alt={filteredItem.name}
-                                    className="img-technique"
-                                    style={{ width: '100%', height: '200px' }}
-                                />
-                            </div>
-                            <h3>{filteredItem.name}</h3>
-                        </div>
+                        <KataTechniqueCard
+                            key={filteredItem.id}
+                            item={filteredItem}
+                            imageSrc={imgSrc}
+                            onCardClick={openCard}
+                        />
                     )
                 })}
             </div>
@@ -86,6 +81,8 @@ function ShowKataTechniques({ kataType, preloadedData }) {
             />
         </div>
     );
-}
+});
+
+ShowKataTechniques.displayName = 'ShowKataTechniques';
 
 export { ShowKataTechniques };

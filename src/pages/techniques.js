@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import TechniquesBeltSelector from "../components/TechniquesBeltSelector";
 import { ShowTechniques } from "../components/ShowTechniques";
 import { ToTop } from "../components/NavigationComponents/toTop";
@@ -6,9 +6,9 @@ import { ToTop } from "../components/NavigationComponents/toTop";
 export default function Techniques() {
     const [filterParam, setFilterColor] = useState('yellow');
 
-    const applyFilter = (beltColor) => {
+    const applyFilter = useCallback((beltColor) => {
         setFilterColor(beltColor);
-    };
+    }, []);
 
     return (
         <div className='app'>

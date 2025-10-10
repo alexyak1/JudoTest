@@ -1,35 +1,25 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback, memo } from 'react';
 import ImageModal from './ImageModal';
 import { SmoothImage } from './SmoothImage';
+import { TechniqueCard } from './TechniqueCard';
+import { useDebouncedResize } from '../hooks/useDebouncedResize';
 import '../utils/imagePreloader';
 
 // Import all images at build time
 const images = require.context('../pages/judo_techniques', true, /\.gif$/);
 
-function ShowTechniques({ belt }) {
+const ShowTechniques = memo(({ belt }) => {
     const [items, setItems] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [modal, setModal] = useState({ open: false, title: '', src: '' });
     const [searchTerm, setSearchTerm] = useState('');
-    const [isMobile, setIsMobile] = useState(false);
     
     const techniquesGridRef = useRef(null);
     const searchFilterRef = useRef(null);
+    const isMobile = useDebouncedResize(150, 768);
 
     const host = window.location.hostname;
-
-    // Mobile detection
-    useEffect(() => {
-        const checkMobile = () => {
-            setIsMobile(window.innerWidth <= 768);
-        };
-        
-        checkMobile();
-        window.addEventListener('resize', checkMobile);
-        
-        return () => window.removeEventListener('resize', checkMobile);
-    }, []);
 
     // Auto-scroll to techniques on mobile when belt changes
     useEffect(() => {
@@ -116,10 +106,27 @@ function ShowTechniques({ belt }) {
         fetchTechniques();
     }, [belt, host]);
 
-    // Filter techniques based on search term
-    const filteredItems = items.filter(item =>
-        item.name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    // Memoized filtered items to prevent unnecessary recalculations
+    const filteredItems = useMemo(() => {
+        return items.filter(item =>
+            item.name.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+    }, [items, searchTerm]);
+
+    // Memoized callbacks to prevent unnecessary re-renders
+    const openCard = useCallback((title, imagePath) => {
+        let imageSrc = '';
+        try {
+            imageSrc = images(imagePath);
+        } catch (e) {
+            imageSrc = '';
+        }
+        setModal({ open: true, title, src: imageSrc });
+    }, []);
+
+    const closeCard = useCallback(() => setModal({ open: false, title: '', src: '' }), []);
+
+    const handleSearchChange = useCallback((e) => setSearchTerm(e.target.value), []);
 
     if (loading) return (
         <div className="loading-placeholder">
@@ -132,18 +139,6 @@ function ShowTechniques({ belt }) {
             Error: {error}
         </div>
     );
-
-    const openCard = (title, imagePath) => {
-        let imageSrc = '';
-        try {
-            imageSrc = images(imagePath);
-        } catch (e) {
-            imageSrc = '';
-        }
-        setModal({ open: true, title, src: imageSrc });
-    };
-
-    const closeCard = () => setModal({ open: false, title: '', src: '' });
 
     return (
         <div>
@@ -162,7 +157,7 @@ function ShowTechniques({ belt }) {
                     className="search-input"
                     placeholder="Search techniques (e.g., o-goshi, seoi-nage)..."
                     value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
+                    onChange={handleSearchChange}
                 />
                 {searchTerm && (
                     <div className="search-results">
@@ -183,23 +178,13 @@ function ShowTechniques({ belt }) {
                         }
 
                         return (
-                            <div key={filteredItem.id} className="technique-card" onClick={() => openCard(filteredItem.name, imagePath)}>
-                                <h3>{filteredItem.name}</h3>
-                                <div className="technique-container">
-                                    {imageSrc ? (
-                                        <SmoothImage
-                                            src={imageSrc}
-                                            alt={filteredItem.name}
-                                            className="img-technique"
-                                            placeholder="🥋"
-                                        />
-                                    ) : (
-                                        <div className="loading-placeholder">
-                                            Image not available
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
+                            <TechniqueCard
+                                key={filteredItem.id}
+                                item={filteredItem}
+                                imageSrc={imageSrc}
+                                imagePath={imagePath}
+                                onCardClick={openCard}
+                            />
                         );
                     })}
                 </div>
@@ -222,6 +207,8 @@ function ShowTechniques({ belt }) {
             />
         </div>
     );
-}
+});
+
+ShowTechniques.displayName = 'ShowTechniques';
 
 export { ShowTechniques };

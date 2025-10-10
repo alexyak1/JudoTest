@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, memo } from 'react';
 
-const ImageModal = ({ isOpen, onClose, title, imageSrc, altText }) => {
+const ImageModal = memo(({ isOpen, onClose, title, imageSrc, altText }) => {
   useEffect(() => {
     if (!isOpen) return;
     const handleKeyDown = (e) => {
@@ -25,6 +25,8 @@ const ImageModal = ({ isOpen, onClose, title, imageSrc, altText }) => {
       </div>
     </div>
   );
-};
+});
+
+ImageModal.displayName = 'ImageModal';
 
 export default ImageModal;

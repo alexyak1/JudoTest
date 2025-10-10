@@ -1,6 +1,6 @@
-import React from "react";
+import React, { memo } from "react";
 
-export default function TechniquesBeltSelector({ setBeltColor, selectedBelt = 'yellow' }) {
+const TechniquesBeltSelector = memo(({ setBeltColor, selectedBelt = 'yellow' }) => {
     const belts = [
         { color: 'yellow', name: 'Yellow Belt', colorCode: '#FFD700' },
         { color: 'orange', name: 'Orange Belt', colorCode: '#FF8C00' },
@@ -27,4 +27,8 @@ export default function TechniquesBeltSelector({ setBeltColor, selectedBelt = 'y
             ))}
         </div>
     );
-};
+});
+
+TechniquesBeltSelector.displayName = 'TechniquesBeltSelector';
+
+export default TechniquesBeltSelector;

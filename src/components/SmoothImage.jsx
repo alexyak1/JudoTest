@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { useSmoothImage } from '../hooks/useSmoothImage';
 import './SmoothImage.css';
 
 // Smooth loading image component
-export const SmoothImage = ({ 
+export const SmoothImage = memo(({ 
   src, 
   alt, 
   className = '', 
@@ -85,4 +85,4 @@ export const SmoothImage = ({
       />
     </div>
   );
-};
+});

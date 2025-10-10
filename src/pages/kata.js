@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Select from 'react-select';
 import { ShowKataTechniques } from "../components/ShowKataTechniques";
 import { ToTop } from "../components/NavigationComponents/toTop";
@@ -20,9 +20,9 @@ export default function Kata() {
         }),
     };
 
-    const applyFilter = (e) => {
+    const applyFilter = useCallback((e) => {
         setFilterColor(e.value)
-    }
+    }, []);
 
     const kata_series = [
         "Te-waza", "Koshi-waza", "Ashi-Waza", "Masutemi-Waza", "Yoko-stemi-Waza"
