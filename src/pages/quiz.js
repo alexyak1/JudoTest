@@ -1,12 +1,19 @@
 import React from "react";
 import BeltSelector from "../components/Test/selectBelt"
 import ProgressBar from "../components/Test/progressBar"
+import { useBeltWithUrl, usePageTracking, trackBeltAction } from "../hooks/useBeltWithUrl";
 import '../quiz.css';
 
 export default function Test() {
 	const { useState, useEffect, Fragment } = React
 	const host = window.location.hostname;
 	const baseUrl = `http://${host}:8787`;
+
+	// Use URL-based belt selection with analytics tracking
+	const { belt: urlBelt, setBelt } = useBeltWithUrl('yellow', 'quiz');
+	
+	// Track page views with belt information
+	usePageTracking('quiz', urlBelt);
 
 	async function getTechniques(beltColor) {
 		let data;
@@ -134,7 +141,17 @@ export default function Test() {
 			}
 		}, [answerStatus])
 
+		// Auto-start quiz if belt is specified in URL
+		useEffect(() => {
+			if (urlBelt && urlBelt !== 'yellow' && questionIndex === null) {
+				setBeltColor(urlBelt);
+			}
+		}, [urlBelt]);
+
 		async function setBeltColor(childdata) {
+			// Track belt selection for quiz
+			trackBeltAction('quiz_belt_selection', 'quiz', childdata);
+			
 			let quizQuestions = await getTechniques(childdata)
 			setQuizQuestions(quizQuestions)
 			onNextClick()

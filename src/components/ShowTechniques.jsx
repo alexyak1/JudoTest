@@ -4,6 +4,7 @@ import { SmoothImage } from './SmoothImage';
 import { TechniqueCard } from './TechniqueCard';
 import { useDebouncedResize } from '../hooks/useDebouncedResize';
 import { useTechniquesCache } from '../hooks/useGlobalCache';
+import { trackBeltAction } from '../hooks/useBeltWithUrl';
 import '../utils/imagePreloader';
 
 // Import all images at build time
@@ -83,7 +84,13 @@ const ShowTechniques = memo(({ belt }) => {
             imageSrc = '';
         }
         setModal({ open: true, title, src: imageSrc });
-    }, []);
+        
+        // Track technique view
+        trackBeltAction('technique_view', 'techniques', belt, {
+            technique_name: title,
+            image_path: imagePath
+        });
+    }, [belt]);
 
     const closeCard = useCallback(() => setModal({ open: false, title: '', src: '' }), []);
 

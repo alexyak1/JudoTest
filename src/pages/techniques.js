@@ -1,14 +1,19 @@
-import React, { useState, useCallback } from "react";
+import React, { useCallback } from "react";
 import TechniquesBeltSelector from "../components/TechniquesBeltSelector";
 import { ShowTechniques } from "../components/ShowTechniques";
 import { ToTop } from "../components/NavigationComponents/toTop";
+import { useBeltWithUrl, usePageTracking } from "../hooks/useBeltWithUrl";
 
 export default function Techniques() {
-    const [filterParam, setFilterColor] = useState('yellow');
+    // Use URL-based belt selection with analytics tracking
+    const { belt, setBelt } = useBeltWithUrl('yellow', 'techniques');
+    
+    // Track page views with belt information
+    usePageTracking('techniques', belt);
 
     const applyFilter = useCallback((beltColor) => {
-        setFilterColor(beltColor);
-    }, []);
+        setBelt(beltColor);
+    }, [setBelt]);
 
     return (
         <div className='app'>
@@ -16,9 +21,9 @@ export default function Techniques() {
             <div>
                 <h2 style={{ color: '#ffffff', fontSize: '1.8rem', fontWeight: '600', fontFamily: 'Inter, sans-serif', textAlign: 'center', marginBottom: '2rem' }}>Here are all techniques:</h2>
                 <div className="belt-selector-container">
-                    <TechniquesBeltSelector setBeltColor={applyFilter} selectedBelt={filterParam} />
+                    <TechniquesBeltSelector setBeltColor={applyFilter} selectedBelt={belt} />
                 </div>
-                <ShowTechniques belt={filterParam} />
+                <ShowTechniques belt={belt} />
                 <ToTop />
             </div>
         </div>
