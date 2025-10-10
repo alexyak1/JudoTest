@@ -33,21 +33,29 @@ function ShowTechniques({ belt }) {
 
     // Auto-scroll to techniques on mobile when belt changes
     useEffect(() => {
-        if (isMobile && techniquesGridRef.current && items.length > 0) {
-            setTimeout(() => {
-                const filterHeight = searchFilterRef.current ? searchFilterRef.current.offsetHeight : 0;
-                const offset = filterHeight + 20; // Add extra 20px for better spacing
-                
-                const elementPosition = techniquesGridRef.current.offsetTop;
-                const offsetPosition = elementPosition - offset;
+        if (isMobile && items.length > 0 && !loading) {
+            // Wait for the techniques grid to be rendered
+            const scrollToTechniques = () => {
+                if (techniquesGridRef.current && searchFilterRef.current) {
+                    const filterHeight = searchFilterRef.current.offsetHeight;
+                    const offset = filterHeight + 20; // Add extra 20px for better spacing
+                    
+                    const elementPosition = techniquesGridRef.current.offsetTop;
+                    const offsetPosition = elementPosition - offset;
 
-                window.scrollTo({
-                    top: offsetPosition,
-                    behavior: 'smooth'
-                });
-            }, 100);
+                    window.scrollTo({
+                        top: offsetPosition,
+                        behavior: 'smooth'
+                    });
+                } else {
+                    // If refs are not ready, try again after a short delay
+                    setTimeout(scrollToTechniques, 100);
+                }
+            };
+            
+            setTimeout(scrollToTechniques, 300); // Initial delay to ensure DOM is ready
         }
-    }, [belt, items.length, isMobile]);
+    }, [belt, items.length, isMobile, loading]);
 
     useEffect(() => {
         setLoading(true);
