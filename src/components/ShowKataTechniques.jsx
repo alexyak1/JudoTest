@@ -58,11 +58,6 @@ function ShowKataTechniques({ kataType, preloadedData }) {
 
     return (
         <div>
-            <h2 style={{ textAlign: 'center', marginBottom: '30px', color: '#333' }}>
-                {items.length} techniques for {kataType}
-            </h2>
-            
-
             <div className="techniques-grid">
                 {items.map(filteredItem => {
                     const imgSrc = require("../pages/kata_techniques/" + filteredItem.kata_name + "/" + filteredItem.name + ".gif");

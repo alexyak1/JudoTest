@@ -357,6 +357,25 @@
   background: rgba(255, 255, 255, 0.15);
 }
 
+/* Mobile sticky search filter */
+@media (max-width: 768px) {
+  .search-filter-container.mobile-sticky {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f0f23 100%);
+    padding: 15px 0;
+    margin: -15px 0 15px 0;
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .search-filter-container.mobile-sticky .search-input {
+    width: 90%;
+    max-width: 350px;
+  }
+}
+
 .search-results {
   margin-top: 10px;
   color: #a0a0a0;
@@ -389,10 +408,10 @@
 /* Techniques belt selector - enhanced version */
 .techniques-belt-grid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 1rem;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 0.8rem;
   width: 100%;
-  max-width: 750px;
+  max-width: 1000px;
   position: relative;
   z-index: 1;
   padding: 0 1rem;
@@ -485,13 +504,53 @@
   z-index: 1;
 }
 
+/* All Belts Special Styling for Techniques */
+.techniques-belt-card.all-belts .techniques-belt-color-bar.all-belts-bar {
+  background: linear-gradient(90deg, 
+    #DC143C 0%, #DC143C 25%, 
+    #FFFFFF 25%, #FFFFFF 50%, 
+    #DC143C 50%, #DC143C 75%, 
+    #FFFFFF 75%, #FFFFFF 100%);
+  background-size: 100% 100%;
+}
+
+.techniques-belt-card.all-belts {
+  position: relative;
+  overflow: hidden;
+}
+
+.techniques-belt-card.all-belts::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, 
+    #DC143C 0%, #DC143C 25%, 
+    #FFFFFF 25%, #FFFFFF 50%, 
+    #DC143C 50%, #DC143C 75%, 
+    #FFFFFF 75%, #FFFFFF 100%);
+  background-size: 100% 100%;
+  opacity: 0.05;
+  pointer-events: none;
+}
+
+.techniques-belt-card.all-belts:hover::before {
+  opacity: 0.08;
+}
+
+.techniques-belt-card.all-belts.selected::before {
+  opacity: 0.1;
+}
+
 /* Responsive design for techniques belt selector */
 @media (max-width: 768px) {
   .techniques-belt-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 0.6rem;
     padding: 0 0.5rem;
-    max-width: 350px;
+    max-width: 500px;
   }
   
   .techniques-belt-card {

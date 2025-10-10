@@ -1,0 +1,66 @@
+[0;34m[2025-10-10 08:40:05][0m [0;32m🚀 Starting JudoTest advanced deployment...[0m
+[0;34m[2025-10-10 08:40:05][0m [1;33m🔍 Checking server connectivity...[0m
+[0;34m[2025-10-10 08:40:10][0m [0;32m✅ Server connection verified[0m
+[0;34m[2025-10-10 08:40:10][0m [1;33m🐳 Checking Docker status on server...[0m
+[0;34m[2025-10-10 08:40:29][0m [0;32m✅ Docker is running[0m
+[0;34m[2025-10-10 08:40:29][0m [1;33m📦 Creating backup of current deployment...[0m
+[0;34m[2025-10-10 08:40:34][0m [1;33mVerifying project directory[0m
+[0;34m[2025-10-10 08:40:34][0m [0;34mExecuting: cd /root/judoquiz/JudoTest && pwd[0m
+[0;34m[2025-10-10 08:40:37][0m [0;32m✅ Verifying project directory completed successfully[0m
+[0;34m[2025-10-10 08:40:37][0m [1;33mStopping existing containers[0m
+[0;34m[2025-10-10 08:40:37][0m [0;34mExecuting: cd /root/judoquiz/JudoTest && docker-compose down[0m
+[0;34m[2025-10-10 08:43:16][0m [1;33m🔍 DRY RUN MODE - No actual changes will be made[0m
+[0;34m[2025-10-10 08:43:16][0m [0;34mWould execute the following commands:[0m
+[0;34m[2025-10-10 08:43:16][0m [0;34m1. ssh root@91.99.101.21 'cd /root/judoquiz/JudoTest && git pull'[0m
+[0;34m[2025-10-10 08:43:16][0m [0;34m2. ssh root@91.99.101.21 'cd /root/judoquiz/JudoTest && docker-compose down'[0m
+[0;34m[2025-10-10 08:43:16][0m [0;34m3. ssh root@91.99.101.21 'cd /root/judoquiz/JudoTest && docker-compose build --no-cache'[0m
+[0;34m[2025-10-10 08:43:16][0m [0;34m4. ssh root@91.99.101.21 'cd /root/judoquiz/JudoTest && docker-compose up -d'[0m
+[0;34m[2025-10-10 08:43:16][0m [0;34m5. Wait for service to be ready at http://91.99.101.21[0m
+[0;34m[2025-10-10 08:43:25][0m [0;32m🚀 Starting JudoTest advanced deployment...[0m
+[0;34m[2025-10-10 08:43:25][0m [1;33m🔍 Checking server connectivity...[0m
+[0;34m[2025-10-10 08:43:29][0m [0;32m✅ Server connection verified[0m
+[0;34m[2025-10-10 08:43:29][0m [1;33m🐳 Checking Docker status on server...[0m
+[0;34m[2025-10-10 08:43:32][0m [0;32m✅ Docker is running[0m
+[0;34m[2025-10-10 08:43:32][0m [1;33m📦 Creating backup of current deployment...[0m
+[0;34m[2025-10-10 08:45:09][0m [0;32m🚀 Starting JudoTest advanced deployment...[0m
+[0;34m[2025-10-10 08:45:09][0m [1;33m🔍 Checking server connectivity...[0m
+[0;34m[2025-10-10 08:45:13][0m [0;32m✅ Server connection verified[0m
+[0;34m[2025-10-10 08:45:13][0m [1;33m🐳 Checking Docker status on server...[0m
+[0;34m[2025-10-10 08:45:17][0m [0;32m✅ Docker is running[0m
+[0;34m[2025-10-10 08:45:17][0m [1;33m📦 Creating backup of current deployment...[0m
+[0;34m[2025-10-10 08:45:20][0m [1;33mVerifying project directory[0m
+[0;34m[2025-10-10 08:45:20][0m [0;34mExecuting: cd /root/judoquiz/JudoTest && pwd[0m
+[0;34m[2025-10-10 08:46:32][0m [0;32m🚀 Starting JudoTest advanced deployment...[0m
+[0;34m[2025-10-10 08:46:32][0m [1;33m🔍 Checking server connectivity...[0m
+[0;34m[2025-10-10 08:46:33][0m [0;32m✅ SSH key authentication is working[0m
+[0;34m[2025-10-10 08:46:33][0m [0;32m✅ Server connection verified[0m
+[0;34m[2025-10-10 08:46:33][0m [1;33m🐳 Checking Docker status on server...[0m
+[0;34m[2025-10-10 08:46:34][0m [0;32m✅ Docker is running[0m
+[0;34m[2025-10-10 08:46:34][0m [1;33m📦 Creating backup of current deployment...[0m
+[0;34m[2025-10-10 08:46:34][0m [1;33mVerifying project directory[0m
+[0;34m[2025-10-10 08:46:34][0m [0;34mExecuting: cd /root/judoquiz/JudoTest && pwd[0m
+[0;34m[2025-10-10 08:46:35][0m [0;32m✅ Verifying project directory completed successfully[0m
+[0;34m[2025-10-10 08:46:35][0m [1;33mPulling latest code from git[0m
+[0;34m[2025-10-10 08:46:35][0m [0;34mExecuting: cd /root/judoquiz/JudoTest && git pull[0m
+[0;34m[2025-10-10 08:46:37][0m [0;32m✅ Pulling latest code from git completed successfully[0m
+[0;34m[2025-10-10 08:46:37][0m [1;33mStopping existing containers[0m
+[0;34m[2025-10-10 08:46:37][0m [0;34mExecuting: cd /root/judoquiz/JudoTest && docker-compose down[0m
+[0;34m[2025-10-10 08:46:39][0m [0;32m✅ Stopping existing containers completed successfully[0m
+[0;34m[2025-10-10 08:46:39][0m [1;33mBuilding new containers[0m
+[0;34m[2025-10-10 08:46:39][0m [0;34mExecuting: cd /root/judoquiz/JudoTest && docker-compose build --no-cache[0m
+[0;34m[2025-10-10 08:48:24][0m [0;32m✅ Building new containers completed successfully[0m
+[0;34m[2025-10-10 08:48:24][0m [1;33mStarting containers[0m
+[0;34m[2025-10-10 08:48:24][0m [0;34mExecuting: cd /root/judoquiz/JudoTest && docker-compose up -d[0m
+[0;34m[2025-10-10 08:48:39][0m [0;32m✅ Starting containers completed successfully[0m
+[0;34m[2025-10-10 08:48:39][0m [1;33m⏳ Waiting for service to be ready...[0m
+[0;34m[2025-10-10 08:48:39][0m [1;33mAttempt 1/30 - Service not ready yet, waiting 10 seconds...[0m
+[0;34m[2025-10-10 08:48:53][0m [0;32m✅ Service is ready and responding[0m
+[0;34m[2025-10-10 08:48:53][0m [1;33mChecking container status[0m
+[0;34m[2025-10-10 08:48:53][0m [0;34mExecuting: cd /root/judoquiz/JudoTest && docker-compose ps[0m
+[0;34m[2025-10-10 08:48:54][0m [0;32m✅ Checking container status completed successfully[0m
+[0;34m[2025-10-10 08:48:54][0m [1;33mChecking recent logs[0m
+[0;34m[2025-10-10 08:48:54][0m [0;34mExecuting: cd /root/judoquiz/JudoTest && docker-compose logs --tail=20[0m
+[0;34m[2025-10-10 08:48:55][0m [0;32m✅ Checking recent logs completed successfully[0m
+[0;34m[2025-10-10 08:48:55][0m [0;32m🎉 Deployment completed successfully![0m
+[0;34m[2025-10-10 08:48:55][0m [0;32mYour application is available at: http://91.99.101.21[0m
+[0;34m[2025-10-10 08:48:55][0m [0;32mDeployment log saved to: deployment.log[0m

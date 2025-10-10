@@ -9,8 +9,25 @@ export default function Test() {
 	const baseUrl = `http://${host}:8787`;
 
 	async function getTechniques(beltColor) {
-		const response = await fetch(`${baseUrl}/techniques?belt=${beltColor}`);
-		const data = await response.json()
+		let data;
+		
+		if (beltColor === 'all') {
+			// Fetch techniques from all belts
+			const allBelts = ['yellow', 'orange', 'green', 'blue', 'brown'];
+			const allTechniques = [];
+			
+			for (const belt of allBelts) {
+				const response = await fetch(`${baseUrl}/techniques?belt=${belt}`);
+				const beltData = await response.json();
+				allTechniques.push(...beltData);
+			}
+			
+			data = allTechniques;
+		} else {
+			// Fetch techniques from specific belt
+			const response = await fetch(`${baseUrl}/techniques?belt=${beltColor}`);
+			data = await response.json();
+		}
 
 		return setTechniques(data)
 	}

@@ -156,6 +156,46 @@ html {
   font-family: 'Inter', sans-serif;
 }
 
+/* All Belts Special Styling */
+.all-belts-bar {
+  background: linear-gradient(90deg, 
+    #DC143C 0%, #DC143C 25%, 
+    #FFFFFF 25%, #FFFFFF 50%, 
+    #DC143C 50%, #DC143C 75%, 
+    #FFFFFF 75%, #FFFFFF 100%);
+  background-size: 100% 100%;
+}
+
+.all-belts {
+  position: relative;
+  overflow: hidden;
+}
+
+.all-belts::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, 
+    #DC143C 0%, #DC143C 25%, 
+    #FFFFFF 25%, #FFFFFF 50%, 
+    #DC143C 50%, #DC143C 75%, 
+    #FFFFFF 75%, #FFFFFF 100%);
+  background-size: 100% 100%;
+  opacity: 0.1;
+  pointer-events: none;
+}
+
+.all-belts:hover::before {
+  opacity: 0.15;
+}
+
+.all-belts.selected::before {
+  opacity: 0.2;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .quiz-title {

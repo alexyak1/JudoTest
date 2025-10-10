@@ -9,7 +9,7 @@ export default function BeltSelector({ setBeltColor, selectedBelt = 'yellow' }) 
         { color: 'green', name: 'Green Belt', colorCode: '#32CD32' },
         { color: 'blue', name: 'Blue Belt', colorCode: '#1E90FF' },
         { color: 'brown', name: 'Brown Belt', colorCode: '#8B4513' },
-        { color: 'black', name: 'Black Belt', colorCode: '#2C2C2C' }
+        { color: 'all', name: 'All Belts', colorCode: 'red-white-red-white', isSpecial: true },
     ];
 
     return (
@@ -17,12 +17,12 @@ export default function BeltSelector({ setBeltColor, selectedBelt = 'yellow' }) 
             {belts.map((belt) => (
                 <div 
                     key={belt.color}
-                    className={`belt-card ${selectedBelt === belt.color ? 'selected' : ''}`}
+                    className={`belt-card ${selectedBelt === belt.color ? 'selected' : ''} ${belt.isSpecial ? 'all-belts' : ''}`}
                     onClick={() => setBeltColor(belt.color)}
                 >
                     <div 
-                        className="belt-color-bar"
-                        style={{ backgroundColor: belt.colorCode }}
+                        className={`belt-color-bar ${belt.isSpecial ? 'all-belts-bar' : ''}`}
+                        style={belt.isSpecial ? {} : { backgroundColor: belt.colorCode }}
                     ></div>
                     <span className="belt-name">{belt.name}</span>
                 </div>
