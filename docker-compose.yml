@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   judo-quiz-app:
     build: 
@@ -7,19 +5,12 @@ services:
       dockerfile: Dockerfile
     container_name: judo-quiz-frontend
     ports:
-      - "80:3000"
+      - "80:80"
     environment:
-      - CHOKIDAR_USEPOLLING=true
-      - WATCHPACK_POLLING=true
       - REACT_APP_API_URL=http://localhost:8787
-    volumes:
-      - .:/app
-      - /app/node_modules
     networks:
       - judo-network
     restart: unless-stopped
-    stdin_open: true
-    tty: true
 
 networks:
   judo-network:
