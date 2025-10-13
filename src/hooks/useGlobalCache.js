@@ -36,8 +36,8 @@ class RequestThrottler {
   }
 }
 
-// Global request throttler instance
-const requestThrottler = new RequestThrottler(2, 500);
+// Global request throttler instance - optimized for faster loading
+const requestThrottler = new RequestThrottler(3, 200);
 
 // Global data cache
 class DataCache {

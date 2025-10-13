@@ -1,9 +1,12 @@
-import React, { useState, useEffect, useCallback, memo } from 'react';
+import React, { useState, useEffect, useCallback, memo, useMemo } from 'react';
 import ImageModal from './ImageModal';
 import { SmoothImage } from './SmoothImage';
 import { KataTechniqueCard } from './KataTechniqueCard';
 import { useKataCache } from '../hooks/useGlobalCache';
 import '../utils/imagePreloader';
+
+// Import all kata images at build time for better performance
+const kataImages = require.context('../pages/kata_techniques', true, /\.gif$/);
 
 const ShowKataTechniques = memo(({ kataType, preloadedData }) => {
     const [modal, setModal] = useState({ open: false, title: '', src: '' });
@@ -16,17 +19,27 @@ const ShowKataTechniques = memo(({ kataType, preloadedData }) => {
     const loading = preloadedData ? false : cacheLoading;
     const error = preloadedData ? null : cacheError;
 
-    // Preload images when data changes
-    useEffect(() => {
-        if (items && items.length > 0) {
-            setTimeout(() => {
-                const imageUrls = items.map(item => 
-                    require("../pages/kata_techniques/" + item.kata_name + "/" + item.name + ".gif")
-                );
-                window.imagePreloader?.preloadBatch(imageUrls);
-            }, 100);
-        }
+    // Memoize image URLs to prevent unnecessary recalculations
+    const imageUrls = useMemo(() => {
+        if (!items || items.length === 0) return [];
+        
+        return items.map(item => {
+            const imagePath = `./${item.kata_name}/${item.name}.gif`;
+            try {
+                return kataImages(imagePath);
+            } catch (e) {
+                return null;
+            }
+        }).filter(Boolean);
     }, [items]);
+
+    // Preload images when data changes - optimized version
+    useEffect(() => {
+        if (imageUrls.length > 0) {
+            // Remove setTimeout delay for faster loading
+            window.imagePreloader?.preloadBatch(imageUrls);
+        }
+    }, [imageUrls]);
 
     const openCard = useCallback((title, src) => setModal({ open: true, title, src }), []);
     const closeCard = useCallback(() => setModal({ open: false, title: '', src: '' }), []);
@@ -46,8 +59,8 @@ const ShowKataTechniques = memo(({ kataType, preloadedData }) => {
     return (
         <div>
             <div className="techniques-grid">
-                {items.map(filteredItem => {
-                    const imgSrc = require("../pages/kata_techniques/" + filteredItem.kata_name + "/" + filteredItem.name + ".gif");
+                {items.map((filteredItem, index) => {
+                    const imgSrc = imageUrls[index] || null;
                     return (
                         <KataTechniqueCard
                             key={filteredItem.id}

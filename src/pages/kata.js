@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import Select from 'react-select';
 import { ShowKataTechniques } from "../components/ShowKataTechniques";
 import { ToTop } from "../components/NavigationComponents/toTop";
@@ -30,6 +30,24 @@ export default function Kata() {
     // Use global cache for all kata data
     const { data: allKataData, loadingStates, error } = useAllKataCache(kata_series);
 
+    // Memoize loading state to prevent unnecessary re-renders
+    const isLoading = useMemo(() => {
+        return Object.values(loadingStates).some(loading => loading);
+    }, [loadingStates]);
+
+    // Show single loading state for better UX
+    if (isLoading && Object.keys(allKataData).length === 0) {
+        return (
+            <div className='app'>
+                <title>Judo quiz | Kata</title>
+                <div className="loading-placeholder" style={{ padding: '40px', textAlign: 'center' }}>
+                    Loading kata techniques...
+                </div>
+                <ToTop></ToTop>
+            </div>
+        );
+    }
+
     return (
         <div className='app'>
         <title>Judo quiz | Kata</title>
@@ -46,16 +64,10 @@ export default function Kata() {
                             border: "none",
                             }}
                         />
-                        {loadingStates[kata_serie] ? (
-                            <div className="loading-placeholder">
-                                Loading {kata_serie} techniques...
-                            </div>
-                        ) : (
-                            <ShowKataTechniques 
-                                kataType={kata_serie} 
-                                preloadedData={allKataData[kata_serie]}
-                            />
-                        )}
+                        <ShowKataTechniques 
+                            kataType={kata_serie} 
+                            preloadedData={allKataData[kata_serie]}
+                        />
                     </div>
                 ))}
 
