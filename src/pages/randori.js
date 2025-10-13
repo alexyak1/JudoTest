@@ -62,10 +62,12 @@ const RandoriTimer = () => {
   const intervalRef = useRef(null);
   const fightEndSoundRef = useRef(null);
   const restEndSoundRef = useRef(null);
+  const fightStartSoundRef = useRef(null);
   
   // Audio elements for mobile
   const fightEndAudioRef = useRef(null);
   const restEndAudioRef = useRef(null);
+  const fightStartAudioRef = useRef(null);
   const audioContextRef = useRef(null);
 
   // Initialize audio
@@ -111,9 +113,11 @@ const RandoriTimer = () => {
     // Create audio elements
     fightEndAudioRef.current = new Audio();
     restEndAudioRef.current = new Audio();
+    fightStartAudioRef.current = new Audio();
     
     fightEndAudioRef.current.src = createSimpleTone(220, 1.2);
     restEndAudioRef.current.src = createSimpleTone(330, 0.8);
+    fightStartAudioRef.current.src = createSimpleTone(440, 0.5); // Higher pitch, shorter for fight start
     
     // Basic settings
     fightEndAudioRef.current.preload = 'auto';
@@ -122,13 +126,19 @@ const RandoriTimer = () => {
     fightEndSoundRef.current = () => {
       console.log('Playing fight end sound');
       fightEndAudioRef.current.currentTime = 0;
-      fightEndAudioRef.current.play().catch(e => console.log('Fight audio play failed:', e));
+      fightEndAudioRef.current.play().catch(e => console.log('Fight end audio play failed:', e));
     };
     
     restEndSoundRef.current = () => {
       console.log('Playing rest end sound');
       restEndAudioRef.current.currentTime = 0;
       restEndAudioRef.current.play().catch(e => console.log('Rest audio play failed:', e));
+    };
+    
+    fightStartSoundRef.current = () => {
+      console.log('Playing fight start sound');
+      fightStartAudioRef.current.currentTime = 0;
+      fightStartAudioRef.current.play().catch(e => console.log('Fight start audio play failed:', e));
     };
   }, []);
 
@@ -220,6 +230,11 @@ const RandoriTimer = () => {
     
     // Scroll to top when timer starts
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    
+    // Play fight start sound
+    setTimeout(() => {
+      fightStartSoundRef.current?.();
+    }, 100);
     
     // Track timer start in Google Analytics
     if (typeof window !== 'undefined' && window.gtag) {
