@@ -20,7 +20,6 @@ export const ResponsiveImage = memo(({
   const { 
     ref, 
     src: optimizedSrc, 
-    loading, 
     error, 
     deviceType, 
     isLoaded, 

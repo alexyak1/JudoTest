@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback, memo, useMemo } from 'react';
 import ImageModal from './ImageModal';
-import { SmoothImage } from './SmoothImage';
 import { KataTechniqueCard } from './KataTechniqueCard';
 import { useKataCache } from '../hooks/useGlobalCache';
 import '../utils/imagePreloader';
@@ -15,7 +14,7 @@ const ShowKataTechniques = memo(({ kataType, preloadedData }) => {
     const { data: cachedData, loading: cacheLoading, error: cacheError } = useKataCache(kataType);
     
     // Use preloaded data if available, otherwise use cached data
-    const items = preloadedData || cachedData || [];
+    const items = useMemo(() => preloadedData || cachedData || [], [preloadedData, cachedData]);
     const loading = preloadedData ? false : cacheLoading;
     const error = preloadedData ? null : cacheError;
 

@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback, memo } from 'react';
 import ImageModal from './ImageModal';
-import { SmoothImage } from './SmoothImage';
 import { TechniqueCard } from './TechniqueCard';
 import { useDebouncedResize } from '../hooks/useDebouncedResize';
 import { useTechniquesCache } from '../hooks/useGlobalCache';
