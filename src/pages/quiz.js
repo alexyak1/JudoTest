@@ -204,6 +204,7 @@ export default function Test() {
 					<Fragment>
 						<ProgressBar currentQuestion={questionIndex} totalQuestionsCount={quizQuestions.length} />
 						<Question
+							key={questionIndex}
 							question={quizQuestions[questionIndex]}
 							setAnswerStatus={setAnswerStatus}
 						/>
