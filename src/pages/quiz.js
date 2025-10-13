@@ -110,6 +110,7 @@ export default function Test() {
 				<div className="question">
 					<div className="questionText">What technique is on the picture?</div>
 					<img
+						key={question.image}
 						className="img-technique"
 						src={question.image}
 						alt="Judo technique">
