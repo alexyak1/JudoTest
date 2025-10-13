@@ -19,9 +19,17 @@
   font-size: 1.8rem;
   font-weight: 700;
   text-align: center;
-  margin: 0;
+  margin: 0 0 10px 0;
   color: #ffffff;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.timer-description {
+  font-size: 0.9rem;
+  color: #a0a0a0;
+  text-align: center;
+  margin: 0;
+  font-weight: 400;
 }
 
 /* Settings Container */

@@ -14,6 +14,7 @@ const RandoriTimer = () => {
   const [fightSecondsDisplay, setFightSecondsDisplay] = useState('30');
   const [restMinutesDisplay, setRestMinutesDisplay] = useState('1');
   const [restSecondsDisplay, setRestSecondsDisplay] = useState('0');
+  const [roundsDisplay, setRoundsDisplay] = useState('4');
 
   // Calculate total seconds
   const fightTime = fightMinutes * 60 + fightSeconds;
@@ -29,12 +30,27 @@ const RandoriTimer = () => {
   const intervalRef = useRef(null);
   const fightEndSoundRef = useRef(null);
   const restEndSoundRef = useRef(null);
+  const audioContextRef = useRef(null);
+  const [audioInitialized, setAudioInitialized] = useState(false);
+  
+  // Fallback audio elements for mobile
+  const fightEndAudioRef = useRef(null);
+  const restEndAudioRef = useRef(null);
 
   // Initialize audio
   useEffect(() => {
     // Create Japanese-style bell/gong sounds
     const createJapaneseBellSound = (frequency, duration, harmonics = 3) => {
-      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      if (!audioContextRef.current) {
+        audioContextRef.current = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      
+      const audioContext = audioContextRef.current;
+      
+      // Resume audio context if suspended (required for mobile)
+      if (audioContext.state === 'suspended') {
+        audioContext.resume();
+      }
       
       // Create multiple oscillators for harmonic richness
       for (let i = 0; i < harmonics; i++) {
@@ -61,6 +77,51 @@ const RandoriTimer = () => {
 
     fightEndSoundRef.current = () => createJapaneseBellSound(220, 1.2, 4); // Lower, longer bell for fight end
     restEndSoundRef.current = () => createJapaneseBellSound(330, 0.8, 3); // Higher, shorter bell for rest end
+    
+    // Create fallback audio elements for mobile
+    fightEndAudioRef.current = new Audio();
+    restEndAudioRef.current = new Audio();
+    
+    // Generate simple tones as data URLs for fallback
+    const generateToneDataURL = (frequency, duration) => {
+      const sampleRate = 44100;
+      const length = sampleRate * duration;
+      const buffer = new ArrayBuffer(44 + length * 2);
+      const view = new DataView(buffer);
+      
+      // WAV header
+      const writeString = (offset, string) => {
+        for (let i = 0; i < string.length; i++) {
+          view.setUint8(offset + i, string.charCodeAt(i));
+        }
+      };
+      
+      writeString(0, 'RIFF');
+      view.setUint32(4, 36 + length * 2, true);
+      writeString(8, 'WAVE');
+      writeString(12, 'fmt ');
+      view.setUint32(16, 16, true);
+      view.setUint16(20, 1, true);
+      view.setUint16(22, 1, true);
+      view.setUint32(24, sampleRate, true);
+      view.setUint32(28, sampleRate * 2, true);
+      view.setUint16(32, 2, true);
+      view.setUint16(34, 16, true);
+      writeString(36, 'data');
+      view.setUint32(40, length * 2, true);
+      
+      // Generate sine wave
+      for (let i = 0; i < length; i++) {
+        const sample = Math.sin(2 * Math.PI * frequency * i / sampleRate) * 0.3;
+        view.setInt16(44 + i * 2, sample * 32767, true);
+      }
+      
+      const blob = new Blob([buffer], { type: 'audio/wav' });
+      return URL.createObjectURL(blob);
+    };
+    
+    fightEndAudioRef.current.src = generateToneDataURL(220, 1.2);
+    restEndAudioRef.current.src = generateToneDataURL(330, 0.8);
   }, []);
 
   // Timer logic
@@ -70,10 +131,23 @@ const RandoriTimer = () => {
         setTimeLeft(prev => {
           if (prev <= 1) {
             // Time's up - play sound and move to next phase
-            if (currentPhase === 'fight') {
-              fightEndSoundRef.current?.();
-            } else if (currentPhase === 'rest') {
-              restEndSoundRef.current?.();
+            try {
+              if (currentPhase === 'fight') {
+                fightEndSoundRef.current?.();
+              } else if (currentPhase === 'rest') {
+                restEndSoundRef.current?.();
+              }
+            } catch (error) {
+              // Fallback to HTML5 Audio for mobile
+              try {
+                if (currentPhase === 'fight') {
+                  fightEndAudioRef.current?.play();
+                } else if (currentPhase === 'rest') {
+                  restEndAudioRef.current?.play();
+                }
+              } catch (fallbackError) {
+                console.log('Audio playback failed:', fallbackError);
+              }
             }
             
             if (currentPhase === 'fight') {
@@ -103,7 +177,19 @@ const RandoriTimer = () => {
     return () => clearInterval(intervalRef.current);
   }, [isRunning, isPaused, currentPhase, fightTime, restTime, rounds, currentRound]);
 
-  const startTimer = () => {
+  const initializeAudio = async () => {
+    if (!audioInitialized && audioContextRef.current) {
+      try {
+        await audioContextRef.current.resume();
+        setAudioInitialized(true);
+      } catch (error) {
+        console.log('Audio initialization failed:', error);
+      }
+    }
+  };
+
+  const startTimer = async () => {
+    await initializeAudio();
     setIsRunning(true);
     setIsPaused(false);
     setCurrentPhase('fight');
@@ -142,9 +228,10 @@ const RandoriTimer = () => {
 
   return (
     <div className="randori-container">
-      <div className="randori-header">
+      <header className="randori-header">
         <h1>TIMER</h1>
-      </div>
+        <p className="timer-description">Free online judo timer and randori timer for martial arts training</p>
+      </header>
 
       {!isRunning ? (
         <div className="settings-container">
@@ -269,8 +356,24 @@ const RandoriTimer = () => {
             <div className="time-input">
               <input
                 type="number"
-                value={rounds}
-                onChange={(e) => setRounds(Math.max(1, parseInt(e.target.value) || 1))}
+                value={roundsDisplay}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setRoundsDisplay(value);
+                  if (value === '') {
+                    setRounds(1);
+                  } else {
+                    const num = parseInt(value);
+                    if (!isNaN(num)) {
+                      setRounds(Math.max(1, Math.min(20, num)));
+                    }
+                  }
+                }}
+                onBlur={() => {
+                  if (roundsDisplay === '') {
+                    setRoundsDisplay('1');
+                  }
+                }}
                 min="1"
                 max="20"
               />
