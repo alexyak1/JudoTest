@@ -70,7 +70,7 @@ const RandoriTimer = () => {
 
   // Initialize audio
   useEffect(() => {
-    // Simple approach for mobile - use HTML5 Audio with data URLs
+    // Very simple audio setup
     const createSimpleTone = (frequency, duration) => {
       const sampleRate = 44100;
       const length = sampleRate * duration;
@@ -100,7 +100,7 @@ const RandoriTimer = () => {
       
       // Generate sine wave
       for (let i = 0; i < length; i++) {
-        const sample = Math.sin(2 * Math.PI * frequency * i / sampleRate) * 0.3;
+        const sample = Math.sin(2 * Math.PI * frequency * i / sampleRate) * 0.5;
         view.setInt16(44 + i * 2, sample * 32767, true);
       }
       
@@ -115,44 +115,21 @@ const RandoriTimer = () => {
     fightEndAudioRef.current.src = createSimpleTone(220, 1.2);
     restEndAudioRef.current.src = createSimpleTone(330, 0.8);
     
-    // Preload audio for mobile
+    // Basic settings
     fightEndAudioRef.current.preload = 'auto';
     restEndAudioRef.current.preload = 'auto';
     
-    // Enable audio in silent mode (like YouTube/Instagram)
-    try {
-      fightEndAudioRef.current.setAttribute('playsinline', 'true');
-      restEndAudioRef.current.setAttribute('playsinline', 'true');
-      
-      // For iOS - allow audio in silent mode
-      if (fightEndAudioRef.current.webkitAudioContext) {
-        fightEndAudioRef.current.webkitAudioContext = true;
-      }
-      if (restEndAudioRef.current.webkitAudioContext) {
-        restEndAudioRef.current.webkitAudioContext = true;
-      }
-    } catch (e) {
-      console.log('Silent mode audio setup failed:', e);
-    }
-    
     fightEndSoundRef.current = () => {
-      try {
-        fightEndAudioRef.current.currentTime = 0;
-        fightEndAudioRef.current.play().catch(e => console.log('Audio play failed:', e));
-      } catch (error) {
-        console.log('Fight end sound failed:', error);
-      }
+      console.log('Playing fight end sound');
+      fightEndAudioRef.current.currentTime = 0;
+      fightEndAudioRef.current.play().catch(e => console.log('Fight audio play failed:', e));
     };
     
     restEndSoundRef.current = () => {
-      try {
-        restEndAudioRef.current.currentTime = 0;
-        restEndAudioRef.current.play().catch(e => console.log('Audio play failed:', e));
-      } catch (error) {
-        console.log('Rest end sound failed:', error);
-      }
+      console.log('Playing rest end sound');
+      restEndAudioRef.current.currentTime = 0;
+      restEndAudioRef.current.play().catch(e => console.log('Rest audio play failed:', e));
     };
-    
   }, []);
 
   // Timer logic
@@ -271,6 +248,12 @@ const RandoriTimer = () => {
                       setFightMinutesDisplay('0');
                     }
                   }}
+                  onFocus={(e) => {
+                    // Move cursor to end of input
+                    setTimeout(() => {
+                      e.target.setSelectionRange(e.target.value.length, e.target.value.length);
+                    }, 0);
+                  }}
                   min="0"
                   max="10"
                 />
@@ -296,6 +279,12 @@ const RandoriTimer = () => {
                     if (fightSecondsDisplay === '') {
                       setFightSecondsDisplay('0');
                     }
+                  }}
+                  onFocus={(e) => {
+                    // Move cursor to end of input
+                    setTimeout(() => {
+                      e.target.setSelectionRange(e.target.value.length, e.target.value.length);
+                    }, 0);
                   }}
                   min="0"
                   max="59"
@@ -329,6 +318,12 @@ const RandoriTimer = () => {
                       setRestMinutesDisplay('0');
                     }
                   }}
+                  onFocus={(e) => {
+                    // Move cursor to end of input
+                    setTimeout(() => {
+                      e.target.setSelectionRange(e.target.value.length, e.target.value.length);
+                    }, 0);
+                  }}
                   min="0"
                   max="10"
                 />
@@ -355,6 +350,12 @@ const RandoriTimer = () => {
                       setRestSecondsDisplay('0');
                     }
                   }}
+                  onFocus={(e) => {
+                    // Move cursor to end of input
+                    setTimeout(() => {
+                      e.target.setSelectionRange(e.target.value.length, e.target.value.length);
+                    }, 0);
+                  }}
                   min="0"
                   max="59"
                 />
@@ -369,23 +370,29 @@ const RandoriTimer = () => {
               <input
                 type="number"
                 value={roundsDisplay}
-                onChange={(e) => {
-                  const value = e.target.value;
-                  setRoundsDisplay(value);
-                  if (value === '') {
-                    setRounds(1);
-                  } else {
-                    const num = parseInt(value);
-                    if (!isNaN(num)) {
-                      setRounds(Math.max(1, Math.min(20, num)));
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setRoundsDisplay(value);
+                    if (value === '') {
+                      setRounds(1);
+                    } else {
+                      const num = parseInt(value);
+                      if (!isNaN(num)) {
+                        setRounds(Math.max(1, Math.min(20, num)));
+                      }
                     }
-                  }
-                }}
-                onBlur={() => {
-                  if (roundsDisplay === '') {
-                    setRoundsDisplay('1');
-                  }
-                }}
+                  }}
+                  onBlur={() => {
+                    if (roundsDisplay === '') {
+                      setRoundsDisplay('1');
+                    }
+                  }}
+                  onFocus={(e) => {
+                    // Move cursor to end of input
+                    setTimeout(() => {
+                      e.target.setSelectionRange(e.target.value.length, e.target.value.length);
+                    }, 0);
+                  }}
                 min="1"
                 max="20"
               />
@@ -394,6 +401,26 @@ const RandoriTimer = () => {
 
           <button className="start-button" onClick={startTimer}>
             START
+          </button>
+          
+          <button 
+            className="test-sound-button" 
+            onClick={() => {
+              console.log('Test sound button clicked');
+              fightEndSoundRef.current?.();
+            }}
+            style={{
+              marginTop: '10px',
+              padding: '8px 16px',
+              fontSize: '0.9rem',
+              background: '#666',
+              color: 'white',
+              border: 'none',
+              borderRadius: '6px',
+              cursor: 'pointer'
+            }}
+          >
+            Test Sound
           </button>
         </div>
       ) : (
