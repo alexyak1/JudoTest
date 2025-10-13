@@ -2,23 +2,55 @@ import React, { useState, useEffect, useRef } from 'react';
 import './randori.css';
 
 const RandoriTimer = () => {
-  // Settings state
-  const [fightMinutes, setFightMinutes] = useState(2);
-  const [fightSeconds, setFightSeconds] = useState(30);
-  const [restMinutes, setRestMinutes] = useState(1);
-  const [restSeconds, setRestSeconds] = useState(0);
-  const [rounds, setRounds] = useState(4);
+  // Load saved settings or use defaults
+  const getSavedSettings = () => {
+    try {
+      const saved = localStorage.getItem('randoriTimerSettings');
+      if (saved) {
+        return JSON.parse(saved);
+      }
+    } catch (error) {
+      console.log('Failed to load saved settings:', error);
+    }
+    return null;
+  };
+
+  const savedSettings = getSavedSettings();
+  
+  // Settings state with saved values or defaults
+  const [fightMinutes, setFightMinutes] = useState(savedSettings?.fightMinutes || 2);
+  const [fightSeconds, setFightSeconds] = useState(savedSettings?.fightSeconds || 30);
+  const [restMinutes, setRestMinutes] = useState(savedSettings?.restMinutes || 1);
+  const [restSeconds, setRestSeconds] = useState(savedSettings?.restSeconds || 0);
+  const [rounds, setRounds] = useState(savedSettings?.rounds || 4);
 
   // Input display states (can be empty while typing)
-  const [fightMinutesDisplay, setFightMinutesDisplay] = useState('2');
-  const [fightSecondsDisplay, setFightSecondsDisplay] = useState('30');
-  const [restMinutesDisplay, setRestMinutesDisplay] = useState('1');
-  const [restSecondsDisplay, setRestSecondsDisplay] = useState('0');
-  const [roundsDisplay, setRoundsDisplay] = useState('4');
+  const [fightMinutesDisplay, setFightMinutesDisplay] = useState(savedSettings?.fightMinutes?.toString() || '2');
+  const [fightSecondsDisplay, setFightSecondsDisplay] = useState(savedSettings?.fightSeconds?.toString() || '30');
+  const [restMinutesDisplay, setRestMinutesDisplay] = useState(savedSettings?.restMinutes?.toString() || '1');
+  const [restSecondsDisplay, setRestSecondsDisplay] = useState(savedSettings?.restSeconds?.toString() || '0');
+  const [roundsDisplay, setRoundsDisplay] = useState(savedSettings?.rounds?.toString() || '4');
 
   // Calculate total seconds
   const fightTime = fightMinutes * 60 + fightSeconds;
   const restTime = restMinutes * 60 + restSeconds;
+
+  // Save settings to localStorage whenever they change
+  useEffect(() => {
+    const settings = {
+      fightMinutes,
+      fightSeconds,
+      restMinutes,
+      restSeconds,
+      rounds
+    };
+    
+    try {
+      localStorage.setItem('randoriTimerSettings', JSON.stringify(settings));
+    } catch (error) {
+      console.log('Failed to save settings:', error);
+    }
+  }, [fightMinutes, fightSeconds, restMinutes, restSeconds, rounds]);
 
   // Timer state
   const [isRunning, setIsRunning] = useState(false);
@@ -121,31 +153,6 @@ const RandoriTimer = () => {
       }
     };
     
-    // Initialize audio context for silent mode playback
-    const initAudioContext = async () => {
-      try {
-        if (!audioContextRef.current) {
-          audioContextRef.current = new (window.AudioContext || window.webkitAudioContext)();
-        }
-        
-        // Configure audio session for silent mode playback
-        if (audioContextRef.current.state === 'suspended') {
-          await audioContextRef.current.resume();
-        }
-        
-        // Set audio session category for iOS (if available)
-        if (navigator.mediaSession) {
-          navigator.mediaSession.setActionHandler('play', () => {});
-          navigator.mediaSession.setActionHandler('pause', () => {});
-        }
-        
-      } catch (error) {
-        console.log('Audio context initialization failed:', error);
-      }
-    };
-    
-    // Initialize audio context on first user interaction
-    initAudioContext();
   }, []);
 
   // Timer logic
