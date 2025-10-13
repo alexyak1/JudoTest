@@ -31,6 +31,9 @@ const Navbar = () => {
                 <NavLink to="/kata">
                     Kata
                 </NavLink>
+                <NavLink to="/randori">
+                    Timer
+                </NavLink>
             </NavMenu>
         </Nav>
     );

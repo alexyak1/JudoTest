@@ -6,6 +6,7 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Quiz from './pages/quiz';
 import Techniques from './pages/techniques';
 import Kata from "./pages/kata";
+import RandoriTimer from "./pages/randori";
 
 function App() {
   useEffect(() => {
@@ -28,6 +29,7 @@ function App() {
         <Route path="/quiz" element={<Quiz />} />
         <Route path="/techniques" element={<Techniques />} />
         <Route path="/kata" element={<Kata />} />
+        <Route path="/randori" element={<RandoriTimer />} />
       </Routes>
       <Footer />
     </Router>
