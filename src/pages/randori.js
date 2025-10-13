@@ -30,60 +30,16 @@ const RandoriTimer = () => {
   const intervalRef = useRef(null);
   const fightEndSoundRef = useRef(null);
   const restEndSoundRef = useRef(null);
-  const audioContextRef = useRef(null);
-  const [audioInitialized, setAudioInitialized] = useState(false);
   
-  // Fallback audio elements for mobile
+  // Audio elements for mobile
   const fightEndAudioRef = useRef(null);
   const restEndAudioRef = useRef(null);
+  const audioContextRef = useRef(null);
 
   // Initialize audio
   useEffect(() => {
-    // Create Japanese-style bell/gong sounds
-    const createJapaneseBellSound = (frequency, duration, harmonics = 3) => {
-      if (!audioContextRef.current) {
-        audioContextRef.current = new (window.AudioContext || window.webkitAudioContext)();
-      }
-      
-      const audioContext = audioContextRef.current;
-      
-      // Resume audio context if suspended (required for mobile)
-      if (audioContext.state === 'suspended') {
-        audioContext.resume();
-      }
-      
-      // Create multiple oscillators for harmonic richness
-      for (let i = 0; i < harmonics; i++) {
-        const oscillator = audioContext.createOscillator();
-        const gainNode = audioContext.createGain();
-        
-        oscillator.connect(gainNode);
-        gainNode.connect(audioContext.destination);
-        
-        // Create harmonic series (fundamental + overtones)
-        oscillator.frequency.value = frequency * (i + 1);
-        oscillator.type = 'sine';
-        
-        // Envelope for bell-like decay
-        const now = audioContext.currentTime;
-        gainNode.gain.setValueAtTime(0, now);
-        gainNode.gain.linearRampToValueAtTime(0.3 / (i + 1), now + 0.01);
-        gainNode.gain.exponentialRampToValueAtTime(0.001, now + duration);
-        
-        oscillator.start(now);
-        oscillator.stop(now + duration);
-      }
-    };
-
-    fightEndSoundRef.current = () => createJapaneseBellSound(220, 1.2, 4); // Lower, longer bell for fight end
-    restEndSoundRef.current = () => createJapaneseBellSound(330, 0.8, 3); // Higher, shorter bell for rest end
-    
-    // Create fallback audio elements for mobile
-    fightEndAudioRef.current = new Audio();
-    restEndAudioRef.current = new Audio();
-    
-    // Generate simple tones as data URLs for fallback
-    const generateToneDataURL = (frequency, duration) => {
+    // Simple approach for mobile - use HTML5 Audio with data URLs
+    const createSimpleTone = (frequency, duration) => {
       const sampleRate = 44100;
       const length = sampleRate * duration;
       const buffer = new ArrayBuffer(44 + length * 2);
@@ -119,9 +75,77 @@ const RandoriTimer = () => {
       const blob = new Blob([buffer], { type: 'audio/wav' });
       return URL.createObjectURL(blob);
     };
+
+    // Create audio elements
+    fightEndAudioRef.current = new Audio();
+    restEndAudioRef.current = new Audio();
     
-    fightEndAudioRef.current.src = generateToneDataURL(220, 1.2);
-    restEndAudioRef.current.src = generateToneDataURL(330, 0.8);
+    fightEndAudioRef.current.src = createSimpleTone(220, 1.2);
+    restEndAudioRef.current.src = createSimpleTone(330, 0.8);
+    
+    // Preload audio for mobile
+    fightEndAudioRef.current.preload = 'auto';
+    restEndAudioRef.current.preload = 'auto';
+    
+    // Enable audio in silent mode (like YouTube/Instagram)
+    try {
+      fightEndAudioRef.current.setAttribute('playsinline', 'true');
+      restEndAudioRef.current.setAttribute('playsinline', 'true');
+      
+      // For iOS - allow audio in silent mode
+      if (fightEndAudioRef.current.webkitAudioContext) {
+        fightEndAudioRef.current.webkitAudioContext = true;
+      }
+      if (restEndAudioRef.current.webkitAudioContext) {
+        restEndAudioRef.current.webkitAudioContext = true;
+      }
+    } catch (e) {
+      console.log('Silent mode audio setup failed:', e);
+    }
+    
+    fightEndSoundRef.current = () => {
+      try {
+        fightEndAudioRef.current.currentTime = 0;
+        fightEndAudioRef.current.play().catch(e => console.log('Audio play failed:', e));
+      } catch (error) {
+        console.log('Fight end sound failed:', error);
+      }
+    };
+    
+    restEndSoundRef.current = () => {
+      try {
+        restEndAudioRef.current.currentTime = 0;
+        restEndAudioRef.current.play().catch(e => console.log('Audio play failed:', e));
+      } catch (error) {
+        console.log('Rest end sound failed:', error);
+      }
+    };
+    
+    // Initialize audio context for silent mode playback
+    const initAudioContext = async () => {
+      try {
+        if (!audioContextRef.current) {
+          audioContextRef.current = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        
+        // Configure audio session for silent mode playback
+        if (audioContextRef.current.state === 'suspended') {
+          await audioContextRef.current.resume();
+        }
+        
+        // Set audio session category for iOS (if available)
+        if (navigator.mediaSession) {
+          navigator.mediaSession.setActionHandler('play', () => {});
+          navigator.mediaSession.setActionHandler('pause', () => {});
+        }
+        
+      } catch (error) {
+        console.log('Audio context initialization failed:', error);
+      }
+    };
+    
+    // Initialize audio context on first user interaction
+    initAudioContext();
   }, []);
 
   // Timer logic
@@ -131,23 +155,10 @@ const RandoriTimer = () => {
         setTimeLeft(prev => {
           if (prev <= 1) {
             // Time's up - play sound and move to next phase
-            try {
-              if (currentPhase === 'fight') {
-                fightEndSoundRef.current?.();
-              } else if (currentPhase === 'rest') {
-                restEndSoundRef.current?.();
-              }
-            } catch (error) {
-              // Fallback to HTML5 Audio for mobile
-              try {
-                if (currentPhase === 'fight') {
-                  fightEndAudioRef.current?.play();
-                } else if (currentPhase === 'rest') {
-                  restEndAudioRef.current?.play();
-                }
-              } catch (fallbackError) {
-                console.log('Audio playback failed:', fallbackError);
-              }
+            if (currentPhase === 'fight') {
+              fightEndSoundRef.current?.();
+            } else if (currentPhase === 'rest') {
+              restEndSoundRef.current?.();
             }
             
             if (currentPhase === 'fight') {
@@ -177,23 +188,14 @@ const RandoriTimer = () => {
     return () => clearInterval(intervalRef.current);
   }, [isRunning, isPaused, currentPhase, fightTime, restTime, rounds, currentRound]);
 
-  const initializeAudio = async () => {
-    if (!audioInitialized && audioContextRef.current) {
-      try {
-        await audioContextRef.current.resume();
-        setAudioInitialized(true);
-      } catch (error) {
-        console.log('Audio initialization failed:', error);
-      }
-    }
-  };
-
-  const startTimer = async () => {
-    await initializeAudio();
+  const startTimer = () => {
     setIsRunning(true);
     setIsPaused(false);
     setCurrentPhase('fight');
     setTimeLeft(fightTime);
+    
+    // Scroll to top when timer starts
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const pauseTimer = () => {
@@ -206,6 +208,9 @@ const RandoriTimer = () => {
     setCurrentPhase('ready');
     setCurrentRound(1);
     setTimeLeft(fightTime);
+    
+    // Scroll to top when timer stops
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const formatTime = (seconds) => {
