@@ -11,7 +11,7 @@ export const SmoothImage = memo(({
   placeholder = '🥋',
   ...props 
 }) => {
-  const { loaded, error, timeout } = useSmoothImage(src);
+  const { loaded, error } = useSmoothImage(src);
 
   if (error) {
     return (
@@ -32,31 +32,6 @@ export const SmoothImage = memo(({
         <div style={{ textAlign: 'center', color: '#999' }}>
           <div style={{ fontSize: '24px', marginBottom: '8px' }}>❌</div>
           <div>Failed to load</div>
-        </div>
-      </div>
-    );
-  }
-
-  if (timeout) {
-    return (
-      <div 
-        className={`smooth-image-timeout ${className}`}
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          backgroundColor: '#fff3cd',
-          border: '2px dashed #ffc107',
-          borderRadius: '8px',
-          minHeight: '200px',
-          ...style
-        }}
-        {...props}
-      >
-        <div style={{ textAlign: 'center', color: '#856404' }}>
-          <div style={{ fontSize: '24px', marginBottom: '8px' }}>⏳</div>
-          <div>Large image loading...</div>
-          <div style={{ fontSize: '0.8em', marginTop: '4px' }}>This may take a moment</div>
         </div>
       </div>
     );
