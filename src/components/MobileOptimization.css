@@ -1,0 +1,41 @@
+/* Simple Mobile Image Optimization */
+@media screen and (max-width: 768px) {
+  .img-technique {
+    /* Force smaller images on mobile */
+    max-width: 100%;
+    height: 150px !important; /* Smaller height for mobile */
+    object-fit: cover; /* Better performance than contain */
+  }
+  
+  .technique-container {
+    height: 150px !important;
+  }
+  
+  /* Reduce image quality for mobile */
+  .img-technique {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
+}
+
+/* Tablet optimization */
+@media screen and (min-width: 769px) and (max-width: 1024px) {
+  .img-technique {
+    height: 200px !important;
+  }
+  
+  .technique-container {
+    height: 200px !important;
+  }
+}
+
+/* Desktop - keep original size */
+@media screen and (min-width: 1025px) {
+  .img-technique {
+    height: 250px !important;
+  }
+  
+  .technique-container {
+    height: 250px !important;
+  }
+}

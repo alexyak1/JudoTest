@@ -5,6 +5,7 @@ import { useDebouncedResize } from '../hooks/useDebouncedResize';
 import { useTechniquesCache } from '../hooks/useGlobalCache';
 import { trackBeltAction } from '../hooks/useBeltWithUrl';
 import '../utils/imagePreloader';
+import '../components/MobileOptimization.css';
 
 // Import all images at build time
 const images = require.context('../pages/judo_techniques', true, /\.gif$/);
@@ -151,7 +152,6 @@ const ShowTechniques = memo(({ belt }) => {
                                 imageSrc={imageSrc}
                                 imagePath={imagePath}
                                 onCardClick={openCard}
-                                index={index}
                             />
                         );
                     })}

@@ -3,6 +3,7 @@ import ImageModal from './ImageModal';
 import { KataTechniqueCard } from './KataTechniqueCard';
 import { useKataCache } from '../hooks/useGlobalCache';
 import '../utils/imagePreloader';
+import '../components/MobileOptimization.css';
 
 // Import all kata images at build time for better performance
 const kataImages = require.context('../pages/kata_techniques', true, /\.gif$/);
