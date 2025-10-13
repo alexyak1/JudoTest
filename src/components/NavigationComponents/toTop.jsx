@@ -19,7 +19,7 @@ const ScrollButton = styled.button`
     box-shadow: 0 8px 32px rgba(102, 126, 234, 0.3);
     opacity: ${(props) => (props.visible ? "1" : "0")};
     transition: all 0.3s ease;
-    z-index: 1000;
+    z-index: 1500;
     font-family: 'Inter', sans-serif;
     font-weight: 600;
 
@@ -38,6 +38,8 @@ const ScrollButton = styled.button`
         right: 20px;
         width: 56px;
         height: 56px;
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
     }
 `;
 
@@ -70,10 +72,35 @@ const ToTop = () => {
         return () => window.removeEventListener("scroll", toggleVisibility);
     }, []);
 
+    const handleClick = (e) => {
+        // Prevent event bubbling and default behavior
+        e.preventDefault();
+        e.stopPropagation();
+        
+        // Scroll to top
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    };
+
+    const handleTouchStart = (e) => {
+        // Prevent touch events from bubbling to elements behind
+        e.stopPropagation();
+    };
+
+    const handleTouchEnd = (e) => {
+        // Prevent touch events from bubbling to elements behind
+        e.preventDefault();
+        e.stopPropagation();
+        
+        // Scroll to top
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    };
+
     return (
         <ScrollButton
             visible={isVisible}
-            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+            onClick={handleClick}
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
             title="Scroll to Top"
         >
             <ArrowIcon />
