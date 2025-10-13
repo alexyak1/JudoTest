@@ -1,10 +1,11 @@
 import React, { memo, useCallback } from 'react';
-import { SmoothImage } from './SmoothImage';
+import { LazyKataImage } from './LazyKataImage';
 
 const KataTechniqueCard = memo(({ 
   item, 
   imageSrc, 
-  onCardClick 
+  onCardClick,
+  index = 0
 }) => {
   const handleClick = useCallback(() => {
     onCardClick(item.name, imageSrc);
@@ -13,11 +14,14 @@ const KataTechniqueCard = memo(({
   return (
     <div className="technique-card" onClick={handleClick}>
       <div className="technique-container">
-        <SmoothImage
+        <LazyKataImage
           src={imageSrc}
           alt={item.name}
           className="img-technique"
           style={{ width: '100%', height: '200px' }}
+          index={index}
+          priorityCount={3}
+          placeholder="🥋"
         />
       </div>
       <h3>{item.name}</h3>

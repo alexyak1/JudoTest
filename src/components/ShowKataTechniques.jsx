@@ -33,11 +33,11 @@ const ShowKataTechniques = memo(({ kataType, preloadedData }) => {
         }).filter(Boolean);
     }, [items]);
 
-    // Preload images when data changes - optimized version
+    // Preload only the first 3 images for immediate display
     useEffect(() => {
         if (imageUrls.length > 0) {
-            // Remove setTimeout delay for faster loading
-            window.imagePreloader?.preloadBatch(imageUrls);
+            const priorityImages = imageUrls.slice(0, 3);
+            window.imagePreloader?.preloadBatch(priorityImages);
         }
     }, [imageUrls]);
 
@@ -67,6 +67,7 @@ const ShowKataTechniques = memo(({ kataType, preloadedData }) => {
                             item={filteredItem}
                             imageSrc={imgSrc}
                             onCardClick={openCard}
+                            index={index}
                         />
                     )
                 })}
