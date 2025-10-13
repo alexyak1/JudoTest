@@ -152,14 +152,54 @@ const RandoriTimer = () => {
                 setCurrentPhase('ready');
                 setCurrentRound(1);
                 return fightTime;
+                
+                // Track timer completion in Google Analytics
+                if (typeof window !== 'undefined' && window.gtag) {
+                  window.gtag('event', 'timer_complete', {
+                    event_category: 'timer_interaction',
+                    event_label: 'all_rounds_completed',
+                    value: rounds,
+                    custom_map: {
+                      total_rounds: rounds,
+                      fight_time: fightTime,
+                      rest_time: restTime
+                    }
+                  });
+                }
               } else {
                 setCurrentPhase('rest');
                 return restTime;
+                
+                // Track phase change to rest
+                if (typeof window !== 'undefined' && window.gtag) {
+                  window.gtag('event', 'phase_change', {
+                    event_category: 'timer_interaction',
+                    event_label: 'fight_to_rest',
+                    value: currentRound,
+                    custom_map: {
+                      current_round: currentRound,
+                      total_rounds: rounds
+                    }
+                  });
+                }
               }
             } else if (currentPhase === 'rest') {
               setCurrentRound(prev => prev + 1);
               setCurrentPhase('fight');
               return fightTime;
+              
+              // Track phase change to fight
+              if (typeof window !== 'undefined' && window.gtag) {
+                window.gtag('event', 'phase_change', {
+                  event_category: 'timer_interaction',
+                  event_label: 'rest_to_fight',
+                  value: currentRound + 1,
+                  custom_map: {
+                    current_round: currentRound + 1,
+                    total_rounds: rounds
+                  }
+                });
+              }
             }
           }
           return prev - 1;
@@ -180,10 +220,38 @@ const RandoriTimer = () => {
     
     // Scroll to top when timer starts
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    
+    // Track timer start in Google Analytics
+    if (typeof window !== 'undefined' && window.gtag) {
+      window.gtag('event', 'timer_start', {
+        event_category: 'timer_interaction',
+        event_label: 'timer_started',
+        value: 1,
+        custom_map: {
+          fight_time: fightTime,
+          rest_time: restTime,
+          rounds: rounds
+        }
+      });
+    }
   };
 
   const pauseTimer = () => {
     setIsPaused(!isPaused);
+    
+    // Track pause/resume in Google Analytics
+    if (typeof window !== 'undefined' && window.gtag) {
+      window.gtag('event', isPaused ? 'timer_resume' : 'timer_pause', {
+        event_category: 'timer_interaction',
+        event_label: isPaused ? 'timer_resumed' : 'timer_paused',
+        value: 1,
+        custom_map: {
+          current_phase: currentPhase,
+          current_round: currentRound,
+          time_left: timeLeft
+        }
+      });
+    }
   };
 
   const stopTimer = () => {
@@ -195,6 +263,19 @@ const RandoriTimer = () => {
     
     // Scroll to top when timer stops
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    
+    // Track timer stop in Google Analytics
+    if (typeof window !== 'undefined' && window.gtag) {
+      window.gtag('event', 'timer_stop', {
+        event_category: 'timer_interaction',
+        event_label: 'timer_stopped',
+        value: 1,
+        custom_map: {
+          completed_rounds: currentRound - 1,
+          total_rounds: rounds
+        }
+      });
+    }
   };
 
   const formatTime = (seconds) => {
@@ -408,6 +489,15 @@ const RandoriTimer = () => {
             onClick={() => {
               console.log('Test sound button clicked');
               fightEndSoundRef.current?.();
+              
+              // Track test sound in Google Analytics
+              if (typeof window !== 'undefined' && window.gtag) {
+                window.gtag('event', 'test_sound', {
+                  event_category: 'timer_interaction',
+                  event_label: 'sound_test_clicked',
+                  value: 1
+                });
+              }
             }}
             style={{
               marginTop: '10px',
