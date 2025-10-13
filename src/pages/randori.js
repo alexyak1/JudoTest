@@ -498,35 +498,6 @@ const RandoriTimer = () => {
           <button className="start-button" onClick={startTimer}>
             START
           </button>
-          
-          <button 
-            className="test-sound-button" 
-            onClick={() => {
-              console.log('Test sound button clicked');
-              fightEndSoundRef.current?.();
-              
-              // Track test sound in Google Analytics
-              if (typeof window !== 'undefined' && window.gtag) {
-                window.gtag('event', 'test_sound', {
-                  event_category: 'timer_interaction',
-                  event_label: 'sound_test_clicked',
-                  value: 1
-                });
-              }
-            }}
-            style={{
-              marginTop: '10px',
-              padding: '8px 16px',
-              fontSize: '0.9rem',
-              background: '#666',
-              color: 'white',
-              border: 'none',
-              borderRadius: '6px',
-              cursor: 'pointer'
-            }}
-          >
-            Test Sound
-          </button>
         </div>
       ) : (
         <div className="timer-container">
