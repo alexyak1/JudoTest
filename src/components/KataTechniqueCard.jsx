@@ -1,5 +1,5 @@
 import React, { memo, useCallback } from 'react';
-import { LazyKataImage } from './LazyKataImage';
+import { ResponsiveImage } from './ResponsiveImage';
 
 const KataTechniqueCard = memo(({ 
   item, 
@@ -14,7 +14,7 @@ const KataTechniqueCard = memo(({
   return (
     <div className="technique-card" onClick={handleClick}>
       <div className="technique-container">
-        <LazyKataImage
+        <ResponsiveImage
           src={imageSrc}
           alt={item.name}
           className="img-technique"
@@ -22,6 +22,7 @@ const KataTechniqueCard = memo(({
           index={index}
           priorityCount={3}
           placeholder="🥋"
+          fallbackSrc={imageSrc} // Fallback to original if optimization fails
         />
       </div>
       <h3>{item.name}</h3>

@@ -136,7 +136,7 @@ const ShowTechniques = memo(({ belt }) => {
 
             {filteredItems.length > 0 ? (
                 <div ref={techniquesGridRef} className="techniques-grid">
-                    {filteredItems.map((filteredItem) => {
+                    {filteredItems.map((filteredItem, index) => {
                         const imagePath = `./${filteredItem.belt}/${filteredItem.name}.gif`;
                         let imageSrc;
                         try {
@@ -152,6 +152,7 @@ const ShowTechniques = memo(({ belt }) => {
                                 imageSrc={imageSrc}
                                 imagePath={imagePath}
                                 onCardClick={openCard}
+                                index={index}
                             />
                         );
                     })}

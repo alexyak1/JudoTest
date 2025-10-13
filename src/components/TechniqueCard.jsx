@@ -1,11 +1,12 @@
 import React, { memo, useCallback } from 'react';
-import { SmoothImage } from './SmoothImage';
+import { ResponsiveImage } from './ResponsiveImage';
 
 const TechniqueCard = memo(({ 
   item, 
   imageSrc, 
   imagePath, 
-  onCardClick 
+  onCardClick,
+  index = 0
 }) => {
   const handleClick = useCallback(() => {
     onCardClick(item.name, imagePath);
@@ -16,11 +17,14 @@ const TechniqueCard = memo(({
       <h3>{item.name}</h3>
       <div className="technique-container">
         {imageSrc ? (
-          <SmoothImage
+          <ResponsiveImage
             src={imageSrc}
             alt={item.name}
             className="img-technique"
             placeholder="🥋"
+            index={index}
+            priorityCount={3}
+            fallbackSrc={imageSrc}
           />
         ) : (
           <div className="loading-placeholder">
