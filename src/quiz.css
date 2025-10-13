@@ -256,6 +256,14 @@ html {
   .quiz-header {
     margin-bottom: 2rem;
   }
+  
+  /* Mobile quiz image styling */
+  .question .img-technique {
+    max-width: 100%;
+    min-height: 200px;
+    max-height: 280px;
+    margin: 15px auto;
+  }
 }
 
 h1 {
@@ -345,6 +353,23 @@ button.restart {
   font-weight: 500;
   margin: 20px 0;
   color: #ffffff;
+}
+
+/* Quiz image styling - ensure full technique is visible */
+.question .img-technique {
+  width: 100%;
+  max-width: 400px;
+  height: auto;
+  min-height: 250px;
+  max-height: 350px;
+  object-fit: contain;
+  margin: 20px auto;
+  display: block;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 /* Answer Style */

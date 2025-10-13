@@ -3,12 +3,12 @@
   .img-technique {
     /* Force smaller images on mobile */
     max-width: 100%;
-    height: 150px !important; /* Smaller height for mobile */
-    object-fit: cover; /* Better performance than contain */
+    height: 200px !important; /* Increased height to show full technique */
+    object-fit: contain; /* Show full technique without cropping */
   }
   
   .technique-container {
-    height: 150px !important;
+    height: 200px !important; /* Match the image height */
   }
   
   /* Reduce image quality for mobile */
