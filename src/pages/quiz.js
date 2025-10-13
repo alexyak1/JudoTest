@@ -4,6 +4,9 @@ import ProgressBar from "../components/Test/progressBar"
 import { useBeltWithUrl, usePageTracking, trackBeltAction } from "../hooks/useBeltWithUrl";
 import '../quiz.css';
 
+// Import all images at build time
+const images = require.context('./judo_techniques', true, /\.gif$/);
+
 export default function Test() {
 	const { useState, useEffect, Fragment } = React
 	const host = window.location.hostname;
@@ -49,8 +52,9 @@ export default function Test() {
 				techniques[threeRandomNumbers[2]].name,
 				techniques[i].name
 			]
+			const imagePath = `./${techniques[i].belt}/${techniques[i].name}.gif`;
 			quizQuestions.push({
-				'image': './judo_techniques/' + techniques[i].belt + '/' + techniques[i].name + '.gif',
+				'image': images(imagePath),
 				'correctAnswer': techniques[i].name,
 				'correctAnswerId': i,
 				'answers': answers.sort(() => Math.random() - 0.5)
@@ -107,7 +111,7 @@ export default function Test() {
 					<div className="questionText">What technique is on the picture?</div>
 					<img
 						className="img-technique"
-						src={require(`${question.image}`)}
+						src={question.image}
 						alt="Judo technique">
 					</img>
 					<div className="answers">
