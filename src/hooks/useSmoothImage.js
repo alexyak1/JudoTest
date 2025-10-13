@@ -5,23 +5,17 @@ export const useSmoothImage = (src) => {
   const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState(false);
 
-  // Memoize the image loading logic to prevent unnecessary re-runs
-  const imageLoadingState = useMemo(() => {
-    if (!src) return { loaded: false, error: false };
-
-    // Check if already cached
-    if (window.imagePreloader?.isCached(src)) {
-      return { loaded: true, error: false };
-    }
-
-    return { loaded: false, error: false };
+  // Memoize the cache check to prevent unnecessary re-runs
+  const isCached = useMemo(() => {
+    if (!src) return false;
+    return window.imagePreloader?.isCached(src) || false;
   }, [src]);
 
   useEffect(() => {
     if (!src) return;
 
     // If already cached, set loaded immediately
-    if (window.imagePreloader?.isCached(src)) {
+    if (isCached) {
       setLoaded(true);
       setError(false);
       return;
@@ -46,7 +40,7 @@ export const useSmoothImage = (src) => {
       img.onload = null;
       img.onerror = null;
     };
-  }, [src]);
+  }, [src, isCached]);
 
   return { loaded, error };
 };

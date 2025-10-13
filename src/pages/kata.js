@@ -1,34 +1,15 @@
-import React, { useState, useEffect, useCallback, useMemo } from "react";
-import Select from 'react-select';
+import React, { useMemo } from "react";
 import { ShowKataTechniques } from "../components/ShowKataTechniques";
 import { ToTop } from "../components/NavigationComponents/toTop";
 import { useAllKataCache } from "../hooks/useGlobalCache";
 
 export default function Kata() {
-    const [filterParam, setFilterColor] = useState('nage-no-kata');
-
-    const options = [
-        { value: 'nage-no-kata', label: 'nage-no-kata' },
-    ]
-
-    const colourStyles = {
-        option: (state) => ({
-            backgroundColor: state.isSelected ? '#55555e' : '#f3f3f3',
-            color: state.isSelected ? 'white' : '#222',
-            padding: 15,
-        }),
-    };
-
-    const applyFilter = useCallback((e) => {
-        setFilterColor(e.value)
-    }, []);
-
     const kata_series = [
         "Te-waza", "Koshi-waza", "Ashi-Waza", "Masutemi-Waza", "Yoko-stemi-Waza"
     ];
 
     // Use global cache for all kata data
-    const { data: allKataData, loadingStates, error } = useAllKataCache(kata_series);
+    const { data: allKataData, loadingStates } = useAllKataCache(kata_series);
 
     // Memoize loading state to prevent unnecessary re-renders
     const isLoading = useMemo(() => {
