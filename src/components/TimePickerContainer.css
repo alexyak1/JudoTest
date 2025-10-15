@@ -1,0 +1,37 @@
+/* Time Picker Container Styles */
+.time-picker-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 30px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 20px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  margin: 20px auto;
+  max-width: 800px;
+  min-height: 280px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Mobile optimizations */
+@media screen and (max-width: 768px) {
+  .time-picker-container {
+    flex-direction: column;
+    gap: 30px;
+    padding: 25px;
+    min-height: 500px;
+    max-width: 600px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .time-picker-container {
+    gap: 20px;
+    padding: 20px;
+    min-height: 450px;
+    max-width: 100%;
+    margin: 20px 10px;
+  }
+}

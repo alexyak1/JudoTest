@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './randori.css';
+import TimePickerContainer from '../components/TimePickerContainer';
 
 const RandoriTimer = () => {
   // Load saved settings or use defaults
@@ -25,10 +26,6 @@ const RandoriTimer = () => {
   const [rounds, setRounds] = useState(savedSettings?.rounds || 4);
 
   // Input display states (can be empty while typing)
-  const [fightMinutesDisplay, setFightMinutesDisplay] = useState(savedSettings?.fightMinutes?.toString() || '2');
-  const [fightSecondsDisplay, setFightSecondsDisplay] = useState(savedSettings?.fightSeconds?.toString() || '30');
-  const [restMinutesDisplay, setRestMinutesDisplay] = useState(savedSettings?.restMinutes?.toString() || '1');
-  const [restSecondsDisplay, setRestSecondsDisplay] = useState(savedSettings?.restSeconds?.toString() || '0');
   const [roundsDisplay, setRoundsDisplay] = useState(savedSettings?.rounds?.toString() || '4');
 
   // Calculate total seconds
@@ -68,7 +65,6 @@ const RandoriTimer = () => {
   const fightEndAudioRef = useRef(null);
   const restEndAudioRef = useRef(null);
   const fightStartAudioRef = useRef(null);
-  const audioContextRef = useRef(null);
 
   // Initialize audio
   useEffect(() => {
@@ -161,7 +157,6 @@ const RandoriTimer = () => {
                 setIsRunning(false);
                 setCurrentPhase('ready');
                 setCurrentRound(1);
-                return fightTime;
                 
                 // Track timer completion in Google Analytics
                 if (typeof window !== 'undefined' && window.gtag) {
@@ -176,9 +171,10 @@ const RandoriTimer = () => {
                     }
                   });
                 }
+                
+                return fightTime;
               } else {
                 setCurrentPhase('rest');
-                return restTime;
                 
                 // Track phase change to rest
                 if (typeof window !== 'undefined' && window.gtag) {
@@ -192,11 +188,12 @@ const RandoriTimer = () => {
                     }
                   });
                 }
+                
+                return restTime;
               }
             } else if (currentPhase === 'rest') {
               setCurrentRound(prev => prev + 1);
               setCurrentPhase('fight');
-              return fightTime;
               
               // Track phase change to fight
               if (typeof window !== 'undefined' && window.gtag) {
@@ -210,6 +207,8 @@ const RandoriTimer = () => {
                   }
                 });
               }
+              
+              return fightTime;
             }
           }
           return prev - 1;
@@ -321,143 +320,22 @@ const RandoriTimer = () => {
       {!isRunning ? (
         <div className="settings-container">
           <div className="setting-group">
-            <label>FIGHT TIME</label>
-            <div className="time-inputs">
-              <div className="time-input">
-                <input
-                  type="number"
-                  value={fightMinutesDisplay}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    setFightMinutesDisplay(value);
-                    if (value === '') {
-                      setFightMinutes(0);
-                    } else {
-                      const num = parseInt(value);
-                      if (!isNaN(num)) {
-                        setFightMinutes(Math.max(0, Math.min(10, num)));
-                      }
-                    }
-                  }}
-                  onBlur={() => {
-                    if (fightMinutesDisplay === '') {
-                      setFightMinutesDisplay('0');
-                    }
-                  }}
-                  onFocus={(e) => {
-                    // Move cursor to end of input
-                    setTimeout(() => {
-                      e.target.setSelectionRange(e.target.value.length, e.target.value.length);
-                    }, 0);
-                  }}
-                  min="0"
-                  max="10"
-                />
-                <span>min</span>
-              </div>
-              <div className="time-input">
-                <input
-                  type="number"
-                  value={fightSecondsDisplay}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    setFightSecondsDisplay(value);
-                    if (value === '') {
-                      setFightSeconds(0);
-                    } else {
-                      const num = parseInt(value);
-                      if (!isNaN(num)) {
-                        setFightSeconds(Math.max(0, Math.min(59, num)));
-                      }
-                    }
-                  }}
-                  onBlur={() => {
-                    if (fightSecondsDisplay === '') {
-                      setFightSecondsDisplay('0');
-                    }
-                  }}
-                  onFocus={(e) => {
-                    // Move cursor to end of input
-                    setTimeout(() => {
-                      e.target.setSelectionRange(e.target.value.length, e.target.value.length);
-                    }, 0);
-                  }}
-                  min="0"
-                  max="59"
-                />
-                <span>sec</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="setting-group">
-            <label>REST TIME</label>
-            <div className="time-inputs">
-              <div className="time-input">
-                <input
-                  type="number"
-                  value={restMinutesDisplay}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    setRestMinutesDisplay(value);
-                    if (value === '') {
-                      setRestMinutes(0);
-                    } else {
-                      const num = parseInt(value);
-                      if (!isNaN(num)) {
-                        setRestMinutes(Math.max(0, Math.min(10, num)));
-                      }
-                    }
-                  }}
-                  onBlur={() => {
-                    if (restMinutesDisplay === '') {
-                      setRestMinutesDisplay('0');
-                    }
-                  }}
-                  onFocus={(e) => {
-                    // Move cursor to end of input
-                    setTimeout(() => {
-                      e.target.setSelectionRange(e.target.value.length, e.target.value.length);
-                    }, 0);
-                  }}
-                  min="0"
-                  max="10"
-                />
-                <span>min</span>
-              </div>
-              <div className="time-input">
-                <input
-                  type="number"
-                  value={restSecondsDisplay}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    setRestSecondsDisplay(value);
-                    if (value === '') {
-                      setRestSeconds(0);
-                    } else {
-                      const num = parseInt(value);
-                      if (!isNaN(num)) {
-                        setRestSeconds(Math.max(0, Math.min(59, num)));
-                      }
-                    }
-                  }}
-                  onBlur={() => {
-                    if (restSecondsDisplay === '') {
-                      setRestSecondsDisplay('0');
-                    }
-                  }}
-                  onFocus={(e) => {
-                    // Move cursor to end of input
-                    setTimeout(() => {
-                      e.target.setSelectionRange(e.target.value.length, e.target.value.length);
-                    }, 0);
-                  }}
-                  min="0"
-                  max="59"
-                />
-                <span>sec</span>
-              </div>
-            </div>
+            <TimePickerContainer
+              fightMinutes={fightMinutes}
+              fightSeconds={fightSeconds}
+              restMinutes={restMinutes}
+              restSeconds={restSeconds}
+              onFightTimeChange={(minutes, seconds) => {
+                setFightMinutes(minutes);
+                setFightSeconds(seconds);
+              }}
+              onRestTimeChange={(minutes, seconds) => {
+                setRestMinutes(minutes);
+                setRestSeconds(seconds);
+              }}
+              maxMinutes={59}
+              maxSeconds={59}
+            />
           </div>
 
           <div className="setting-group">
@@ -484,10 +362,8 @@ const RandoriTimer = () => {
                     }
                   }}
                   onFocus={(e) => {
-                    // Move cursor to end of input
-                    setTimeout(() => {
-                      e.target.setSelectionRange(e.target.value.length, e.target.value.length);
-                    }, 0);
+                    // Clear input on click/focus
+                    setRoundsDisplay('');
                   }}
                 min="1"
                 max="20"
