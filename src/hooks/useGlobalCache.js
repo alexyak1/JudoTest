@@ -182,31 +182,16 @@ export const useTechniquesCache = (belt) => {
       setLoading(true);
       setError(null);
       
-      let result;
+      // Build URL - no belt param returns all techniques
+      const url = belt === 'all' 
+        ? `http://${host}:8787/techniques`
+        : `http://${host}:8787/techniques?belt=${belt}`;
       
-      if (belt === 'all') {
-        // Fetch techniques from all belts
-        const allBelts = ['yellow', 'orange', 'green', 'blue', 'brown'];
-        const allTechniques = [];
-        
-        for (const beltColor of allBelts) {
-          const response = await fetch(`http://${host}:8787/techniques?belt=${beltColor}`);
-          if (!response.ok) {
-            throw new Error(`Failed to fetch data for ${beltColor} belt`);
-          }
-          const beltData = await response.json();
-          allTechniques.push(...beltData);
-        }
-        
-        result = allTechniques;
-      } else {
-        // Fetch techniques from specific belt
-        const response = await fetch(`http://${host}:8787/techniques?belt=${belt}`);
-        if (!response.ok) {
-          throw new Error('Failed to fetch data');
-        }
-        result = await response.json();
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error('Failed to fetch data');
       }
+      const result = await response.json();
       
       // Cache the result
       globalCache.set(cacheKey, result);
