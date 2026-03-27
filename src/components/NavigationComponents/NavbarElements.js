@@ -69,9 +69,10 @@ export const NavLink = styled(Link)`
 export const NavMenu = styled.div`
   display: flex;
   align-items: center;
-  gap: 1.5rem; /* Adds spacing between links */
+  gap: 1.5rem;
+  flex-wrap: wrap;
 
   @media screen and (max-width: 768px) {
-    gap: 1rem;
+    gap: 0.3rem;
   }
 `;

@@ -2,6 +2,8 @@ import React from "react";
 import BeltSelector from "../components/Test/selectBelt"
 import ProgressBar from "../components/Test/progressBar"
 import { useBeltWithUrl, usePageTracking, trackBeltAction } from "../hooks/useBeltWithUrl";
+import { useAuth } from "../hooks/useAuth";
+import { apiRequest } from "../utils/api";
 import '../quiz.css';
 
 // Import all images at build time
@@ -135,6 +137,8 @@ export default function Test() {
 		const [correctAnswerCount, setCorrectAnswerCount] = useState(0)
 		const [quizComplete, setQuizComplete] = useState(false)
 		const [quizQuestions, setQuizQuestions] = useState([])
+		const [resultSaved, setResultSaved] = useState(false)
+		const { isAuthenticated } = useAuth()
 
 		useEffect(() => {
 			setAnswerStatus(null)
@@ -145,6 +149,20 @@ export default function Test() {
 				setCorrectAnswerCount(count => count + 1)
 			}
 		}, [answerStatus])
+
+		useEffect(() => {
+			if (quizComplete && isAuthenticated && quizQuestions.length > 0) {
+				apiRequest('/user/quiz-results', {
+					method: 'POST',
+					body: JSON.stringify({
+						belt: urlBelt,
+						total_questions: quizQuestions.length,
+						correct_answers: correctAnswerCount,
+					}),
+				}).then(() => setResultSaved(true))
+				  .catch(() => {});
+			}
+		}, [quizComplete])
 
 		// Auto-start quiz if belt is specified in URL
 		useEffect(() => {
@@ -174,6 +192,7 @@ export default function Test() {
 			setQuizComplete(false)
 			setQuestionIndex(null)
 			setCorrectAnswerCount(0)
+			setResultSaved(false)
 		}
 
 		if (questionIndex == null) {
@@ -197,8 +216,15 @@ export default function Test() {
 			<div className="quiz app">
 				{quizComplete ? (
 					<Fragment>
-						<h1>Quiz complete!🥳</h1>
+						<h1>Quiz complete!</h1>
 						<p>You answered {correctAnswerCount} questions correctly (out of a total {quizQuestions.length} questions)</p>
+						{isAuthenticated ? (
+							resultSaved && <p style={{color: '#4ade80', fontSize: '0.9rem'}}>Result saved to your account</p>
+						) : (
+							<p style={{fontSize: '0.9rem'}}>
+								<a href="/login" style={{color: '#667eea'}}>Log in</a> to save your quiz results
+							</p>
+						)}
 					</Fragment>
 				) : (
 					<Fragment>
