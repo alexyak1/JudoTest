@@ -259,6 +259,10 @@ const StudentProfile = ({ user, isOwnProfile, canEdit, onUpdate, onUpdateUser })
     const [localUser, setLocalUser] = useState(user);
     const [clubs, setClubs] = useState([]);
     const [joiningClub, setJoiningClub] = useState(false);
+    const [showInvite, setShowInvite] = useState(false);
+    const [inviteEmail, setInviteEmail] = useState('');
+    const [inviting, setInviting] = useState(false);
+    const [inviteMsg, setInviteMsg] = useState('');
 
     // For coach-viewed profiles, use local state
     const displayUser = isOwnProfile ? user : localUser;
@@ -356,6 +360,51 @@ const StudentProfile = ({ user, isOwnProfile, canEdit, onUpdate, onUpdateUser })
                         </EditBtn>
                     )}
                 </ProfileHeader>
+
+                {canEdit && !displayUser.has_password && (
+                    <div style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+                        {inviteMsg ? (
+                            <span style={{ color: inviteMsg === 'Invite sent!' ? '#4ade80' : '#ff6b6b', fontSize: '0.85rem' }}>{inviteMsg}</span>
+                        ) : !showInvite ? (
+                            <span
+                                onClick={() => { setShowInvite(true); setInviteEmail(displayUser.email || ''); }}
+                                style={{ color: '#667eea', fontSize: '0.85rem', cursor: 'pointer' }}
+                            >
+                                Invite to JudoQuiz
+                            </span>
+                        ) : (
+                            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                                <input
+                                    type="email"
+                                    value={inviteEmail}
+                                    onChange={e => setInviteEmail(e.target.value)}
+                                    placeholder="Enter student's email"
+                                    autoFocus
+                                    style={{
+                                        flex: 1, background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)',
+                                        borderRadius: '8px', padding: '0.6rem 0.8rem', color: '#fff', fontSize: '0.9rem', outline: 'none',
+                                    }}
+                                />
+                                <AddBtn onClick={async () => {
+                                    if (!inviteEmail) return;
+                                    setInviting(true);
+                                    try {
+                                        await apiRequest(`/coach/students/${user.id}/invite`, {
+                                            method: 'POST',
+                                            body: JSON.stringify({ email: inviteEmail }),
+                                        });
+                                        setInviteMsg('Invite sent!');
+                                    } catch (err) {
+                                        setInviteMsg(err.message || 'Failed');
+                                    }
+                                    setInviting(false);
+                                }} disabled={inviting || !inviteEmail} style={{ padding: '0.6rem 1rem', fontSize: '0.85rem', whiteSpace: 'nowrap' }}>
+                                    {inviting ? 'Sending...' : 'Send Invite'}
+                                </AddBtn>
+                            </div>
+                        )}
+                    </div>
+                )}
             </ProfileCard>
 
             {showClubPicker && clubs.length > 0 && (

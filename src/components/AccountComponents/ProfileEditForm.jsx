@@ -154,6 +154,7 @@ const SuccessMsg = styled.div`
 
 const ProfileEditForm = ({ user, onClose, onSave, apiPrefix = '/user', isOwnProfile }) => {
     const [name, setName] = useState(user.name || '');
+    const [studentEmail, setStudentEmail] = useState(user.email || '');
     const [photoURL, setPhotoURL] = useState(user.photo_url || '');
     const [saving, setSaving] = useState(false);
     const [uploading, setUploading] = useState(false);
@@ -272,11 +273,13 @@ const ProfileEditForm = ({ user, onClose, onSave, apiPrefix = '/user', isOwnProf
         }
 
         try {
+            const body = { name, photo_url: photoURL };
+            if (!isOwnProfile && studentEmail) body.email = studentEmail;
             await apiRequest(`${apiPrefix}/profile`, {
                 method: 'PUT',
-                body: JSON.stringify({ name, photo_url: photoURL }),
+                body: JSON.stringify(body),
             });
-            onSave({ name, photo_url: photoURL });
+            onSave({ name, photo_url: photoURL, email: studentEmail || undefined });
         } catch {
             // ignore
         }
@@ -292,6 +295,12 @@ const ProfileEditForm = ({ user, onClose, onSave, apiPrefix = '/user', isOwnProf
                         <Label>Name</Label>
                         <Input value={name} onChange={e => setName(e.target.value)} required />
                     </div>
+                    {!isOwnProfile && (
+                        <div>
+                            <Label>Email</Label>
+                            <Input type="email" value={studentEmail} onChange={e => setStudentEmail(e.target.value)} placeholder="student@email.com" />
+                        </div>
+                    )}
                     {showClubSection && (
                         <div>
                             <Label>Club</Label>
