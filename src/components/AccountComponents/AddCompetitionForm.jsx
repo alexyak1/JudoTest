@@ -103,6 +103,8 @@ const RESULTS = ['gold', 'silver', 'bronze', 'participated'];
 const AddCompetitionForm = ({ onClose, onSave, apiPrefix = '/user' }) => {
     const [name, setName] = useState('');
     const [date, setDate] = useState('');
+    const [link, setLink] = useState('');
+    const [category, setCategory] = useState('');
     const [result, setResult] = useState('participated');
     const [saving, setSaving] = useState(false);
 
@@ -112,7 +114,7 @@ const AddCompetitionForm = ({ onClose, onSave, apiPrefix = '/user' }) => {
         try {
             const newComp = await apiRequest(`${apiPrefix}/competitions`, {
                 method: 'POST',
-                body: JSON.stringify({ name, date, result }),
+                body: JSON.stringify({ name, date, link, category, result }),
             });
             onSave(newComp);
         } catch (err) {
@@ -133,6 +135,14 @@ const AddCompetitionForm = ({ onClose, onSave, apiPrefix = '/user' }) => {
                     <div>
                         <Label>Date</Label>
                         <Input type="date" value={date} onChange={e => setDate(e.target.value)} required />
+                    </div>
+                    <div>
+                        <Label>Link (optional)</Label>
+                        <Input value={link} onChange={e => setLink(e.target.value)} placeholder="https://smoothcomp.com/..." />
+                    </div>
+                    <div>
+                        <Label>Category (optional)</Label>
+                        <Input value={category} onChange={e => setCategory(e.target.value)} placeholder="e.g. PU13, FU11" />
                     </div>
                     <div>
                         <Label>Result</Label>

@@ -383,6 +383,7 @@ const CoachDashboard = ({ studentId, onStudentChange }) => {
     const [showCompForm, setShowCompForm] = useState(false);
     const [showAddStudent, setShowAddStudent] = useState(false);
     const [expandedComp, setExpandedComp] = useState(null);
+    const [clubCoaches, setClubCoaches] = useState([]);
 
     const clubApproved = user?.club_status === 'approved';
 
@@ -396,7 +397,16 @@ const CoachDashboard = ({ studentId, onStudentChange }) => {
         setLoading(false);
     };
 
-    useEffect(() => { fetchStudents(); }, []);
+    const fetchCoaches = () => {
+        apiRequest('/coach/club-coaches').then(setClubCoaches).catch(() => {});
+    };
+
+    const refreshAll = () => {
+        fetchStudents();
+        fetchCoaches();
+    };
+
+    useEffect(() => { refreshAll(); }, []);
 
     // Load student from URL param on mount
     useEffect(() => {
@@ -407,14 +417,17 @@ const CoachDashboard = ({ studentId, onStudentChange }) => {
         }
     }, [studentId]);
 
-    const removeStudent = async (sid, e) => {
-        e.stopPropagation();
+    const [confirmRemove, setConfirmRemove] = useState(null); // { id, name }
+
+    const removeStudent = async () => {
+        if (!confirmRemove) return;
         try {
-            await apiRequest(`/coach/remove-student/${sid}`, { method: 'DELETE' });
-            setStudents(prev => prev.filter(s => s.id !== sid));
+            await apiRequest(`/coach/remove-student/${confirmRemove.id}`, { method: 'DELETE' });
+            setStudents(prev => prev.filter(s => s.id !== confirmRemove.id));
         } catch {
             // ignore
         }
+        setConfirmRemove(null);
     };
 
     const viewStudent = async (id) => {
@@ -433,7 +446,7 @@ const CoachDashboard = ({ studentId, onStudentChange }) => {
                 method: 'PUT',
                 body: JSON.stringify({ result: newResult }),
             });
-            fetchStudents();
+            refreshAll();
         } catch {
             // ignore
         }
@@ -445,30 +458,40 @@ const CoachDashboard = ({ studentId, onStudentChange }) => {
                 method: 'PUT',
                 body: JSON.stringify({ category: newCategory }),
             });
-            fetchStudents();
+            refreshAll();
         } catch {
             // ignore
         }
     };
 
-    // Group competitions across students
+    // Group competitions across students and coaches
     const getCompetitions = () => {
         const compMap = {};
-        students.forEach(student => {
-            (student.competitions || []).forEach(comp => {
+        const addComps = (person) => {
+            (person.competitions || []).forEach(comp => {
                 const key = `${comp.name}_${comp.date}`;
                 if (!compMap[key]) {
                     compMap[key] = { name: comp.name, date: comp.date, link: comp.link, participants: [] };
                 }
-                compMap[key].participants.push({
-                    ...comp,
-                    studentName: student.name,
-                    studentId: student.id,
-                });
+                if (!compMap[key].participants.find(p => p.id === comp.id)) {
+                    compMap[key].participants.push({
+                        ...comp,
+                        studentName: person.name,
+                        studentId: person.id,
+                    });
+                }
             });
-        });
+        };
+        students.forEach(addComps);
+        clubCoaches.forEach(addComps);
         return Object.values(compMap).sort((a, b) => b.date.localeCompare(a.date));
     };
+
+    // All possible participants: students + coaches
+    const allParticipants = [
+        ...clubCoaches.map(c => ({ ...c, _type: 'coach' })),
+        ...students.map(s => ({ ...s, _type: 'student' })),
+    ];
 
     if (selectedStudent) {
         return (
@@ -508,7 +531,7 @@ const CoachDashboard = ({ studentId, onStudentChange }) => {
                                             {(student.belts || []).length} belts | {(student.competitions || []).length} competitions
                                         </CardSub>
                                     </div>
-                                    <RemoveBtn onClick={(e) => removeStudent(student.id, e)} title="Remove student">
+                                    <RemoveBtn onClick={(e) => { e.stopPropagation(); setConfirmRemove({ id: student.id, name: student.name }); }} title="Remove student">
                                         <FiTrash2 size={14} />
                                     </RemoveBtn>
                                 </CardHeader>
@@ -523,11 +546,9 @@ const CoachDashboard = ({ studentId, onStudentChange }) => {
             <Card>
                 <SectionHeader>
                     <SectionTitle>Competitions</SectionTitle>
-                    {students.length > 0 && (
-                        <AddBtn onClick={() => setShowCompForm(true)}>
-                            <FiPlus size={14} /> Add Competition
-                        </AddBtn>
-                    )}
+                    <AddBtn onClick={() => setShowCompForm(true)}>
+                        <FiPlus size={14} /> Add Competition
+                    </AddBtn>
                 </SectionHeader>
 
                 {competitions.length > 0 ? (
@@ -552,6 +573,7 @@ const CoachDashboard = ({ studentId, onStudentChange }) => {
                                                 <Th>Student</Th>
                                                 <Th>Category</Th>
                                                 <Th>Result</Th>
+                                                <Th></Th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -585,11 +607,25 @@ const CoachDashboard = ({ studentId, onStudentChange }) => {
                                                             <option value="bronze">Bronze</option>
                                                         </ResultSelect>
                                                     </Td>
+                                                    <Td>
+                                                        <span
+                                                            onClick={async () => {
+                                                                try {
+                                                                    await apiRequest(`/coach/competitions/${p.id}`, { method: 'DELETE' });
+                                                                    refreshAll();
+                                                                } catch {}
+                                                            }}
+                                                            style={{ color: '#666', cursor: 'pointer', fontSize: '0.8rem' }}
+                                                            title="Remove"
+                                                        >
+                                                            <FiTrash2 size={13} />
+                                                        </span>
+                                                    </Td>
                                                 </tr>
                                             ))}
                                         </tbody>
                                     </Table>
-                                    <AddStudentToComp comp={comp} students={students} onAdded={fetchStudents} />
+                                    <AddStudentToComp comp={comp} students={allParticipants} onAdded={refreshAll} />
                                 </CompDetails>
                             )}
                         </CompRow>
@@ -601,7 +637,7 @@ const CoachDashboard = ({ studentId, onStudentChange }) => {
 
             {showCompForm && (
                 <CompetitionForm
-                    students={students}
+                    students={allParticipants}
                     onClose={() => setShowCompForm(false)}
                     onSave={() => { setShowCompForm(false); fetchStudents(); }}
                 />
@@ -610,8 +646,32 @@ const CoachDashboard = ({ studentId, onStudentChange }) => {
             {showAddStudent && (
                 <AddStudentModal
                     onClose={() => setShowAddStudent(false)}
-                    onAdded={() => { setShowAddStudent(false); fetchStudents(); }}
+                    onAdded={() => { setShowAddStudent(false); refreshAll(); }}
                 />
+            )}
+
+            {confirmRemove && (
+                <Overlay onClick={() => setConfirmRemove(null)}>
+                    <Modal onClick={e => e.stopPropagation()} style={{ maxWidth: '380px', textAlign: 'center' }}>
+                        <ModalTitle>Remove Student</ModalTitle>
+                        <p style={{ color: '#ff6b6b', margin: '0 0 1.5rem' }}>
+                            Are you sure you want to remove <strong style={{ color: '#fff' }}>{confirmRemove.name}</strong> from your students?
+                        </p>
+                        <ButtonRow>
+                            <CancelBtn type="button" onClick={() => setConfirmRemove(null)}>Cancel</CancelBtn>
+                            <button
+                                onClick={removeStudent}
+                                style={{
+                                    flex: 1, padding: '0.8rem', fontWeight: 600,
+                                    background: 'rgba(255,107,107,0.2)', border: '1px solid rgba(255,107,107,0.3)',
+                                    color: '#ff6b6b', borderRadius: '10px', cursor: 'pointer',
+                                }}
+                            >
+                                Yes, Remove
+                            </button>
+                        </ButtonRow>
+                    </Modal>
+                </Overlay>
             )}
         </>
     );
@@ -658,9 +718,9 @@ const AddStudentToComp = ({ comp, students, onAdded }) => {
                     color: '#fff', fontSize: '0.85rem', outline: 'none',
                 }}
             >
-                <option value="" style={{ background: '#1a1a2e' }}>Add student...</option>
+                <option value="" style={{ background: '#1a1a2e' }}>Add participant...</option>
                 {available.map(s => (
-                    <option key={s.id} value={s.id} style={{ background: '#1a1a2e' }}>{s.name}</option>
+                    <option key={s.id} value={s.id} style={{ background: '#1a1a2e' }}>{s.name}{s._type === 'coach' ? ' (coach)' : ''}</option>
                 ))}
             </select>
             <AddBtn onClick={handleAdd} disabled={adding || !selectedId} style={{ padding: '0.5rem 0.8rem', fontSize: '0.8rem' }}>
@@ -676,8 +736,13 @@ const CompetitionForm = ({ students, onClose, onSave }) => {
     const [link, setLink] = useState('');
     const [category, setCategory] = useState('');
     const [selectedIds, setSelectedIds] = useState([]);
+    const [search, setSearch] = useState('');
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState('');
+
+    const filtered = students.filter(s =>
+        s.name.toLowerCase().includes(search.toLowerCase())
+    );
 
     const toggleStudent = (id) => {
         setSelectedIds(prev =>
@@ -693,10 +758,6 @@ const CompetitionForm = ({ students, onClose, onSave }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (selectedIds.length === 0) {
-            setError('Select at least one student');
-            return;
-        }
         setError('');
         setSaving(true);
         try {
@@ -740,14 +801,20 @@ const CompetitionForm = ({ students, onClose, onSave }) => {
                         <Input value={category} onChange={e => setCategory(e.target.value)} placeholder="e.g. PU13, FU11" />
                     </div>
                     <div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <Label>Select Students</Label>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                            <Label style={{ margin: 0 }}>Participants {selectedIds.length > 0 && `(${selectedIds.length})`}</Label>
                             <SelectAllBtn onClick={selectAll}>
                                 {selectedIds.length === students.length ? 'Deselect all' : 'Select all'}
                             </SelectAllBtn>
                         </div>
-                        <StudentCheckList>
-                            {students.map(s => (
+                        <Input
+                            value={search}
+                            onChange={e => setSearch(e.target.value)}
+                            placeholder="Search by name..."
+                            style={{ marginBottom: '0.5rem', padding: '0.6rem 0.8rem', fontSize: '0.9rem' }}
+                        />
+                        <StudentCheckList style={{ maxHeight: '250px' }}>
+                            {filtered.map(s => (
                                 <CheckItem key={s.id} checked={selectedIds.includes(s.id)}>
                                     <input
                                         type="checkbox"
@@ -755,8 +822,10 @@ const CompetitionForm = ({ students, onClose, onSave }) => {
                                         onChange={() => toggleStudent(s.id)}
                                     />
                                     {s.name}
+                                    {s._type === 'coach' && <span style={{ color: '#667eea', fontSize: '0.75rem', marginLeft: '0.3rem' }}>(coach)</span>}
                                 </CheckItem>
                             ))}
+                            {filtered.length === 0 && <span style={{ color: '#666', fontSize: '0.85rem', padding: '0.5rem' }}>No matches</span>}
                         </StudentCheckList>
                     </div>
                     <ButtonRow>

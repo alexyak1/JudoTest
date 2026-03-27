@@ -4,7 +4,6 @@ import { TechniqueCard } from './TechniqueCard';
 import { useDebouncedResize } from '../hooks/useDebouncedResize';
 import { useTechniquesCache } from '../hooks/useGlobalCache';
 import { trackBeltAction } from '../hooks/useBeltWithUrl';
-import '../utils/imagePreloader';
 import '../components/MobileOptimization.css';
 
 // Import all images at build time
@@ -46,26 +45,6 @@ const ShowTechniques = memo(({ belt }) => {
             setTimeout(scrollToTechniques, 300); // Initial delay to ensure DOM is ready
         }
     }, [belt, items?.length, isMobile, loading]);
-
-    // Preload images when data changes
-    useEffect(() => {
-        if (items && items.length > 0) {
-            setTimeout(() => {
-                const imageUrls = items.map(item => {
-                    const imagePath = `./${item.belt}/${item.name}.gif`;
-                    try {
-                        return images(imagePath);
-                    } catch (e) {
-                        return null;
-                    }
-                }).filter(Boolean);
-                
-                if (imageUrls.length > 0) {
-                    window.imagePreloader?.preloadBatch(imageUrls);
-                }
-            }, 100);
-        }
-    }, [items]);
 
     // Memoized filtered items to prevent unnecessary recalculations
     const filteredItems = useMemo(() => {
@@ -151,6 +130,7 @@ const ShowTechniques = memo(({ belt }) => {
                                 item={filteredItem}
                                 imageSrc={imageSrc}
                                 imagePath={imagePath}
+                                index={index}
                                 onCardClick={openCard}
                             />
                         );
