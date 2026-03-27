@@ -106,7 +106,7 @@ export default function Account() {
 
             {activeTab === 'profile' && (
                 <>
-                    {(isCoach || isAdmin) && user.club_status === 'approved' && <PendingRequests />}
+                    {(isAdmin || (isCoach && user.club_status === 'approved')) && <PendingRequests />}
                     <StudentProfile user={user} isOwnProfile={true} onUpdate={refreshUser} onUpdateUser={updateUser} />
                 </>
             )}
