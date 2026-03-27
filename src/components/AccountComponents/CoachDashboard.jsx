@@ -56,6 +56,8 @@ const MiniAvatar = styled.div`
     justify-content: center;
     color: #fff;
     font-weight: 600;
+    overflow: hidden;
+    img { width: 100%; height: 100%; object-fit: cover; }
     flex-shrink: 0;
 `;
 
@@ -524,7 +526,12 @@ const CoachDashboard = ({ studentId, onStudentChange }) => {
                         {students.map(student => (
                             <StudentCard key={student.id} onClick={() => viewStudent(student.id)}>
                                 <CardHeader>
-                                    <MiniAvatar>{student.name?.charAt(0)?.toUpperCase()}</MiniAvatar>
+                                    <MiniAvatar>
+                                        {student.photo_url
+                                            ? <img src={student.photo_url.startsWith('http') ? student.photo_url : `http://${window.location.hostname}:8787${student.photo_url}`} alt={student.name} />
+                                            : student.name?.charAt(0)?.toUpperCase()
+                                        }
+                                    </MiniAvatar>
                                     <div>
                                         <CardName>{student.name}</CardName>
                                         <CardSub>

@@ -61,6 +61,13 @@ const Avatar = styled.div`
     color: #fff;
     font-weight: 600;
     flex-shrink: 0;
+    overflow: hidden;
+
+    img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
 `;
 
 const CoachName = styled.div`
@@ -261,7 +268,12 @@ const CoachesList = () => {
                     {coaches.map(coach => (
                         <CoachCard key={coach.id} onClick={() => viewCoach(coach.id)}>
                             <CardHeader>
-                                <Avatar>{coach.name?.charAt(0)?.toUpperCase()}</Avatar>
+                                <Avatar>
+                                    {coach.photo_url
+                                        ? <img src={coach.photo_url.startsWith('http') ? coach.photo_url : `http://${window.location.hostname}:8787${coach.photo_url}`} alt={coach.name} />
+                                        : coach.name?.charAt(0)?.toUpperCase()
+                                    }
+                                </Avatar>
                                 <div>
                                     <CoachName>
                                         {coach.name}
