@@ -174,13 +174,14 @@ const ProfileEditForm = ({ user, onClose, onSave, apiPrefix = '/user', isOwnProf
     const [leavingClub, setLeavingClub] = useState(false);
 
     const showPasswordSection = isOwnProfile && user.email;
-    const showClubSection = isOwnProfile && (user.role === 'coach' || user.role === 'admin');
+    const showClubSection = isOwnProfile && user.role !== 'admin';
 
     useEffect(() => {
         if (showClubSection) {
-            apiRequest('/coach/clubs').then(setClubs).catch(() => {});
+            const endpoint = (user.role === 'coach' || user.role === 'admin') ? '/coach/clubs' : '/user/clubs';
+            apiRequest(endpoint).then(setClubs).catch(() => {});
         }
-    }, [showClubSection]);
+    }, [showClubSection, user.role]);
 
     const handleLeaveClub = async () => {
         setLeavingClub(true);
@@ -344,9 +345,48 @@ const ProfileEditForm = ({ user, onClose, onSave, apiPrefix = '/user', isOwnProf
                                     </div>
                                 )}
                                 </>
+                            ) : !clubAction ? (
+                                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                    <CancelBtn type="button" onClick={() => setClubAction('join')} style={{ flex: 'none', padding: '0.5rem 0.8rem', fontSize: '0.85rem' }}>
+                                        Join existing
+                                    </CancelBtn>
+                                    {(user.role === 'coach' || user.role === 'admin') && (
+                                        <CancelBtn type="button" onClick={() => setClubAction('create')} style={{ flex: 'none', padding: '0.5rem 0.8rem', fontSize: '0.85rem' }}>
+                                            Create new
+                                        </CancelBtn>
+                                    )}
+                                </div>
+                            ) : clubAction === 'create' ? (
+                                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                    <Input value={newClubName} onChange={e => setNewClubName(e.target.value)} placeholder="Club name" style={{ flex: 1 }}
+                                        onKeyDown={e => e.key === 'Enter' && e.preventDefault()}
+                                    />
+                                    <SaveBtn type="button" disabled={!newClubName.trim()} style={{ flex: 'none', padding: '0.5rem 1rem' }} onClick={async () => {
+                                        try {
+                                            await apiRequest('/coach/create-club', { method: 'POST', body: JSON.stringify({ name: newClubName.trim() }) });
+                                            setClubAction('');
+                                            onSave(null);
+                                        } catch {}
+                                    }}>Create</SaveBtn>
+                                    <CancelBtn type="button" onClick={() => setClubAction('')} style={{ flex: 'none', padding: '0.5rem 0.8rem' }}>Back</CancelBtn>
+                                </div>
                             ) : (
-                                <div style={{ color: '#666', fontSize: '0.9rem', fontStyle: 'italic' }}>
-                                    No club yet. Go to Students tab to create or join one.
+                                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                    <select value={selectedClubId} onChange={e => setSelectedClubId(e.target.value)} style={{
+                                        flex: 1, background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)',
+                                        borderRadius: '10px', padding: '0.8rem 1rem', color: '#fff', fontSize: '1rem', outline: 'none',
+                                    }}>
+                                        <option value="" style={{ background: '#1a1a2e' }}>Select a club...</option>
+                                        {clubs.map(c => <option key={c.id} value={c.id} style={{ background: '#1a1a2e' }}>{c.name}</option>)}
+                                    </select>
+                                    <SaveBtn type="button" disabled={!selectedClubId} style={{ flex: 'none', padding: '0.5rem 1rem' }} onClick={async () => {
+                                        try {
+                                            await apiRequest('/user/join-club', { method: 'POST', body: JSON.stringify({ club_id: parseInt(selectedClubId) }) });
+                                            setClubAction('');
+                                            onSave(null);
+                                        } catch {}
+                                    }}>Join</SaveBtn>
+                                    <CancelBtn type="button" onClick={() => setClubAction('')} style={{ flex: 'none', padding: '0.5rem 0.8rem' }}>Back</CancelBtn>
                                 </div>
                             )}
                         </div>
