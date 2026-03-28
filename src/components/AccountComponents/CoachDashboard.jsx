@@ -386,6 +386,7 @@ const CoachDashboard = ({ studentId, onStudentChange }) => {
     const [showAddStudent, setShowAddStudent] = useState(false);
     const [expandedComp, setExpandedComp] = useState(null);
     const [clubCoaches, setClubCoaches] = useState([]);
+    const [clubCompetitions, setClubCompetitions] = useState([]);
 
     const clubApproved = user?.club_status === 'approved';
 
@@ -403,9 +404,14 @@ const CoachDashboard = ({ studentId, onStudentChange }) => {
         apiRequest('/coach/club-coaches').then(setClubCoaches).catch(() => {});
     };
 
+    const fetchCompetitions = () => {
+        apiRequest('/coach/competitions').then(setClubCompetitions).catch(() => {});
+    };
+
     const refreshAll = () => {
         fetchStudents();
         fetchCoaches();
+        fetchCompetitions();
     };
 
     useEffect(() => { refreshAll(); }, []);
@@ -466,26 +472,20 @@ const CoachDashboard = ({ studentId, onStudentChange }) => {
         }
     };
 
-    // Group competitions across students and coaches
+    // Group competitions from API data
     const getCompetitions = () => {
         const compMap = {};
-        const addComps = (person) => {
-            (person.competitions || []).forEach(comp => {
-                const key = `${comp.name}_${comp.date}`;
-                if (!compMap[key]) {
-                    compMap[key] = { name: comp.name, date: comp.date, link: comp.link, participants: [] };
-                }
-                if (!compMap[key].participants.find(p => p.id === comp.id)) {
-                    compMap[key].participants.push({
-                        ...comp,
-                        studentName: person.name,
-                        studentId: person.id,
-                    });
-                }
+        clubCompetitions.forEach(comp => {
+            const key = `${comp.name}_${comp.date}`;
+            if (!compMap[key]) {
+                compMap[key] = { name: comp.name, date: comp.date, link: comp.link, participants: [] };
+            }
+            compMap[key].participants.push({
+                ...comp,
+                studentName: comp.user_name,
+                studentId: comp.user_id,
             });
-        };
-        students.forEach(addComps);
-        clubCoaches.forEach(addComps);
+        });
         return Object.values(compMap).sort((a, b) => b.date.localeCompare(a.date));
     };
 
@@ -662,7 +662,7 @@ const CoachDashboard = ({ studentId, onStudentChange }) => {
                     <Modal onClick={e => e.stopPropagation()} style={{ maxWidth: '380px', textAlign: 'center' }}>
                         <ModalTitle>Remove Student</ModalTitle>
                         <p style={{ color: '#ff6b6b', margin: '0 0 1.5rem' }}>
-                            Are you sure you want to remove <strong style={{ color: '#fff' }}>{confirmRemove.name}</strong> from your students?
+                            Are you sure you want to remove <strong style={{ color: '#fff' }}>{confirmRemove.name}</strong> from {user?.club?.name || 'the club'}?
                         </p>
                         <ButtonRow>
                             <CancelBtn type="button" onClick={() => setConfirmRemove(null)}>Cancel</CancelBtn>
