@@ -341,6 +341,8 @@ const ClubPage = () => {
     };
 
     const handleCategoryChange = async (compId, newCategory) => {
+        // Instant local update
+        setCompetitions(prev => prev.map(c => c.id === compId ? { ...c, category: newCategory } : c));
         try {
             await apiRequest(`/coach/competitions/${compId}/category`, {
                 method: 'PUT',
@@ -499,9 +501,17 @@ const ClubPage = () => {
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {comp.participants.map(p => (
-                                                <tr key={p.id}>
-                                                    <Td>{p.studentName}</Td>
+                                            {comp.participants.map(p => {
+                                                const isDupe = comp.participants.filter(x =>
+                                                    x.studentId === p.studentId && x.id !== p.id &&
+                                                    (x.category || '') === (p.category || '')
+                                                ).length > 0;
+                                                return (
+                                                <tr key={p.id} style={isDupe ? { background: 'rgba(245,158,11,0.08)' } : {}}>
+                                                    <Td>
+                                                        {p.studentName}
+                                                        {isDupe && <span style={{ color: '#f59e0b', fontSize: '0.65rem', marginLeft: '0.3rem' }} title="Same person with same category">duplicate</span>}
+                                                    </Td>
                                                     <Td>
                                                         {canEdit ? (
                                                             <input
@@ -544,39 +554,12 @@ const ClubPage = () => {
                                                         </Td>
                                                     )}
                                                 </tr>
-                                            ))}
+                                                );
+                                            })}
                                         </tbody>
                                     </Table>
                                     {canEdit && (() => {
-                                        const participantIds = comp.participants.map(p => p.studentId);
-                                        const available = clubMembers.filter(m => !participantIds.includes(m.id));
-                                        if (available.length === 0) return null;
-                                        return (
-                                            <div style={{ display: 'flex', gap: '0.4rem', marginTop: '0.6rem', alignItems: 'center' }}>
-                                                <select id={`add-part-${idx}`} style={{
-                                                    flex: 1, background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)',
-                                                    borderRadius: '6px', padding: '0.35rem 0.5rem', color: '#fff', fontSize: '0.8rem', outline: 'none',
-                                                }}>
-                                                    <option value="" style={{ background: '#1a1a2e' }}>Add participant...</option>
-                                                    {available.map(m => (
-                                                        <option key={m.id} value={m.id} style={{ background: '#1a1a2e' }}>{m.name}{m._type === 'coach' ? ' (coach)' : ''}</option>
-                                                    ))}
-                                                </select>
-                                                <AddBtn onClick={async () => {
-                                                    const sel = document.getElementById(`add-part-${idx}`);
-                                                    if (!sel.value) return;
-                                                    try {
-                                                        await apiRequest('/coach/competitions', {
-                                                            method: 'POST',
-                                                            body: JSON.stringify({ name: comp.name, date: comp.date, link: comp.link || '', student_ids: [parseInt(sel.value)] }),
-                                                        });
-                                                        fetchData();
-                                                    } catch {}
-                                                }} style={{ padding: '0.35rem 0.6rem', fontSize: '0.75rem' }}>
-                                                    <FiPlus size={12} /> Add
-                                                </AddBtn>
-                                            </div>
-                                        );
+                                        return <AddParticipantSearch comp={comp} members={clubMembers} onAdded={fetchData} />;
                                     })()}
                                 </CompDetails>
                             )}
@@ -658,9 +641,88 @@ const ClubPage = () => {
     );
 };
 
+const AddParticipantSearch = ({ comp, members, onAdded }) => {
+    const [search, setSearch] = useState('');
+    const [selectedIds, setSelectedIds] = useState([]);
+    const [adding, setAdding] = useState(false);
+    const [expanded, setExpanded] = useState(false);
+
+    const filtered = search
+        ? members.filter(m => m.name.toLowerCase().includes(search.toLowerCase()))
+        : members;
+
+    const toggle = (id) => {
+        setSelectedIds(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
+    };
+
+    const addSelected = async () => {
+        if (selectedIds.length === 0) return;
+        setAdding(true);
+        try {
+            await apiRequest('/coach/competitions', {
+                method: 'POST',
+                body: JSON.stringify({ name: comp.name, date: comp.date, link: comp.link || '', student_ids: selectedIds }),
+            });
+            setSelectedIds([]);
+            setSearch('');
+            setExpanded(false);
+            onAdded();
+        } catch {}
+        setAdding(false);
+    };
+
+    if (!expanded) {
+        return (
+            <div style={{ marginTop: '0.5rem' }}>
+                <AddBtn onClick={() => setExpanded(true)} style={{ padding: '0.35rem 0.6rem', fontSize: '0.75rem' }}>
+                    <FiPlus size={12} /> Add participants
+                </AddBtn>
+            </div>
+        );
+    }
+
+    return (
+        <div style={{ marginTop: '0.5rem', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '6px', padding: '0.5rem' }}>
+            <input
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                placeholder="Search by name..."
+                autoComplete="off"
+                style={{
+                    width: '100%', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)',
+                    borderRadius: '6px', padding: '0.35rem 0.5rem', color: '#fff', fontSize: '0.8rem', outline: 'none',
+                    boxSizing: 'border-box', marginBottom: '0.4rem',
+                }}
+            />
+            <div style={{ maxHeight: '150px', overflowY: 'auto' }}>
+                {filtered.map(m => (
+                    <label key={m.id} style={{
+                        display: 'flex', alignItems: 'center', gap: '0.4rem', padding: '0.25rem 0.3rem',
+                        cursor: 'pointer', color: selectedIds.includes(m.id) ? '#fff' : '#aaa', fontSize: '0.8rem',
+                        borderRadius: '4px',
+                    }}>
+                        <input type="checkbox" checked={selectedIds.includes(m.id)} onChange={() => toggle(m.id)} style={{ accentColor: '#667eea' }} />
+                        {m.name}
+                        {m._type === 'coach' && <span style={{ color: '#667eea', fontSize: '0.65rem' }}>(coach)</span>}
+                    </label>
+                ))}
+                {filtered.length === 0 && <span style={{ color: '#555', fontSize: '0.75rem' }}>No matches</span>}
+            </div>
+            <div style={{ display: 'flex', gap: '0.4rem', marginTop: '0.4rem' }}>
+                <AddBtn onClick={addSelected} disabled={adding || selectedIds.length === 0} style={{ padding: '0.3rem 0.6rem', fontSize: '0.75rem' }}>
+                    {adding ? 'Adding...' : `Add ${selectedIds.length > 0 ? `(${selectedIds.length})` : ''}`}
+                </AddBtn>
+                <span onClick={() => { setExpanded(false); setSelectedIds([]); setSearch(''); }} style={{ color: '#888', fontSize: '0.75rem', cursor: 'pointer', padding: '0.3rem', alignSelf: 'center' }}>Cancel</span>
+            </div>
+        </div>
+    );
+};
+
 const CompForm = ({ onClose, onSave }) => {
     const [name, setName] = useState('');
-    const [date, setDate] = useState('');
+    const [startDate, setStartDate] = useState('');
+    const [endDate, setEndDate] = useState('');
+    const [multiDay, setMultiDay] = useState(false);
     const [link, setLink] = useState('');
     const [saving, setSaving] = useState(false);
 
@@ -670,7 +732,7 @@ const CompForm = ({ onClose, onSave }) => {
         try {
             await apiRequest('/coach/competitions', {
                 method: 'POST',
-                body: JSON.stringify({ name, date, link, student_ids: [] }),
+                body: JSON.stringify({ name, date: endDate ? `${startDate} - ${endDate}` : startDate, link, student_ids: [] }),
             });
             onSave();
         } catch {}
@@ -688,7 +750,17 @@ const CompForm = ({ onClose, onSave }) => {
                     </div>
                     <div>
                         <Label>Date</Label>
-                        <Input type="date" value={date} onChange={e => setDate(e.target.value)} required />
+                        <Input type="date" value={startDate} onChange={e => setStartDate(e.target.value)} required />
+                        <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginTop: '0.4rem', cursor: 'pointer', color: '#888', fontSize: '0.8rem' }}>
+                            <input type="checkbox" checked={multiDay} onChange={e => { setMultiDay(e.target.checked); if (!e.target.checked) setEndDate(''); }} style={{ accentColor: '#667eea' }} />
+                            Multi-day event
+                        </label>
+                        {multiDay && (
+                            <div style={{ marginTop: '0.4rem' }}>
+                                <Label>End Date</Label>
+                                <Input type="date" value={endDate} onChange={e => setEndDate(e.target.value)} required />
+                            </div>
+                        )}
                     </div>
                     <div>
                         <Label>Link (optional)</Label>
@@ -734,7 +806,7 @@ const EditCompForm = ({ comp, onClose, onSave }) => {
                     </div>
                     <div>
                         <Label>Date</Label>
-                        <Input type="date" value={date} onChange={e => setDate(e.target.value)} required />
+                        <Input value={date} onChange={e => setDate(e.target.value)} placeholder="e.g. 2026-03-21 or 21-22 Mar" required />
                     </div>
                     <div>
                         <Label>Link</Label>

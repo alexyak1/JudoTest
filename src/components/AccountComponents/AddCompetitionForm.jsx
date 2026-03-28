@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
+
 import { apiRequest } from '../../utils/api';
 
 const Overlay = styled.div`
@@ -129,7 +130,9 @@ const RESULTS = ['gold', 'silver', 'bronze', 'participated'];
 
 const AddCompetitionForm = ({ onClose, onSave, apiPrefix = '/user' }) => {
     const [name, setName] = useState('');
-    const [date, setDate] = useState('');
+    const [startDate, setStartDate] = useState('');
+    const [endDate, setEndDate] = useState('');
+    const [multiDay, setMultiDay] = useState(false);
     const [link, setLink] = useState('');
     const [category, setCategory] = useState('');
     const [result, setResult] = useState('participated');
@@ -150,7 +153,14 @@ const AddCompetitionForm = ({ onClose, onSave, apiPrefix = '/user' }) => {
 
     const pickExisting = (comp) => {
         setName(comp.name);
-        setDate(comp.date);
+        if (comp.date && comp.date.includes(' - ')) {
+            const [s, e] = comp.date.split(' - ');
+            setStartDate(s.trim());
+            setEndDate(e.trim());
+        } else {
+            setStartDate(comp.date || '');
+            setEndDate('');
+        }
         setLink(comp.link || '');
         setShowSuggestions(false);
         setPicked(true);
@@ -159,7 +169,8 @@ const AddCompetitionForm = ({ onClose, onSave, apiPrefix = '/user' }) => {
     const clearPicked = () => {
         setPicked(false);
         setName('');
-        setDate('');
+        setStartDate('');
+        setEndDate('');
         setLink('');
     };
 
@@ -169,7 +180,7 @@ const AddCompetitionForm = ({ onClose, onSave, apiPrefix = '/user' }) => {
         try {
             const newComp = await apiRequest(`${apiPrefix}/competitions`, {
                 method: 'POST',
-                body: JSON.stringify({ name, date, link, category, result }),
+                body: JSON.stringify({ name, date: endDate ? `${startDate} - ${endDate}` : startDate, link, category, result }),
             });
             onSave(newComp);
         } catch (err) {
@@ -194,7 +205,7 @@ const AddCompetitionForm = ({ onClose, onSave, apiPrefix = '/user' }) => {
                                     borderRadius: '10px', color: '#667eea',
                                     fontSize: '1rem', fontWeight: 500,
                                 }}>
-                                    {name} <span style={{ color: '#888', fontSize: '0.85rem' }}>{date}</span>
+                                    {name} <span style={{ color: '#888', fontSize: '0.85rem' }}>{endDate ? `${startDate} - ${endDate}` : startDate}</span>
                                 </div>
                                 <span onClick={clearPicked} style={{ color: '#888', fontSize: '0.8rem', cursor: 'pointer', textDecoration: 'underline' }}>change</span>
                             </div>
@@ -225,7 +236,17 @@ const AddCompetitionForm = ({ onClose, onSave, apiPrefix = '/user' }) => {
                         <>
                             <div>
                                 <Label>Date</Label>
-                                <Input type="date" value={date} onChange={e => setDate(e.target.value)} required />
+                                <Input type="date" value={startDate} onChange={e => setStartDate(e.target.value)} required />
+                                <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginTop: '0.4rem', cursor: 'pointer', color: '#888', fontSize: '0.8rem' }}>
+                                    <input type="checkbox" checked={multiDay} onChange={e => { setMultiDay(e.target.checked); if (!e.target.checked) setEndDate(''); }} style={{ accentColor: '#667eea' }} />
+                                    Multi-day event
+                                </label>
+                                {multiDay && (
+                                    <div style={{ marginTop: '0.4rem' }}>
+                                        <Label>End Date</Label>
+                                        <Input type="date" value={endDate} onChange={e => setEndDate(e.target.value)} required />
+                                    </div>
+                                )}
                             </div>
                             <div>
                                 <Label>Link (optional)</Label>

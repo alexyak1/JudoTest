@@ -154,6 +154,7 @@ const SuccessMsg = styled.div`
 
 const ProfileEditForm = ({ user, onClose, onSave, apiPrefix = '/user', isOwnProfile }) => {
     const [name, setName] = useState(user.name || '');
+    const [birthDate, setBirthDate] = useState(user.birth_date || '');
     const [studentEmail, setStudentEmail] = useState(user.email || '');
     const [photoURL, setPhotoURL] = useState(user.photo_url || '');
     const [saving, setSaving] = useState(false);
@@ -273,13 +274,13 @@ const ProfileEditForm = ({ user, onClose, onSave, apiPrefix = '/user', isOwnProf
         }
 
         try {
-            const body = { name, photo_url: photoURL };
+            const body = { name, photo_url: photoURL, birth_date: birthDate };
             if (!isOwnProfile && studentEmail) body.email = studentEmail;
             await apiRequest(`${apiPrefix}/profile`, {
                 method: 'PUT',
                 body: JSON.stringify(body),
             });
-            onSave({ name, photo_url: photoURL, email: studentEmail || undefined });
+            onSave({ name, photo_url: photoURL, birth_date: birthDate, email: studentEmail || undefined });
         } catch {
             // ignore
         }
@@ -294,6 +295,10 @@ const ProfileEditForm = ({ user, onClose, onSave, apiPrefix = '/user', isOwnProf
                     <div>
                         <Label>Name</Label>
                         <Input value={name} onChange={e => setName(e.target.value)} required />
+                    </div>
+                    <div>
+                        <Label>Date of Birth</Label>
+                        <Input type="date" value={birthDate} onChange={e => setBirthDate(e.target.value)} />
                     </div>
                     {!isOwnProfile && (
                         <div>

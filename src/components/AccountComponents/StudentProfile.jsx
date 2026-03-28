@@ -371,7 +371,13 @@ const StudentProfile = ({ user, isOwnProfile, canEdit, onUpdate, onUpdateUser })
                         }
                     </Avatar>
                     <ProfileInfo>
-                        <Name>{displayUser.name} <RoleBadge role={displayUser.role}>{displayUser.role}</RoleBadge></Name>
+                        <Name>
+                            {displayUser.name} <RoleBadge role={displayUser.role}>{displayUser.role}</RoleBadge>
+                            {displayUser.birth_date && (() => {
+                                const age = Math.floor((new Date() - new Date(displayUser.birth_date)) / 31557600000);
+                                return <span style={{ color: '#888', fontSize: '0.75rem', marginLeft: '0.4rem' }}>{age} y/o</span>;
+                            })()}
+                        </Name>
                         {displayUser.club && (
                             <Bio style={{ color: displayUser.club_status === 'pending' ? '#f59e0b' : '#667eea', fontSize: '0.85rem', margin: '0.2rem 0' }}>
                                 <a href="/account?tab=club" style={{ color: 'inherit', textDecoration: 'none' }}
