@@ -113,19 +113,17 @@ const ErrorMsg = styled.div`
 
 const AddBeltForm = ({ onClose, onSave, apiPrefix = '/user' }) => {
     const { user } = useAuth();
-    const isCoachEndpoint = apiPrefix !== '/user';
     const [color, setColor] = useState('yellow');
     const [graduationDate, setGraduationDate] = useState('');
-    const [examinerId, setExaminerId] = useState(isCoachEndpoint ? String(user?.id || '') : '');
+    const [examinerId, setExaminerId] = useState(String(user?.id || ''));
+    const [customExaminer, setCustomExaminer] = useState('');
     const [coaches, setCoaches] = useState([]);
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState('');
 
     useEffect(() => {
-        if (isCoachEndpoint) {
-            apiRequest('/coach/club-coaches').then(setCoaches).catch(() => {});
-        }
-    }, [isCoachEndpoint]);
+        apiRequest('/user/club-coaches').then(setCoaches).catch(() => {});
+    }, []);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -133,7 +131,9 @@ const AddBeltForm = ({ onClose, onSave, apiPrefix = '/user' }) => {
         setError('');
         try {
             const body = { color, graduation_date: graduationDate };
-            if (isCoachEndpoint && examinerId) {
+            if (examinerId === 'other') {
+                body.examiner_name = customExaminer;
+            } else if (examinerId) {
                 body.examiner_id = parseInt(examinerId);
             }
             const newBelt = await apiRequest(`${apiPrefix}/belts`, {
@@ -165,16 +165,24 @@ const AddBeltForm = ({ onClose, onSave, apiPrefix = '/user' }) => {
                         <Label>Graduation Date</Label>
                         <Input type="date" value={graduationDate} onChange={e => setGraduationDate(e.target.value)} required />
                     </div>
-                    {isCoachEndpoint && coaches.length > 0 && (
-                        <div>
-                            <Label>Examiner</Label>
-                            <Select value={examinerId} onChange={e => setExaminerId(e.target.value)}>
-                                {coaches.map(c => (
-                                    <option key={c.id} value={c.id}>{c.name}{c.id === user?.id ? ' (me)' : ''}</option>
-                                ))}
-                            </Select>
-                        </div>
-                    )}
+                    <div>
+                        <Label>Examiner</Label>
+                        <Select value={examinerId} onChange={e => setExaminerId(e.target.value)}>
+                            <option value="">Not specified</option>
+                            {coaches.map(c => (
+                                <option key={c.id} value={c.id}>{c.name}{c.id === user?.id ? ' (me)' : ''}</option>
+                            ))}
+                            <option value="other">Other (type name)...</option>
+                        </Select>
+                        {examinerId === 'other' && (
+                            <Input
+                                value={customExaminer}
+                                onChange={e => setCustomExaminer(e.target.value)}
+                                placeholder="Examiner name"
+                                style={{ marginTop: '0.5rem' }}
+                            />
+                        )}
+                    </div>
                     <ButtonRow>
                         <CancelBtn type="button" onClick={onClose}>Cancel</CancelBtn>
                         <SaveBtn type="submit" disabled={saving}>{saving ? 'Saving...' : 'Add Belt'}</SaveBtn>

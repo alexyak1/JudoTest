@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { apiRequest } from '../../utils/api';
 
@@ -20,6 +20,8 @@ const Modal = styled.div`
     padding: 2rem;
     width: 100%;
     max-width: 420px;
+    max-height: 90vh;
+    overflow-y: auto;
 `;
 
 const Title = styled.h3`
@@ -52,6 +54,7 @@ const Input = styled.input`
     width: 100%;
     box-sizing: border-box;
     &:focus { border-color: #667eea; }
+    &::placeholder { color: #555; }
     &::-webkit-calendar-picker-indicator { filter: invert(1); }
 `;
 
@@ -98,6 +101,30 @@ const CancelBtn = styled.button`
     &:hover { border-color: #667eea; color: #fff; }
 `;
 
+const SuggestionList = styled.div`
+    max-height: 150px;
+    overflow-y: auto;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    margin-top: 0.3rem;
+`;
+
+const SuggestionItem = styled.div`
+    padding: 0.5rem 0.8rem;
+    cursor: pointer;
+    color: #ddd;
+    font-size: 0.9rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    &:hover { background: rgba(102, 126, 234, 0.1); }
+    &:last-child { border-bottom: none; }
+`;
+
+const SuggestionDate = styled.span`
+    color: #888;
+    font-size: 0.8rem;
+    margin-left: 0.5rem;
+`;
+
 const RESULTS = ['gold', 'silver', 'bronze', 'participated'];
 
 const AddCompetitionForm = ({ onClose, onSave, apiPrefix = '/user' }) => {
@@ -107,6 +134,34 @@ const AddCompetitionForm = ({ onClose, onSave, apiPrefix = '/user' }) => {
     const [category, setCategory] = useState('');
     const [result, setResult] = useState('participated');
     const [saving, setSaving] = useState(false);
+    const [existing, setExisting] = useState([]);
+    const [showSuggestions, setShowSuggestions] = useState(false);
+    const [picked, setPicked] = useState(false);
+
+    useEffect(() => {
+        apiRequest('/user/club-competitions')
+            .then(comps => setExisting(comps || []))
+            .catch(() => {});
+    }, []);
+
+    const filtered = name.length > 0
+        ? existing.filter(e => e.name.toLowerCase().includes(name.toLowerCase()))
+        : existing.slice(0, 10);
+
+    const pickExisting = (comp) => {
+        setName(comp.name);
+        setDate(comp.date);
+        setLink(comp.link || '');
+        setShowSuggestions(false);
+        setPicked(true);
+    };
+
+    const clearPicked = () => {
+        setPicked(false);
+        setName('');
+        setDate('');
+        setLink('');
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -130,16 +185,54 @@ const AddCompetitionForm = ({ onClose, onSave, apiPrefix = '/user' }) => {
                 <Form onSubmit={handleSubmit}>
                     <div>
                         <Label>Competition Name</Label>
-                        <Input value={name} onChange={e => setName(e.target.value)} placeholder="e.g. City Championship" required />
+                        {picked ? (
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                <div style={{
+                                    flex: 1, padding: '0.8rem 1rem',
+                                    background: 'rgba(102, 126, 234, 0.1)',
+                                    border: '1px solid rgba(102, 126, 234, 0.2)',
+                                    borderRadius: '10px', color: '#667eea',
+                                    fontSize: '1rem', fontWeight: 500,
+                                }}>
+                                    {name} <span style={{ color: '#888', fontSize: '0.85rem' }}>{date}</span>
+                                </div>
+                                <span onClick={clearPicked} style={{ color: '#888', fontSize: '0.8rem', cursor: 'pointer', textDecoration: 'underline' }}>change</span>
+                            </div>
+                        ) : (
+                            <>
+                                <Input
+                                    value={name}
+                                    onChange={e => { setName(e.target.value); setShowSuggestions(true); }}
+                                    onFocus={() => setShowSuggestions(true)}
+                                    placeholder="Start typing or pick from list..."
+                                    required
+                                    autoComplete="off"
+                                />
+                                {showSuggestions && filtered.length > 0 && (
+                                    <SuggestionList>
+                                        {filtered.map((comp, i) => (
+                                            <SuggestionItem key={i} onClick={() => pickExisting(comp)}>
+                                                {comp.name}
+                                                <SuggestionDate>{comp.date}</SuggestionDate>
+                                            </SuggestionItem>
+                                        ))}
+                                    </SuggestionList>
+                                )}
+                            </>
+                        )}
                     </div>
-                    <div>
-                        <Label>Date</Label>
-                        <Input type="date" value={date} onChange={e => setDate(e.target.value)} required />
-                    </div>
-                    <div>
-                        <Label>Link (optional)</Label>
-                        <Input value={link} onChange={e => setLink(e.target.value)} placeholder="https://smoothcomp.com/..." />
-                    </div>
+                    {!picked && (
+                        <>
+                            <div>
+                                <Label>Date</Label>
+                                <Input type="date" value={date} onChange={e => setDate(e.target.value)} required />
+                            </div>
+                            <div>
+                                <Label>Link (optional)</Label>
+                                <Input value={link} onChange={e => setLink(e.target.value)} placeholder="https://smoothcomp.com/..." />
+                            </div>
+                        </>
+                    )}
                     <div>
                         <Label>Category (optional)</Label>
                         <Input value={category} onChange={e => setCategory(e.target.value)} placeholder="e.g. PU13, FU11" />

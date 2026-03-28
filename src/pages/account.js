@@ -6,6 +6,7 @@ import StudentProfile from '../components/AccountComponents/StudentProfile';
 import CoachDashboard from '../components/AccountComponents/CoachDashboard';
 import AdminDashboard from '../components/AccountComponents/AdminDashboard';
 import CoachesList from '../components/AccountComponents/CoachesList';
+import ClubPage from '../components/AccountComponents/ClubPage';
 import PendingRequests from '../components/AccountComponents/PendingRequests';
 
 const Container = styled.div`
@@ -74,7 +75,8 @@ export default function Account() {
 
     if (!user) return null;
 
-    const showTabs = isCoach || isAdmin;
+    const hasClub = user.club_id && user.club_status === 'approved';
+    const showTabs = isCoach || isAdmin || hasClub;
 
     return (
         <Container>
@@ -86,6 +88,11 @@ export default function Account() {
                     <Tab active={activeTab === 'profile'} onClick={() => setActiveTab('profile')}>
                         My Profile
                     </Tab>
+                    {(isCoach || hasClub) && (
+                        <Tab active={activeTab === 'club'} onClick={() => setActiveTab('club')}>
+                            Club
+                        </Tab>
+                    )}
                     {isCoach && (
                         <Tab active={activeTab === 'students'} onClick={() => setActiveTab('students')}>
                             Students
@@ -109,6 +116,10 @@ export default function Account() {
                     {(isAdmin || (isCoach && user.club_status === 'approved')) && <PendingRequests />}
                     <StudentProfile user={user} isOwnProfile={true} onUpdate={refreshUser} onUpdateUser={updateUser} />
                 </>
+            )}
+
+            {activeTab === 'club' && (isCoach || hasClub) && (
+                <ClubPage />
             )}
 
             {activeTab === 'students' && isCoach && (

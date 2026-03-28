@@ -4,6 +4,7 @@ import { FiEdit2, FiPlus, FiTrash2 } from 'react-icons/fi';
 import ProfileEditForm from './ProfileEditForm';
 import AddBeltForm from './AddBeltForm';
 import AddCompetitionForm from './AddCompetitionForm';
+import AddLicenseForm from './AddLicenseForm';
 import { apiRequest } from '../../utils/api';
 
 const API_BASE = `http://${window.location.hostname}:8787`;
@@ -15,23 +16,31 @@ const getFullPhotoURL = (url) => {
 };
 
 const ProfileCard = styled.div`
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 16px;
-    padding: 2rem;
-    margin-bottom: 1.5rem;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 1.2rem 1.5rem;
+    margin-bottom: 0.8rem;
 
     @media (max-width: 768px) {
-        padding: 1.2rem;
-        border-radius: 12px;
+        padding: 1rem;
+    }
+`;
+
+const TwoCol = styled.div`
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.8rem;
+
+    @media (max-width: 768px) {
+        grid-template-columns: 1fr;
     }
 `;
 
 const ProfileHeader = styled.div`
     display: flex;
     align-items: center;
-    gap: 1.5rem;
-    margin-bottom: 1.5rem;
+    gap: 1rem;
 
     @media (max-width: 768px) {
         flex-direction: column;
@@ -40,14 +49,14 @@ const ProfileHeader = styled.div`
 `;
 
 const Avatar = styled.div`
-    width: 80px;
-    height: 80px;
+    width: 56px;
+    height: 56px;
     border-radius: 50%;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 2rem;
+    font-size: 1.4rem;
     color: #fff;
     flex-shrink: 0;
     overflow: hidden;
@@ -61,42 +70,47 @@ const Avatar = styled.div`
 
 const ProfileInfo = styled.div`
     flex: 1;
+    min-width: 0;
 `;
 
 const Name = styled.h2`
     color: #ffffff;
-    margin: 0 0 0.3rem 0;
+    margin: 0;
     font-family: 'Inter', sans-serif;
+    font-size: 1.2rem;
 `;
 
 const RoleBadge = styled.span`
     background: ${p => p.role === 'admin' ? '#764ba2' : p.role === 'coach' ? '#667eea' : '#4a9eff'};
     color: #fff;
-    padding: 0.2rem 0.7rem;
+    padding: 0.15rem 0.5rem;
     border-radius: 20px;
-    font-size: 0.75rem;
+    font-size: 0.65rem;
     font-weight: 600;
     text-transform: uppercase;
+    vertical-align: middle;
+    margin-left: 0.4rem;
 `;
 
 const Bio = styled.p`
     color: #a0a0a0;
-    margin: 0.5rem 0 0 0;
+    margin: 0.2rem 0 0 0;
     font-family: 'Inter', sans-serif;
+    font-size: 0.85rem;
 `;
 
 const EditBtn = styled.button`
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    color: #a0a0a0;
-    border-radius: 8px;
-    padding: 0.5rem 0.8rem;
+    background: none;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: #888;
+    border-radius: 6px;
+    padding: 0.35rem 0.6rem;
     cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 0.4rem;
-    font-size: 0.85rem;
-    transition: all 0.3s;
+    gap: 0.3rem;
+    font-size: 0.8rem;
+    transition: all 0.2s;
 
     &:hover {
         border-color: #667eea;
@@ -104,61 +118,59 @@ const EditBtn = styled.button`
     }
 `;
 
-const Section = styled.div`
-    margin-bottom: 1.5rem;
-`;
+const Section = styled.div``;
 
 const SectionHeader = styled.div`
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1rem;
+    margin-bottom: 0.6rem;
 `;
 
 const SectionTitle = styled.h3`
-    color: #ffffff;
+    color: #999;
     font-family: 'Inter', sans-serif;
     margin: 0;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
 `;
 
 const AddBtn = styled.button`
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border: none;
-    color: #fff;
-    border-radius: 8px;
-    padding: 0.4rem 0.8rem;
+    background: rgba(102, 126, 234, 0.15);
+    border: 1px solid rgba(102, 126, 234, 0.25);
+    color: #667eea;
+    border-radius: 6px;
+    padding: 0.3rem 0.6rem;
     cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 0.3rem;
-    font-size: 0.85rem;
+    gap: 0.25rem;
+    font-size: 0.75rem;
     font-weight: 500;
-    transition: opacity 0.3s;
+    transition: all 0.2s;
 
-    &:hover { opacity: 0.85; }
+    &:hover { background: rgba(102, 126, 234, 0.25); }
 `;
 
 const DeleteBtn = styled.button`
     background: none;
     border: none;
-    color: #666;
+    color: #555;
     cursor: pointer;
-    padding: 0.2rem;
+    padding: 0.15rem;
     display: flex;
     align-items: center;
-    transition: color 0.3s;
+    transition: color 0.2s;
 
     &:hover { color: #ff6b6b; }
 `;
 
 const BeltList = styled.div`
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-    gap: 0.8rem;
-
-    @media (max-width: 400px) {
-        grid-template-columns: 1fr;
-    }
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
 `;
 
 const BELT_COLORS = {
@@ -167,12 +179,13 @@ const BELT_COLORS = {
 };
 
 const BeltItem = styled.div`
-    background: rgba(255, 255, 255, 0.05);
-    border: 2px solid ${p => BELT_COLORS[p.color] || '#444'};
-    border-radius: 10px;
-    padding: 0.8rem 1rem;
+    background: rgba(255, 255, 255, 0.04);
+    border-left: 3px solid ${p => BELT_COLORS[p.color] || '#444'};
+    border-radius: 6px;
+    padding: 0.5rem 0.8rem;
     cursor: pointer;
     transition: all 0.2s;
+    min-width: 120px;
     &:hover { background: rgba(255, 255, 255, 0.08); }
 `;
 
@@ -185,14 +198,15 @@ const BeltDot = styled.div`
 
 const BeltText = styled.span`
     color: #ffffff;
-    font-weight: 500;
+    font-weight: 600;
     text-transform: capitalize;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
+    display: block;
 `;
 
 const BeltDate = styled.span`
-    color: #a0a0a0;
-    font-size: 0.8rem;
+    color: #888;
+    font-size: 0.75rem;
 `;
 
 const TableWrap = styled.div`
@@ -207,25 +221,27 @@ const Table = styled.table`
 `;
 
 const Th = styled.th`
-    color: #a0a0a0;
+    color: #666;
     font-weight: 500;
     text-align: left;
-    padding: 0.6rem 0.8rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    font-size: 0.85rem;
+    padding: 0.4rem 0.6rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
 `;
 
 const Td = styled.td`
-    color: #ffffff;
-    padding: 0.6rem 0.8rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    font-size: 0.9rem;
+    color: #ddd;
+    padding: 0.4rem 0.6rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+    font-size: 0.85rem;
 `;
 
 const ResultBadge = styled.span`
-    padding: 0.2rem 0.6rem;
-    border-radius: 12px;
-    font-size: 0.8rem;
+    padding: 0.15rem 0.45rem;
+    border-radius: 10px;
+    font-size: 0.75rem;
     font-weight: 500;
     background: ${p => {
         switch (p.result) {
@@ -246,9 +262,10 @@ const ResultBadge = styled.span`
 `;
 
 const EmptyState = styled.p`
-    color: #666;
+    color: #555;
     font-style: italic;
-    font-size: 0.9rem;
+    font-size: 0.8rem;
+    margin: 0.3rem 0;
 `;
 
 const StudentProfile = ({ user, isOwnProfile, canEdit, onUpdate, onUpdateUser }) => {
@@ -256,6 +273,7 @@ const StudentProfile = ({ user, isOwnProfile, canEdit, onUpdate, onUpdateUser })
     const [addingBelt, setAddingBelt] = useState(false);
     const [editingBelt, setEditingBelt] = useState(null);
     const [addingCompetition, setAddingCompetition] = useState(false);
+    const [addingLicense, setAddingLicense] = useState(false);
     const [localUser, setLocalUser] = useState(user);
     const [clubs, setClubs] = useState([]);
     const [joiningClub, setJoiningClub] = useState(false);
@@ -293,8 +311,11 @@ const StudentProfile = ({ user, isOwnProfile, canEdit, onUpdate, onUpdateUser })
         }
 
         try {
-            const deleteType = type === 'belts' ? 'belts' : 'competitions';
-            await apiRequest(`${apiPrefix}/${deleteType}/${id}`, { method: 'DELETE' });
+            let deletePrefix = apiPrefix;
+            if (type === 'licenses' && !isOwnProfile) {
+                deletePrefix = `/coach/coaches/${user.id}`;
+            }
+            await apiRequest(`${deletePrefix}/${type}/${id}`, { method: 'DELETE' });
         } catch {
             if (onUpdate) onUpdate();
         }
@@ -331,7 +352,11 @@ const StudentProfile = ({ user, isOwnProfile, canEdit, onUpdate, onUpdateUser })
         }
     };
 
-    const belts = displayUser.belts || [];
+    const BELT_ORDER = { yellow: 1, orange: 2, green: 3, blue: 4, brown: 5, black: 6 };
+    const belts = [...(displayUser.belts || [])].sort((a, b) => (BELT_ORDER[a.color] || 99) - (BELT_ORDER[b.color] || 99));
+    const licenses = displayUser.licenses || [];
+    const showLicenses = displayUser.role === 'coach' || displayUser.role === 'admin';
+    const licenseApiPrefix = isOwnProfile ? '/user' : `/coach/coaches/${user.id}`;
     const competitions = displayUser.competitions || [];
     const quizResults = displayUser.quiz_results || [];
 
@@ -349,7 +374,10 @@ const StudentProfile = ({ user, isOwnProfile, canEdit, onUpdate, onUpdateUser })
                         <Name>{displayUser.name} <RoleBadge role={displayUser.role}>{displayUser.role}</RoleBadge></Name>
                         {displayUser.club && (
                             <Bio style={{ color: displayUser.club_status === 'pending' ? '#f59e0b' : '#667eea', fontSize: '0.85rem', margin: '0.2rem 0' }}>
-                                {displayUser.club.name}
+                                <a href="/account?tab=club" style={{ color: 'inherit', textDecoration: 'none' }}
+                                    onMouseOver={e => e.target.style.textDecoration = 'underline'}
+                                    onMouseOut={e => e.target.style.textDecoration = 'none'}
+                                >{displayUser.club.name}</a>
                                 {displayUser.club_status === 'pending' && ' — waiting for approval'}
                             </Bio>
                         )}
@@ -471,54 +499,6 @@ const StudentProfile = ({ user, isOwnProfile, canEdit, onUpdate, onUpdateUser })
             <ProfileCard>
                 <Section>
                     <SectionHeader>
-                        <SectionTitle>Belts</SectionTitle>
-                        {editable && (
-                            <AddBtn onClick={() => setAddingBelt(true)}>
-                                <FiPlus size={14} /> Add Belt
-                            </AddBtn>
-                        )}
-                    </SectionHeader>
-                    {belts.length > 0 ? (
-                        <BeltList>
-                            {belts.map(belt => (
-                                <BeltItem key={belt.id} color={belt.color} onClick={() => setEditingBelt(belt)}>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.3rem' }}>
-                                        <BeltDot color={belt.color} />
-                                        <BeltText>{belt.color}</BeltText>
-                                    </div>
-                                    <BeltDate style={{ display: 'block' }}>{belt.graduation_date}</BeltDate>
-                                    {belt.examiner_name && <BeltDate style={{ display: 'block', fontSize: '0.75rem' }}>by {belt.examiner_name}</BeltDate>}
-                                </BeltItem>
-                            ))}
-                        </BeltList>
-                    ) : (
-                        <EmptyState>No belts recorded yet</EmptyState>
-                    )}
-                </Section>
-            </ProfileCard>
-
-            {addingBelt && (
-                <AddBeltForm
-                    apiPrefix={apiPrefix}
-                    onClose={() => setAddingBelt(false)}
-                    onSave={handleBeltAdded}
-                />
-            )}
-
-            {editingBelt && (
-                <EditBeltModal
-                    belt={editingBelt}
-                    editable={editable}
-                    apiPrefix={apiPrefix}
-                    onClose={() => setEditingBelt(null)}
-                    onSave={handleBeltUpdated}
-                    onDelete={(id) => { setEditingBelt(null); handleDelete('belts', id); }}
-                />
-            )}
-
-            <ProfileCard>
-                <Section>
-                    <SectionHeader>
                         <SectionTitle>Competitions</SectionTitle>
                         {editable && (
                             <AddBtn onClick={() => setAddingCompetition(true)}>
@@ -574,6 +554,117 @@ const StudentProfile = ({ user, isOwnProfile, canEdit, onUpdate, onUpdateUser })
                 />
             )}
 
+            {showLicenses && (
+                <ProfileCard>
+                    <Section>
+                        <SectionHeader>
+                            <SectionTitle>Licenses</SectionTitle>
+                            {editable && (
+                                <AddBtn onClick={() => setAddingLicense(true)}>
+                                    <FiPlus size={14} /> Add License
+                                </AddBtn>
+                            )}
+                        </SectionHeader>
+                        {licenses.length > 0 ? (
+                            <TableWrap>
+                            <Table>
+                                <thead>
+                                    <tr>
+                                        <Th>License</Th>
+                                        <Th>Issued</Th>
+                                        <Th>Expires</Th>
+                                        {editable && <Th></Th>}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {licenses.map(lic => {
+                                        const isExpired = lic.expires_at && new Date(lic.expires_at) < new Date();
+                                        return (
+                                            <tr key={lic.id}>
+                                                <Td>{lic.name}</Td>
+                                                <Td>{lic.issued_at}</Td>
+                                                <Td style={{ color: isExpired ? '#ff6b6b' : undefined }}>
+                                                    {lic.expires_at || 'No expiry'}
+                                                    {isExpired && ' (expired)'}
+                                                </Td>
+                                                {editable && (
+                                                    <Td>
+                                                        <DeleteBtn onClick={() => handleDelete('licenses', lic.id)}>
+                                                            <FiTrash2 size={13} />
+                                                        </DeleteBtn>
+                                                    </Td>
+                                                )}
+                                            </tr>
+                                        );
+                                    })}
+                                </tbody>
+                            </Table>
+                            </TableWrap>
+                        ) : (
+                            <EmptyState>No licenses yet</EmptyState>
+                        )}
+                    </Section>
+                </ProfileCard>
+            )}
+
+            {addingLicense && (
+                <AddLicenseForm
+                    apiPrefix={licenseApiPrefix}
+                    onClose={() => setAddingLicense(false)}
+                    onSave={(newLic) => {
+                        setAddingLicense(false);
+                        const updateFn = prev => ({ ...prev, licenses: [...(prev.licenses || []), newLic] });
+                        if (isOwnProfile && onUpdateUser) onUpdateUser(updateFn);
+                        else setLocalUser(updateFn);
+                    }}
+                />
+            )}
+
+            <ProfileCard>
+                <Section>
+                    <SectionHeader>
+                        <SectionTitle>Belts</SectionTitle>
+                        {editable && (
+                            <AddBtn onClick={() => setAddingBelt(true)}>
+                                <FiPlus size={14} /> Add Belt
+                            </AddBtn>
+                        )}
+                    </SectionHeader>
+                    {belts.length > 0 ? (
+                        <BeltList>
+                            {belts.map(belt => (
+                                <BeltItem key={belt.id} color={belt.color} onClick={() => setEditingBelt(belt)}>
+                                    <BeltText>{belt.color}</BeltText>
+                                    <BeltDate style={{ display: 'block' }}>{belt.graduation_date}</BeltDate>
+                                    {belt.examiner_name && <BeltDate style={{ display: 'block', fontSize: '0.7rem', opacity: 0.6 }}>by {belt.examiner_name}</BeltDate>}
+                                </BeltItem>
+                            ))}
+                        </BeltList>
+                    ) : (
+                        <EmptyState>No belts recorded yet</EmptyState>
+                    )}
+                </Section>
+            </ProfileCard>
+
+            {addingBelt && (
+                <AddBeltForm
+                    apiPrefix={apiPrefix}
+                    onClose={() => setAddingBelt(false)}
+                    onSave={handleBeltAdded}
+                />
+            )}
+
+            {editingBelt && (
+                <EditBeltModal
+                    belt={editingBelt}
+                    editable={editable}
+                    apiPrefix={apiPrefix}
+                    onClose={() => setEditingBelt(null)}
+                    onSave={handleBeltUpdated}
+                    onDelete={(id) => { setEditingBelt(null); handleDelete('belts', id); }}
+                />
+            )}
+
             <ProfileCard>
                 <Section>
                     <SectionHeader>
@@ -605,6 +696,7 @@ const StudentProfile = ({ user, isOwnProfile, canEdit, onUpdate, onUpdateUser })
                     )}
                 </Section>
             </ProfileCard>
+
         </>
     );
 };
@@ -758,16 +850,15 @@ const EditBeltModal = ({ belt, editable, apiPrefix, onClose, onSave, onDelete })
     const [confirmDelete, setConfirmDelete] = useState(false);
     const [color, setColor] = useState(belt.color);
     const [graduationDate, setGraduationDate] = useState(belt.graduation_date);
-    const [examinerId, setExaminerId] = useState(belt.examiner_id ? String(belt.examiner_id) : '');
+    const [examinerId, setExaminerId] = useState(belt.examiner_id ? String(belt.examiner_id) : (belt.examiner_name ? 'other' : ''));
+    const [customExaminer, setCustomExaminer] = useState(belt.examiner_name || '');
     const [coaches, setCoaches] = useState([]);
     const [saving, setSaving] = useState(false);
-    const isCoachEndpoint = apiPrefix !== '/user';
-
     React.useEffect(() => {
-        if (isCoachEndpoint && editing) {
-            apiRequest('/coach/club-coaches').then(setCoaches).catch(() => {});
+        if (editing) {
+            apiRequest('/user/club-coaches').then(setCoaches).catch(() => {});
         }
-    }, [isCoachEndpoint, editing]);
+    }, [editing]);
 
     const handleSave = async (e) => {
         e.preventDefault();
@@ -775,7 +866,11 @@ const EditBeltModal = ({ belt, editable, apiPrefix, onClose, onSave, onDelete })
         try {
             await apiRequest(`${apiPrefix}/belts/${belt.id}`, { method: 'DELETE' });
             const body = { color, graduation_date: graduationDate };
-            if (examinerId) body.examiner_id = parseInt(examinerId);
+            if (examinerId === 'other') {
+                body.examiner_name = customExaminer;
+            } else if (examinerId) {
+                body.examiner_id = parseInt(examinerId);
+            }
             const newBelt = await apiRequest(`${apiPrefix}/belts`, {
                 method: 'POST',
                 body: JSON.stringify(body),
@@ -804,17 +899,24 @@ const EditBeltModal = ({ belt, editable, apiPrefix, onClose, onSave, onDelete })
                             <ModalLabel>Graduation Date</ModalLabel>
                             <ModalInput type="date" value={graduationDate} onChange={e => setGraduationDate(e.target.value)} required />
                         </div>
-                        {isCoachEndpoint && coaches.length > 0 && (
-                            <div>
-                                <ModalLabel>Examiner</ModalLabel>
-                                <ModalSelect value={examinerId} onChange={e => setExaminerId(e.target.value)}>
-                                    <option value="">Not specified</option>
-                                    {coaches.map(c => (
-                                        <option key={c.id} value={c.id}>{c.name}</option>
-                                    ))}
-                                </ModalSelect>
-                            </div>
-                        )}
+                        <div>
+                            <ModalLabel>Examiner</ModalLabel>
+                            <ModalSelect value={examinerId} onChange={e => setExaminerId(e.target.value)}>
+                                <option value="">Not specified</option>
+                                {coaches.map(c => (
+                                    <option key={c.id} value={c.id}>{c.name}</option>
+                                ))}
+                                <option value="other">Other (type name)...</option>
+                            </ModalSelect>
+                            {examinerId === 'other' && (
+                                <ModalInput
+                                    value={customExaminer}
+                                    onChange={e => setCustomExaminer(e.target.value)}
+                                    placeholder="Examiner name"
+                                    style={{ marginTop: '0.5rem' }}
+                                />
+                            )}
+                        </div>
                         <ModalBtnRow>
                             <ModalCancelBtn type="button" onClick={() => setEditing(false)}>Cancel</ModalCancelBtn>
                             <ModalSaveBtn type="submit" disabled={saving}>{saving ? 'Saving...' : 'Save'}</ModalSaveBtn>

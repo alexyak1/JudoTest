@@ -387,6 +387,9 @@ const CoachDashboard = ({ studentId, onStudentChange }) => {
     const [expandedComp, setExpandedComp] = useState(null);
     const [clubCoaches, setClubCoaches] = useState([]);
     const [clubCompetitions, setClubCompetitions] = useState([]);
+    const [statsFilter, setStatsFilter] = useState('year');
+    const [statsFrom, setStatsFrom] = useState('');
+    const [statsTo, setStatsTo] = useState('');
 
     const clubApproved = user?.club_status === 'approved';
 
@@ -510,145 +513,150 @@ const CoachDashboard = ({ studentId, onStudentChange }) => {
 
     if (loading) return <EmptyState>Loading students...</EmptyState>;
 
-    const competitions = getCompetitions();
+    // Filter competitions by date range
+    const filterComps = (comps) => {
+        if (!comps) return [];
+        const year = String(new Date().getFullYear());
+        return comps.filter(c => {
+            if (statsFilter === 'all') return true;
+            if (statsFilter === 'year') return c.date && c.date.startsWith(year);
+            if (statsFilter === 'custom') return (!statsFrom || c.date >= statsFrom) && (!statsTo || c.date <= statsTo);
+            return true;
+        });
+    };
+
+    const allMembers = [...students, ...clubCoaches];
+    const getPersonStats = (person) => {
+        const comps = filterComps(person.competitions);
+        return {
+            total: comps.length,
+            gold: comps.filter(c => c.result === 'gold').length,
+            silver: comps.filter(c => c.result === 'silver').length,
+            bronze: comps.filter(c => c.result === 'bronze').length,
+            medals: comps.filter(c => ['gold', 'silver', 'bronze'].includes(c.result)).length,
+        };
+    };
+
+    const topCompetitors = [...allMembers]
+        .map(p => ({ ...p, stats: getPersonStats(p) }))
+        .filter(p => p.stats.total > 0)
+        .sort((a, b) => b.stats.medals - a.stats.medals || b.stats.gold - a.stats.gold || b.stats.total - a.stats.total)
+        .slice(0, 10);
+
+    const clubName = user?.club?.name || 'Club';
 
     return (
         <>
             <Card>
                 <SectionHeader>
-                    <SectionTitle>Your Students</SectionTitle>
+                    <SectionTitle>Top Competitors</SectionTitle>
+                </SectionHeader>
+                <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center', flexWrap: 'wrap', marginBottom: '0.8rem' }}>
+                    <button onClick={() => setStatsFilter('year')} style={{
+                        background: statsFilter === 'year' ? 'rgba(102,126,234,0.2)' : 'rgba(255,255,255,0.04)',
+                        border: `1px solid ${statsFilter === 'year' ? 'rgba(102,126,234,0.4)' : 'rgba(255,255,255,0.08)'}`,
+                        color: statsFilter === 'year' ? '#667eea' : '#888',
+                        borderRadius: '6px', padding: '0.3rem 0.6rem', fontSize: '0.8rem', cursor: 'pointer',
+                    }}>{new Date().getFullYear()}</button>
+                    <button onClick={() => setStatsFilter('all')} style={{
+                        background: statsFilter === 'all' ? 'rgba(102,126,234,0.2)' : 'rgba(255,255,255,0.04)',
+                        border: `1px solid ${statsFilter === 'all' ? 'rgba(102,126,234,0.4)' : 'rgba(255,255,255,0.08)'}`,
+                        color: statsFilter === 'all' ? '#667eea' : '#888',
+                        borderRadius: '6px', padding: '0.3rem 0.6rem', fontSize: '0.8rem', cursor: 'pointer',
+                    }}>All time</button>
+                    <button onClick={() => setStatsFilter('custom')} style={{
+                        background: statsFilter === 'custom' ? 'rgba(102,126,234,0.2)' : 'rgba(255,255,255,0.04)',
+                        border: `1px solid ${statsFilter === 'custom' ? 'rgba(102,126,234,0.4)' : 'rgba(255,255,255,0.08)'}`,
+                        color: statsFilter === 'custom' ? '#667eea' : '#888',
+                        borderRadius: '6px', padding: '0.3rem 0.6rem', fontSize: '0.8rem', cursor: 'pointer',
+                    }}>Custom</button>
+                    {statsFilter === 'custom' && (
+                        <>
+                            <input type="date" value={statsFrom} onChange={e => setStatsFrom(e.target.value)} style={{
+                                background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)',
+                                borderRadius: '6px', padding: '0.3rem 0.5rem', color: '#fff', fontSize: '0.8rem', outline: 'none',
+                            }} />
+                            <span style={{ color: '#555' }}>-</span>
+                            <input type="date" value={statsTo} onChange={e => setStatsTo(e.target.value)} style={{
+                                background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)',
+                                borderRadius: '6px', padding: '0.3rem 0.5rem', color: '#fff', fontSize: '0.8rem', outline: 'none',
+                            }} />
+                        </>
+                    )}
+                </div>
+                {topCompetitors.length > 0 ? (
+                    <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                        <thead>
+                            <tr>
+                                <th style={{ color: '#666', fontSize: '0.7rem', textTransform: 'uppercase', textAlign: 'left', padding: '0.3rem 0.5rem', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>#</th>
+                                <th style={{ color: '#666', fontSize: '0.7rem', textTransform: 'uppercase', textAlign: 'left', padding: '0.3rem 0.5rem', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>Name</th>
+                                <th style={{ color: '#666', fontSize: '0.7rem', textTransform: 'uppercase', textAlign: 'center', padding: '0.3rem 0.5rem', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>Comps</th>
+                                <th style={{ color: '#ffd700', fontSize: '0.7rem', textAlign: 'center', padding: '0.3rem 0.5rem', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>G</th>
+                                <th style={{ color: '#c0c0c0', fontSize: '0.7rem', textAlign: 'center', padding: '0.3rem 0.5rem', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>S</th>
+                                <th style={{ color: '#cd7f32', fontSize: '0.7rem', textAlign: 'center', padding: '0.3rem 0.5rem', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>B</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {topCompetitors.map((p, i) => (
+                                <tr key={p.id}>
+                                    <td style={{ color: '#555', padding: '0.3rem 0.5rem', fontSize: '0.8rem', borderBottom: '1px solid rgba(255,255,255,0.03)' }}>{i + 1}</td>
+                                    <td style={{ color: '#ddd', padding: '0.3rem 0.5rem', fontSize: '0.85rem', fontWeight: 500, borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
+                                        {p.name}
+                                        {p.role === 'coach' && <span style={{ color: '#667eea', fontSize: '0.65rem', marginLeft: '0.3rem' }}>(coach)</span>}
+                                    </td>
+                                    <td style={{ color: '#888', padding: '0.3rem 0.5rem', fontSize: '0.8rem', textAlign: 'center', borderBottom: '1px solid rgba(255,255,255,0.03)' }}>{p.stats.total}</td>
+                                    <td style={{ color: p.stats.gold ? '#ffd700' : '#333', padding: '0.3rem 0.5rem', fontSize: '0.85rem', fontWeight: 600, textAlign: 'center', borderBottom: '1px solid rgba(255,255,255,0.03)' }}>{p.stats.gold || '-'}</td>
+                                    <td style={{ color: p.stats.silver ? '#c0c0c0' : '#333', padding: '0.3rem 0.5rem', fontSize: '0.85rem', fontWeight: 600, textAlign: 'center', borderBottom: '1px solid rgba(255,255,255,0.03)' }}>{p.stats.silver || '-'}</td>
+                                    <td style={{ color: p.stats.bronze ? '#cd7f32' : '#333', padding: '0.3rem 0.5rem', fontSize: '0.85rem', fontWeight: 600, textAlign: 'center', borderBottom: '1px solid rgba(255,255,255,0.03)' }}>{p.stats.bronze || '-'}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                ) : (
+                    <p style={{ color: '#555', fontSize: '0.8rem', fontStyle: 'italic', margin: '0.3rem 0' }}>No competition data for this period</p>
+                )}
+            </Card>
+
+            <Card>
+                <SectionHeader>
+                    <SectionTitle>{clubName} Students</SectionTitle>
                     <AddBtn onClick={() => setShowAddStudent(true)}>
                         <FiPlus size={14} /> Add Student
                     </AddBtn>
                 </SectionHeader>
                 {students.length > 0 ? (
                     <StudentGrid>
-                        {students.map(student => (
-                            <StudentCard key={student.id} onClick={() => viewStudent(student.id)}>
-                                <CardHeader>
-                                    <MiniAvatar>
-                                        {student.photo_url
-                                            ? <img src={student.photo_url.startsWith('http') ? student.photo_url : `http://${window.location.hostname}:8787${student.photo_url}`} alt={student.name} />
-                                            : student.name?.charAt(0)?.toUpperCase()
-                                        }
-                                    </MiniAvatar>
-                                    <div>
-                                        <CardName>{student.name}</CardName>
-                                        <CardSub>
-                                            {(student.belts || []).length} belts | {(student.competitions || []).length} competitions
-                                        </CardSub>
-                                    </div>
-                                    <RemoveBtn onClick={(e) => { e.stopPropagation(); setConfirmRemove({ id: student.id, name: student.name }); }} title="Remove student">
-                                        <FiTrash2 size={14} />
-                                    </RemoveBtn>
-                                </CardHeader>
-                            </StudentCard>
-                        ))}
+                        {students.map(student => {
+                            const s = getPersonStats(student);
+                            return (
+                                <StudentCard key={student.id} onClick={() => viewStudent(student.id)}>
+                                    <CardHeader>
+                                        <MiniAvatar>
+                                            {student.photo_url
+                                                ? <img src={student.photo_url.startsWith('http') ? student.photo_url : `http://${window.location.hostname}:8787${student.photo_url}`} alt={student.name} />
+                                                : student.name?.charAt(0)?.toUpperCase()
+                                            }
+                                        </MiniAvatar>
+                                        <div>
+                                            <CardName>{student.name}</CardName>
+                                            <CardSub>
+                                                {(student.belts || []).length} belts
+                                                {s.total > 0 && ` | ${s.total} comps`}
+                                                {s.medals > 0 && ` | ${s.medals} medals`}
+                                            </CardSub>
+                                        </div>
+                                        <RemoveBtn onClick={(e) => { e.stopPropagation(); setConfirmRemove({ id: student.id, name: student.name }); }} title="Remove student">
+                                            <FiTrash2 size={14} />
+                                        </RemoveBtn>
+                                    </CardHeader>
+                                </StudentCard>
+                            );
+                        })}
                     </StudentGrid>
                 ) : (
                     <EmptyState>No students assigned yet</EmptyState>
                 )}
             </Card>
-
-            <Card>
-                <SectionHeader>
-                    <SectionTitle>Competitions</SectionTitle>
-                    <AddBtn onClick={() => setShowCompForm(true)}>
-                        <FiPlus size={14} /> Add Competition
-                    </AddBtn>
-                </SectionHeader>
-
-                {competitions.length > 0 ? (
-                    competitions.map((comp, idx) => (
-                        <CompRow key={idx}>
-                            <CompHeader onClick={() => setExpandedComp(expandedComp === idx ? null : idx)}>
-                                <div>
-                                    <CompName>{comp.name}</CompName>
-                                    <CompDate>{comp.date}</CompDate>
-                                    <span style={{ color: '#666', fontSize: '0.8rem', marginLeft: '0.5rem' }}>
-                                        ({comp.participants.length} students)
-                                    </span>
-                                </div>
-                                {expandedComp === idx ? <FiChevronUp color="#a0a0a0" /> : <FiChevronDown color="#a0a0a0" />}
-                            </CompHeader>
-                            {expandedComp === idx && (
-                                <CompDetails>
-                                    {comp.link && <CompLink href={comp.link} target="_blank" rel="noopener noreferrer">{comp.link}</CompLink>}
-                                    <Table>
-                                        <thead>
-                                            <tr>
-                                                <Th>Student</Th>
-                                                <Th>Category</Th>
-                                                <Th>Result</Th>
-                                                <Th></Th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {comp.participants.map(p => (
-                                                <tr key={p.id}>
-                                                    <Td>{p.studentName}</Td>
-                                                    <Td>
-                                                        <input
-                                                            defaultValue={p.category || ''}
-                                                            placeholder="-"
-                                                            onBlur={e => {
-                                                                if (e.target.value !== (p.category || '')) {
-                                                                    handleCategoryChange(p.id, e.target.value);
-                                                                }
-                                                            }}
-                                                            onKeyDown={e => e.key === 'Enter' && e.target.blur()}
-                                                            style={{
-                                                                background: 'transparent', border: 'none', borderBottom: '1px solid rgba(255,255,255,0.1)',
-                                                                color: '#fff', fontSize: '0.85rem', padding: '0.2rem 0', outline: 'none', width: '80px',
-                                                            }}
-                                                        />
-                                                    </Td>
-                                                    <Td>
-                                                        <ResultSelect
-                                                            value={p.result}
-                                                            onChange={e => handleResultChange(p.id, e.target.value)}
-                                                        >
-                                                            <option value="participated">Participated</option>
-                                                            <option value="gold">Gold</option>
-                                                            <option value="silver">Silver</option>
-                                                            <option value="bronze">Bronze</option>
-                                                        </ResultSelect>
-                                                    </Td>
-                                                    <Td>
-                                                        <span
-                                                            onClick={async () => {
-                                                                try {
-                                                                    await apiRequest(`/coach/competitions/${p.id}`, { method: 'DELETE' });
-                                                                    refreshAll();
-                                                                } catch {}
-                                                            }}
-                                                            style={{ color: '#666', cursor: 'pointer', fontSize: '0.8rem' }}
-                                                            title="Remove"
-                                                        >
-                                                            <FiTrash2 size={13} />
-                                                        </span>
-                                                    </Td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </Table>
-                                    <AddStudentToComp comp={comp} students={allParticipants} onAdded={refreshAll} />
-                                </CompDetails>
-                            )}
-                        </CompRow>
-                    ))
-                ) : (
-                    <EmptyState>No competitions yet</EmptyState>
-                )}
-            </Card>
-
-            {showCompForm && (
-                <CompetitionForm
-                    students={allParticipants}
-                    onClose={() => setShowCompForm(false)}
-                    onSave={() => { setShowCompForm(false); fetchStudents(); }}
-                />
-            )}
 
             {showAddStudent && (
                 <AddStudentModal
