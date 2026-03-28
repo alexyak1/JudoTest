@@ -88,7 +88,7 @@ export default function Account() {
                     <Tab active={activeTab === 'profile'} onClick={() => setActiveTab('profile')}>
                         My Profile
                     </Tab>
-                    {(isCoach || hasClub) && (
+                    {(isCoach || isAdmin || hasClub) && (
                         <Tab active={activeTab === 'club'} onClick={() => setActiveTab('club')}>
                             Club
                         </Tab>
@@ -118,7 +118,7 @@ export default function Account() {
                 </>
             )}
 
-            {activeTab === 'club' && (isCoach || hasClub) && (
+            {activeTab === 'club' && (isCoach || isAdmin || hasClub) && (
                 <ClubPage />
             )}
 
