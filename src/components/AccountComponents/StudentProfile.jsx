@@ -175,8 +175,9 @@ const BeltList = styled.div`
 `;
 
 const BELT_COLORS = {
-    white: '#e0e0e0', yellow: '#ffd700', orange: '#ff8c00',
-    green: '#228b22', blue: '#4169e1', brown: '#8b4513', black: '#333333',
+    white: '#e0e0e0', yellow: '#ffd700', 'yellow-orange': '#ffb300', orange: '#ff8c00',
+    'orange-green': '#6baa3d', green: '#228b22', 'green-blue': '#2e8b8b', blue: '#4169e1',
+    brown: '#8b4513', black: '#333333',
 };
 
 const BeltItem = styled.div`
@@ -353,7 +354,7 @@ const StudentProfile = ({ user, isOwnProfile, canEdit, onUpdate, onUpdateUser })
         }
     };
 
-    const BELT_ORDER = { yellow: 1, orange: 2, green: 3, blue: 4, brown: 5, black: 6 };
+    const BELT_ORDER = { yellow: 1, 'yellow-orange': 2, orange: 3, 'orange-green': 4, green: 5, 'green-blue': 6, blue: 7, brown: 8, black: 9 };
     const belts = [...(displayUser.belts || [])].sort((a, b) => (BELT_ORDER[a.color] || 99) - (BELT_ORDER[b.color] || 99));
     const licenses = displayUser.licenses || [];
     const showLicenses = displayUser.role === 'coach' || displayUser.role === 'admin';
@@ -941,7 +942,7 @@ const InfoValue = styled.span`
     text-transform: capitalize;
 `;
 
-const BELT_OPTIONS_MODAL = ['yellow', 'orange', 'green', 'blue', 'brown', 'black'];
+const BELT_OPTIONS_MODAL = ['yellow', 'yellow-orange', 'orange', 'orange-green', 'green', 'green-blue', 'blue', 'brown', 'black'];
 
 const DeleteConfirmText = styled.p`
     color: #ff6b6b;

@@ -100,7 +100,7 @@ const CancelBtn = styled.button`
     &:hover { border-color: #667eea; color: #fff; }
 `;
 
-const BELT_OPTIONS = ['yellow', 'orange', 'green', 'blue', 'brown', 'black'];
+const BELT_OPTIONS = ['yellow', 'yellow-orange', 'orange', 'orange-green', 'green', 'green-blue', 'blue', 'brown', 'black'];
 
 const ErrorMsg = styled.div`
     color: #ff6b6b;
