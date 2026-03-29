@@ -5,6 +5,7 @@ import ProfileEditForm from './ProfileEditForm';
 import AddBeltForm from './AddBeltForm';
 import AddCompetitionForm from './AddCompetitionForm';
 import AddLicenseForm from './AddLicenseForm';
+import { getWeightClasses } from '../../utils/categories';
 import { apiRequest } from '../../utils/api';
 
 const API_BASE = `http://${window.location.hostname}:8787`;
@@ -519,6 +520,8 @@ const StudentProfile = ({ user, isOwnProfile, canEdit, onUpdate, onUpdateUser })
                                 <tr>
                                     <Th>Competition</Th>
                                     <Th>Date</Th>
+                                    {editable && <Th>Category</Th>}
+                                    {editable && <Th>Weight</Th>}
                                     <Th>Result</Th>
                                     {editable && <Th></Th>}
                                 </tr>
@@ -533,7 +536,103 @@ const StudentProfile = ({ user, isOwnProfile, canEdit, onUpdate, onUpdateUser })
                                             }
                                         </Td>
                                         <Td>{comp.date}</Td>
-                                        <Td><ResultBadge result={comp.result}>{comp.result}</ResultBadge></Td>
+                                        {editable && (
+                                            <Td>
+                                                <select
+                                                    defaultValue={comp.category || ''}
+                                                    onChange={async e => {
+                                                        const newCat = e.target.value;
+                                                        // Update local state so weight dropdown refreshes
+                                                        const updateFn = prev => ({
+                                                            ...prev,
+                                                            competitions: (prev.competitions || []).map(c => c.id === comp.id ? { ...c, category: newCat } : c),
+                                                        });
+                                                        if (isOwnProfile && onUpdateUser) onUpdateUser(updateFn);
+                                                        else setLocalUser(updateFn);
+                                                        try {
+                                                            await apiRequest(`/coach/competitions/${comp.id}/category`, {
+                                                                method: 'PUT',
+                                                                body: JSON.stringify({ category: newCat }),
+                                                            });
+                                                        } catch {}
+                                                    }}
+                                                    style={{
+                                                        background: 'transparent', border: 'none',
+                                                        borderBottom: '1px solid rgba(255,255,255,0.08)',
+                                                        color: '#ddd', fontSize: '0.8rem', padding: '0.1rem 0',
+                                                        outline: 'none', width: '80px',
+                                                    }}
+                                                >
+                                                    <option value="" style={{ background: '#1a1a2e' }}>-</option>
+                                                    {['U9','U11','U13','U15','U18','U21','Senior','M1','M2','M3','M4','M5','M6','M7','M8','M9'].map(cat => (
+                                                        <option key={cat} value={cat} style={{ background: '#1a1a2e' }}>{cat}</option>
+                                                    ))}
+                                                </select>
+                                            </Td>
+                                        )}
+                                        {editable && (
+                                            <Td key={`wc-${comp.id}-${comp.category}`}>
+                                                {(() => {
+                                                    if (!comp.category) return <span style={{ color: '#555', fontSize: '0.75rem' }}>set category first</span>;
+                                                    const wc = getWeightClasses(comp.category, displayUser.gender);
+                                                    const groups = Object.entries(wc);
+                                                    return (
+                                                        <select
+                                                            defaultValue={comp.weight_class || ''}
+                                                            onChange={async e => {
+                                                                try {
+                                                                    await apiRequest(`/coach/competitions/${comp.id}/weight-class`, {
+                                                                        method: 'PUT',
+                                                                        body: JSON.stringify({ weight_class: e.target.value }),
+                                                                    });
+                                                                } catch {}
+                                                            }}
+                                                            style={{
+                                                                background: 'transparent', border: 'none',
+                                                                borderBottom: '1px solid rgba(255,255,255,0.08)',
+                                                                color: '#ddd', fontSize: '0.8rem', padding: '0.1rem 0',
+                                                                outline: 'none', width: '80px',
+                                                            }}
+                                                        >
+                                                            <option value="" style={{ background: '#1a1a2e' }}>-</option>
+                                                            {groups.map(([label, weights]) => (
+                                                                <optgroup key={label} label={label.charAt(0).toUpperCase() + label.slice(1)} style={{ background: '#1a1a2e' }}>
+                                                                    {weights.map(w => (
+                                                                        <option key={w} value={w} style={{ background: '#1a1a2e' }}>{w}kg</option>
+                                                                    ))}
+                                                                </optgroup>
+                                                            ))}
+                                                        </select>
+                                                    );
+                                                })()}
+                                            </Td>
+                                        )}
+                                        <Td>
+                                            {editable ? (
+                                                <select
+                                                    defaultValue={comp.result}
+                                                    onChange={async e => {
+                                                        try {
+                                                            await apiRequest(`/coach/competitions/${comp.id}/result`, {
+                                                                method: 'PUT',
+                                                                body: JSON.stringify({ result: e.target.value }),
+                                                            });
+                                                        } catch {}
+                                                    }}
+                                                    style={{
+                                                        background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)',
+                                                        borderRadius: '4px', padding: '0.2rem 0.3rem', color: '#fff', fontSize: '0.8rem', outline: 'none',
+                                                    }}
+                                                >
+                                                    <option value="participated" style={{ background: '#1a1a2e' }}>Participated</option>
+                                                    <option value="gold" style={{ background: '#1a1a2e' }}>Gold</option>
+                                                    <option value="silver" style={{ background: '#1a1a2e' }}>Silver</option>
+                                                    <option value="bronze" style={{ background: '#1a1a2e' }}>Bronze</option>
+                                                </select>
+                                            ) : (
+                                                <ResultBadge result={comp.result}>{comp.result}</ResultBadge>
+                                            )}
+                                        </Td>
                                         {editable && (
                                             <Td>
                                                 <DeleteBtn onClick={() => handleDelete('competitions', comp.id)}>

@@ -155,6 +155,7 @@ const SuccessMsg = styled.div`
 const ProfileEditForm = ({ user, onClose, onSave, apiPrefix = '/user', isOwnProfile }) => {
     const [name, setName] = useState(user.name || '');
     const [birthDate, setBirthDate] = useState(user.birth_date || '');
+    const [gender, setGender] = useState(user.gender || '');
     const [studentEmail, setStudentEmail] = useState(user.email || '');
     const [photoURL, setPhotoURL] = useState(user.photo_url || '');
     const [saving, setSaving] = useState(false);
@@ -274,13 +275,13 @@ const ProfileEditForm = ({ user, onClose, onSave, apiPrefix = '/user', isOwnProf
         }
 
         try {
-            const body = { name, photo_url: photoURL, birth_date: birthDate };
+            const body = { name, photo_url: photoURL, birth_date: birthDate, gender };
             if (!isOwnProfile && studentEmail) body.email = studentEmail;
             await apiRequest(`${apiPrefix}/profile`, {
                 method: 'PUT',
                 body: JSON.stringify(body),
             });
-            onSave({ name, photo_url: photoURL, birth_date: birthDate, email: studentEmail || undefined });
+            onSave({ name, photo_url: photoURL, birth_date: birthDate, gender, email: studentEmail || undefined });
         } catch {
             // ignore
         }
@@ -296,9 +297,22 @@ const ProfileEditForm = ({ user, onClose, onSave, apiPrefix = '/user', isOwnProf
                         <Label>Name</Label>
                         <Input value={name} onChange={e => setName(e.target.value)} required />
                     </div>
-                    <div>
-                        <Label>Date of Birth</Label>
-                        <Input type="date" value={birthDate} onChange={e => setBirthDate(e.target.value)} />
+                    <div style={{ display: 'flex', gap: '0.8rem' }}>
+                        <div style={{ flex: 1 }}>
+                            <Label>Date of Birth</Label>
+                            <Input type="date" value={birthDate} onChange={e => setBirthDate(e.target.value)} />
+                        </div>
+                        <div style={{ flex: 1 }}>
+                            <Label>Gender</Label>
+                            <select value={gender} onChange={e => setGender(e.target.value)} style={{
+                                width: '100%', background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)',
+                                borderRadius: '10px', padding: '0.8rem 1rem', color: '#fff', fontSize: '1rem', outline: 'none', boxSizing: 'border-box',
+                            }}>
+                                <option value="" style={{ background: '#1a1a2e' }}>-</option>
+                                <option value="male" style={{ background: '#1a1a2e' }}>Male</option>
+                                <option value="female" style={{ background: '#1a1a2e' }}>Female</option>
+                            </select>
+                        </div>
                     </div>
                     {!isOwnProfile && (
                         <div>

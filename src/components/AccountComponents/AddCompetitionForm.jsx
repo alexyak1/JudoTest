@@ -256,7 +256,12 @@ const AddCompetitionForm = ({ onClose, onSave, apiPrefix = '/user' }) => {
                     )}
                     <div>
                         <Label>Category (optional)</Label>
-                        <Input value={category} onChange={e => setCategory(e.target.value)} placeholder="e.g. PU13, FU11" />
+                        <Select value={category} onChange={e => setCategory(e.target.value)}>
+                            <option value="" style={{ background: '#1a1a2e' }}>-</option>
+                            {['U9','U11','U13','U15','U18','U21','Senior','M1','M2','M3','M4','M5','M6','M7','M8','M9'].map(cat => (
+                                <option key={cat} value={cat} style={{ background: '#1a1a2e' }}>{cat}</option>
+                            ))}
+                        </Select>
                     </div>
                     <div>
                         <Label>Result</Label>

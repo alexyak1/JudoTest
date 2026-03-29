@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { FiPlus, FiChevronDown, FiChevronUp, FiTrash2, FiCalendar, FiEdit2 } from 'react-icons/fi';
 import { apiRequest } from '../../utils/api';
+import { getWeightClasses } from '../../utils/categories';
 import { useAuth } from '../../hooks/useAuth';
 
 const StatRow = styled.div`
@@ -496,6 +497,7 @@ const ClubPage = () => {
                                             <tr>
                                                 <Th>Name</Th>
                                                 <Th>Category</Th>
+                                                <Th>Weight</Th>
                                                 <Th>Result</Th>
                                                 {canEdit && <Th></Th>}
                                             </tr>
@@ -509,29 +511,66 @@ const ClubPage = () => {
                                                 return (
                                                 <tr key={p.id} style={isDupe ? { background: 'rgba(245,158,11,0.08)' } : {}}>
                                                     <Td>
-                                                        {p.studentName}
+                                                        <a href={`/account?tab=students&student=${p.studentId}`} style={{ color: '#667eea', textDecoration: 'none' }}
+                                                            onMouseOver={e => e.target.style.textDecoration = 'underline'}
+                                                            onMouseOut={e => e.target.style.textDecoration = 'none'}
+                                                        >{p.studentName}</a>
                                                         {isDupe && <span style={{ color: '#f59e0b', fontSize: '0.65rem', marginLeft: '0.3rem' }} title="Same person with same category">duplicate</span>}
                                                     </Td>
                                                     <Td>
                                                         {canEdit ? (
-                                                            <input
+                                                            <select
                                                                 defaultValue={p.category || ''}
-                                                                placeholder="-"
-                                                                onBlur={e => {
-                                                                    if (e.target.value !== (p.category || '')) {
-                                                                        handleCategoryChange(p.id, e.target.value);
-                                                                    }
-                                                                }}
-                                                                onKeyDown={e => e.key === 'Enter' && e.target.blur()}
+                                                                onChange={e => handleCategoryChange(p.id, e.target.value)}
                                                                 style={{
                                                                     background: 'transparent', border: 'none',
                                                                     borderBottom: '1px solid rgba(255,255,255,0.08)',
                                                                     color: '#ddd', fontSize: '0.8rem', padding: '0.1rem 0',
-                                                                    outline: 'none', width: '70px',
+                                                                    outline: 'none', width: '80px',
                                                                 }}
-                                                            />
+                                                            >
+                                                                <option value="" style={{ background: '#1a1a2e' }}>-</option>
+                                                                {['U9','U11','U13','U15','U18','U21','Senior','M1','M2','M3','M4','M5','M6','M7','M8','M9'].map(cat => (
+                                                                    <option key={cat} value={cat} style={{ background: '#1a1a2e' }}>{cat}</option>
+                                                                ))}
+                                                            </select>
                                                         ) : (
                                                             <span style={{ color: '#ddd', fontSize: '0.8rem' }}>{p.category || '-'}</span>
+                                                        )}
+                                                    </Td>
+                                                    <Td key={`wc-${p.id}-${p.category}`}>
+                                                        {canEdit ? (() => {
+                                                            if (!p.category) return <span style={{ color: '#555', fontSize: '0.75rem' }}>set category first</span>;
+                                                            const wc = getWeightClasses(p.category, p.user_gender);
+                                                            const groups = Object.entries(wc);
+                                                            return (
+                                                                <select
+                                                                    defaultValue={p.weight_class || ''}
+                                                                    onChange={e => {
+                                                                        apiRequest(`/coach/competitions/${p.id}/weight-class`, {
+                                                                            method: 'PUT',
+                                                                            body: JSON.stringify({ weight_class: e.target.value }),
+                                                                        }).catch(() => {});
+                                                                    }}
+                                                                    style={{
+                                                                        background: 'transparent', border: 'none',
+                                                                        borderBottom: '1px solid rgba(255,255,255,0.08)',
+                                                                        color: '#ddd', fontSize: '0.8rem', padding: '0.1rem 0',
+                                                                        outline: 'none', width: '80px',
+                                                                    }}
+                                                                >
+                                                                    <option value="" style={{ background: '#1a1a2e' }}>-</option>
+                                                                    {groups.map(([label, weights]) => (
+                                                                        <optgroup key={label} label={label.charAt(0).toUpperCase() + label.slice(1)} style={{ background: '#1a1a2e' }}>
+                                                                            {weights.map(w => (
+                                                                                <option key={w} value={w} style={{ background: '#1a1a2e' }}>{w}kg</option>
+                                                                            ))}
+                                                                        </optgroup>
+                                                                    ))}
+                                                                </select>
+                                                            );
+                                                        })() : (
+                                                            <span style={{ color: '#ddd', fontSize: '0.8rem' }}>{p.weight_class ? `${p.weight_class}kg` : '-'}</span>
                                                         )}
                                                     </Td>
                                                     <Td>

@@ -390,6 +390,7 @@ const CoachDashboard = ({ studentId, onStudentChange }) => {
     const [statsFilter, setStatsFilter] = useState('year');
     const [statsFrom, setStatsFrom] = useState('');
     const [statsTo, setStatsTo] = useState('');
+    const [categoryFilter, setCategoryFilter] = useState('all');
 
     const clubApproved = user?.club_status === 'approved';
 
@@ -525,9 +526,19 @@ const CoachDashboard = ({ studentId, onStudentChange }) => {
         });
     };
 
+    const CATEGORY_GROUPS = {
+        all: { label: 'All', match: () => true },
+        children: { label: 'Children (U9-U18)', match: c => /^U(9|11|13|15|18)$/i.test((c.category || '').trim()) },
+        u21_senior: { label: 'U21 / Senior', match: c => /^(U21|senior)$/i.test((c.category || '').trim()) },
+        masters: { label: 'Masters (M1-M9)', match: c => /^M[1-9]$/i.test((c.category || '').trim()) },
+    };
+
     const allMembers = [...students, ...clubCoaches];
     const getPersonStats = (person) => {
-        const comps = filterComps(person.competitions);
+        let comps = filterComps(person.competitions);
+        if (categoryFilter !== 'all') {
+            comps = comps.filter(CATEGORY_GROUPS[categoryFilter]?.match || (() => true));
+        }
         return {
             total: comps.length,
             gold: comps.filter(c => c.result === 'gold').length,
@@ -540,7 +551,7 @@ const CoachDashboard = ({ studentId, onStudentChange }) => {
     const topCompetitors = [...allMembers]
         .map(p => ({ ...p, stats: getPersonStats(p) }))
         .filter(p => p.stats.total > 0)
-        .sort((a, b) => b.stats.medals - a.stats.medals || b.stats.gold - a.stats.gold || b.stats.total - a.stats.total)
+        .sort((a, b) => b.stats.gold - a.stats.gold || b.stats.silver - a.stats.silver || b.stats.bronze - a.stats.bronze || a.stats.total - b.stats.total)
         .slice(0, 10);
 
     const clubName = user?.club?.name || 'Club';
@@ -584,6 +595,17 @@ const CoachDashboard = ({ studentId, onStudentChange }) => {
                         </>
                     )}
                 </div>
+                <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center', flexWrap: 'wrap', marginBottom: '0.8rem' }}>
+                    <span style={{ color: '#666', fontSize: '0.75rem', marginRight: '0.2rem' }}>Category:</span>
+                    {Object.entries(CATEGORY_GROUPS).map(([key, { label }]) => (
+                        <button key={key} onClick={() => setCategoryFilter(key)} style={{
+                            background: categoryFilter === key ? 'rgba(102,126,234,0.2)' : 'rgba(255,255,255,0.04)',
+                            border: `1px solid ${categoryFilter === key ? 'rgba(102,126,234,0.4)' : 'rgba(255,255,255,0.08)'}`,
+                            color: categoryFilter === key ? '#667eea' : '#888',
+                            borderRadius: '6px', padding: '0.25rem 0.5rem', fontSize: '0.75rem', cursor: 'pointer',
+                        }}>{label}</button>
+                    ))}
+                </div>
                 {topCompetitors.length > 0 ? (
                     <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                         <thead>
@@ -600,8 +622,11 @@ const CoachDashboard = ({ studentId, onStudentChange }) => {
                             {topCompetitors.map((p, i) => (
                                 <tr key={p.id}>
                                     <td style={{ color: '#555', padding: '0.3rem 0.5rem', fontSize: '0.8rem', borderBottom: '1px solid rgba(255,255,255,0.03)' }}>{i + 1}</td>
-                                    <td style={{ color: '#ddd', padding: '0.3rem 0.5rem', fontSize: '0.85rem', fontWeight: 500, borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
-                                        {p.name}
+                                    <td style={{ padding: '0.3rem 0.5rem', fontSize: '0.85rem', fontWeight: 500, borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
+                                        <span onClick={() => viewStudent(p.id)} style={{ color: '#667eea', cursor: 'pointer', textDecoration: 'none' }}
+                                            onMouseOver={e => e.target.style.textDecoration = 'underline'}
+                                            onMouseOut={e => e.target.style.textDecoration = 'none'}
+                                        >{p.name}</span>
                                         {p.role === 'coach' && <span style={{ color: '#667eea', fontSize: '0.65rem', marginLeft: '0.3rem' }}>(coach)</span>}
                                     </td>
                                     <td style={{ color: '#888', padding: '0.3rem 0.5rem', fontSize: '0.8rem', textAlign: 'center', borderBottom: '1px solid rgba(255,255,255,0.03)' }}>{p.stats.total}</td>

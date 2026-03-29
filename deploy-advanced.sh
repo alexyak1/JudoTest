@@ -43,10 +43,10 @@ rollback_deployment() {
     # Try to restore from backup if it exists
     if [ -d "$BACKUP_DIR" ]; then
         log "${YELLOW}📦 Restoring from backup...${NC}"
-        ssh -o StrictHostKeyChecking=no "$SERVER_USER@$SERVER_IP" "cd $SERVER_PATH && docker-compose down && docker-compose up -d" || true
+        ssh -o StrictHostKeyChecking=no "$SERVER_USER@$SERVER_IP" "cd $SERVER_PATH && docker compose down && docker compose up -d" || true
     else
         log "${YELLOW}⚠️  No backup found, attempting to restart existing containers...${NC}"
-        ssh -o StrictHostKeyChecking=no "$SERVER_USER@$SERVER_IP" "cd $SERVER_PATH && docker-compose restart" || true
+        ssh -o StrictHostKeyChecking=no "$SERVER_USER@$SERVER_IP" "cd $SERVER_PATH && docker compose restart" || true
     fi
 }
 
@@ -97,9 +97,9 @@ backup_current_deployment() {
     
     ssh -o StrictHostKeyChecking=no "$SERVER_USER@$SERVER_IP" "
         cd $SERVER_PATH
-        if [ -f docker-compose.yml ]; then
+        if [ -f docker compose.yml ]; then
             mkdir -p $BACKUP_DIR
-            cp docker-compose.yml $BACKUP_DIR/
+            cp docker compose.yml $BACKUP_DIR/
             cp Dockerfile $BACKUP_DIR/ 2>/dev/null || true
             echo 'Backup created at $BACKUP_DIR'
         else
@@ -182,22 +182,22 @@ main() {
     execute_remote_command "cd $SERVER_PATH && git pull" "Pulling latest code from git"
     
     # Stop existing containers
-    execute_remote_command "cd $SERVER_PATH && docker-compose down" "Stopping existing containers"
+    execute_remote_command "cd $SERVER_PATH && docker compose down" "Stopping existing containers"
     
     # Build new containers
-    execute_remote_command "cd $SERVER_PATH && docker-compose build --no-cache" "Building new containers"
+    execute_remote_command "cd $SERVER_PATH && docker compose build --no-cache" "Building new containers"
     
     # Start containers in detached mode
-    execute_remote_command "cd $SERVER_PATH && docker-compose up -d" "Starting containers"
+    execute_remote_command "cd $SERVER_PATH && docker compose up -d" "Starting containers"
     
     # Wait for service to be ready
     wait_for_service
     
     # Final status check
-    execute_remote_command "cd $SERVER_PATH && docker-compose ps" "Checking container status"
+    execute_remote_command "cd $SERVER_PATH && docker compose ps" "Checking container status"
     
     # Health check
-    execute_remote_command "cd $SERVER_PATH && docker-compose logs --tail=20" "Checking recent logs"
+    execute_remote_command "cd $SERVER_PATH && docker compose logs --tail=20" "Checking recent logs"
     
     log "${GREEN}🎉 Deployment completed successfully!${NC}"
     log "${GREEN}Your application is available at: http://$SERVER_IP${NC}"
@@ -234,9 +234,9 @@ if [ "$1" = "--dry-run" ]; then
     log "${YELLOW}🔍 DRY RUN MODE - No actual changes will be made${NC}"
     log "${BLUE}Would execute the following commands:${NC}"
     log "${BLUE}1. ssh $SERVER_USER@$SERVER_IP 'cd $SERVER_PATH && git pull'${NC}"
-    log "${BLUE}2. ssh $SERVER_USER@$SERVER_IP 'cd $SERVER_PATH && docker-compose down'${NC}"
-    log "${BLUE}3. ssh $SERVER_USER@$SERVER_IP 'cd $SERVER_PATH && docker-compose build --no-cache'${NC}"
-    log "${BLUE}4. ssh $SERVER_USER@$SERVER_IP 'cd $SERVER_PATH && docker-compose up -d'${NC}"
+    log "${BLUE}2. ssh $SERVER_USER@$SERVER_IP 'cd $SERVER_PATH && docker compose down'${NC}"
+    log "${BLUE}3. ssh $SERVER_USER@$SERVER_IP 'cd $SERVER_PATH && docker compose build --no-cache'${NC}"
+    log "${BLUE}4. ssh $SERVER_USER@$SERVER_IP 'cd $SERVER_PATH && docker compose up -d'${NC}"
     log "${BLUE}5. Wait for service to be ready at http://$SERVER_IP${NC}"
     exit 0
 fi
