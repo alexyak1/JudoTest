@@ -170,7 +170,7 @@ const Input = styled.input`
 `;
 
 const CoachesList = () => {
-    const { user, isAdmin } = useAuth();
+    const { user, isAdmin, isCoach } = useAuth();
     const [coaches, setCoaches] = useState([]);
     const [selectedCoach, setSelectedCoach] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -282,7 +282,7 @@ const CoachesList = () => {
                                     {coach.email && <CoachEmail>{coach.email}</CoachEmail>}
                                 </div>
                             </CardHeader>
-                            {isAdmin && coach.id !== user?.id && (
+                            {(isAdmin || isCoach) && coach.id !== user?.id && (
                                 <DeleteBtn onClick={(e) => { e.stopPropagation(); removeCoach(coach.id); }}>
                                     <FiTrash2 size={13} /> Remove from club
                                 </DeleteBtn>
