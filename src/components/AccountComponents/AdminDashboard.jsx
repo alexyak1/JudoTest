@@ -325,7 +325,18 @@ const AdminDashboard = () => {
                                         </RoleSelect>
                                     </Td>
                                     <Td>
-                                        <ViewBtn onClick={() => viewUserProfile(user.id)}>View</ViewBtn>
+                                        <div style={{ display: 'flex', gap: '0.4rem' }}>
+                                            <ViewBtn onClick={() => viewUserProfile(user.id)}>View</ViewBtn>
+                                            <ViewBtn onClick={async () => {
+                                                if (!window.confirm(`Delete ${user.name}? This removes all their data permanently.`)) return;
+                                                try {
+                                                    await apiRequest(`/admin/users/${user.id}`, { method: 'DELETE' });
+                                                    fetchData();
+                                                } catch {}
+                                            }} style={{ background: 'rgba(255,107,107,0.15)', border: '1px solid rgba(255,107,107,0.3)', color: '#ff6b6b' }}>
+                                                Delete
+                                            </ViewBtn>
+                                        </div>
                                     </Td>
                                 </tr>
                             ))}

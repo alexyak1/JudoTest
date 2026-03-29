@@ -159,6 +159,7 @@ const ProfileEditForm = ({ user, onClose, onSave, apiPrefix = '/user', isOwnProf
     const [studentEmail, setStudentEmail] = useState(user.email || '');
     const [photoURL, setPhotoURL] = useState(user.photo_url || '');
     const [saving, setSaving] = useState(false);
+    const [saveError, setSaveError] = useState('');
     const [uploading, setUploading] = useState(false);
     const [uploadMsg, setUploadMsg] = useState('');
     const [currentPassword, setCurrentPassword] = useState('');
@@ -282,8 +283,9 @@ const ProfileEditForm = ({ user, onClose, onSave, apiPrefix = '/user', isOwnProf
                 body: JSON.stringify(body),
             });
             onSave({ name, photo_url: photoURL, birth_date: birthDate, gender, email: studentEmail || undefined });
-        } catch {
-            // ignore
+            return;
+        } catch (err) {
+            setSaveError(err.message || 'Failed to save');
         }
         setSaving(false);
     };
@@ -293,6 +295,13 @@ const ProfileEditForm = ({ user, onClose, onSave, apiPrefix = '/user', isOwnProf
             <Modal onClick={e => e.stopPropagation()}>
                 <Title>Edit Profile</Title>
                 <Form onSubmit={handleSubmit}>
+                    {saveError && (
+                        <div style={{
+                            color: '#ff6b6b', background: 'rgba(255,107,107,0.1)',
+                            border: '1px solid rgba(255,107,107,0.2)', borderRadius: '8px',
+                            padding: '0.6rem', fontSize: '0.85rem', textAlign: 'center',
+                        }}>{saveError}</div>
+                    )}
                     <div>
                         <Label>Name</Label>
                         <Input value={name} onChange={e => setName(e.target.value)} required />

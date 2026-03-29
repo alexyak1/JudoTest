@@ -282,7 +282,7 @@ const CoachesList = () => {
                                     {coach.email && <CoachEmail>{coach.email}</CoachEmail>}
                                 </div>
                             </CardHeader>
-                            {(isAdmin || isCoach) && coach.id !== user?.id && (
+                            {isAdmin && coach.id !== user?.id && (
                                 <DeleteBtn onClick={(e) => { e.stopPropagation(); removeCoach(coach.id); }}>
                                     <FiTrash2 size={13} /> Remove from club
                                 </DeleteBtn>
