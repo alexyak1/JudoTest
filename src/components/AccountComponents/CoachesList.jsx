@@ -231,7 +231,7 @@ const CoachesList = () => {
         return (
             <>
                 <BackBtn onClick={() => setSelectedCoach(null)}>Back to Coaches</BackBtn>
-                <StudentProfile user={selectedCoach} isOwnProfile={false} canEdit={isAdmin} />
+                <StudentProfile user={selectedCoach} isOwnProfile={false} canEdit={isAdmin || isCoach} />
             </>
         );
     }
