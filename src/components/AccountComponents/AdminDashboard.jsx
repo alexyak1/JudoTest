@@ -163,21 +163,75 @@ const AddBtn = styled.button`
     &:disabled { opacity: 0.5; cursor: not-allowed; }
 `;
 
+const StatRow = styled.div`
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+`;
+
+const StatCard = styled.div`
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    padding: 0.6rem;
+    text-align: center;
+`;
+
+const StatValue = styled.div`
+    color: ${p => p.color || '#fff'};
+    font-size: 1.5rem;
+    font-weight: 700;
+`;
+
+const StatLabel = styled.div`
+    color: #888;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-top: 0.1rem;
+`;
+
+const ActivityTable = styled.table`
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.8rem;
+`;
+
+const ActivityTh = styled.th`
+    color: #666;
+    font-weight: 500;
+    text-align: left;
+    padding: 0.3rem 0.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+`;
+
+const ActivityTd = styled.td`
+    color: #ddd;
+    padding: 0.3rem 0.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+`;
+
 const AdminDashboard = () => {
     const [users, setUsers] = useState([]);
     const [clubs, setClubs] = useState([]);
+    const [dashboard, setDashboard] = useState(null);
     const [selectedUser, setSelectedUser] = useState(null);
     const [loading, setLoading] = useState(true);
     const [newClubName, setNewClubName] = useState('');
 
     const fetchData = async () => {
         try {
-            const [usersData, clubsData] = await Promise.all([
+            const [usersData, clubsData, dashData] = await Promise.all([
                 apiRequest('/admin/users'),
                 apiRequest('/admin/clubs'),
+                apiRequest('/admin/dashboard'),
             ]);
             setUsers(usersData);
             setClubs(clubsData);
+            setDashboard(dashData);
         } catch {
             // ignore
         }
@@ -255,8 +309,84 @@ const AdminDashboard = () => {
 
     const getUserCountForClub = (clubId) => users.filter(u => u.club_id === clubId).length;
 
+    const formatDate = (d) => {
+        if (!d) return 'Never';
+        const date = new Date(d);
+        const now = new Date();
+        const diff = now - date;
+        if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`;
+        if (diff < 86400000) return `${Math.floor(diff / 3600000)}h ago`;
+        if (diff < 604800000) return `${Math.floor(diff / 86400000)}d ago`;
+        return date.toLocaleDateString();
+    };
+
     return (
         <>
+            {dashboard && (
+                <Card>
+                    <SectionHeader>
+                        <SectionTitle>User Activity</SectionTitle>
+                    </SectionHeader>
+                    <StatRow>
+                        <StatCard>
+                            <StatValue>{dashboard.total_users}</StatValue>
+                            <StatLabel>Total Users</StatLabel>
+                        </StatCard>
+                        <StatCard>
+                            <StatValue color="#4a9eff">{dashboard.total_students}</StatValue>
+                            <StatLabel>Students</StatLabel>
+                        </StatCard>
+                        <StatCard>
+                            <StatValue color="#667eea">{dashboard.total_coaches}</StatValue>
+                            <StatLabel>Coaches</StatLabel>
+                        </StatCard>
+                        <StatCard>
+                            <StatValue color="#4ade80">{dashboard.active_this_week}</StatValue>
+                            <StatLabel>Active 7d</StatLabel>
+                        </StatCard>
+                        <StatCard>
+                            <StatValue color="#f59e0b">{dashboard.active_this_month}</StatValue>
+                            <StatLabel>Active 30d</StatLabel>
+                        </StatCard>
+                        <StatCard>
+                            <StatValue color="#ff6b6b">{dashboard.never_logged_in}</StatValue>
+                            <StatLabel>Never Logged In</StatLabel>
+                        </StatCard>
+                    </StatRow>
+                    <div style={{ maxHeight: '250px', overflowY: 'auto' }}>
+                        <ActivityTable>
+                            <thead>
+                                <tr>
+                                    <ActivityTh>Name</ActivityTh>
+                                    <ActivityTh>Role</ActivityTh>
+                                    <ActivityTh>Club</ActivityTh>
+                                    <ActivityTh>Last Login</ActivityTh>
+                                    <ActivityTh>Joined</ActivityTh>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {(dashboard.users || []).map(u => (
+                                    <tr key={u.id}>
+                                        <ActivityTd>
+                                            <a href={`/account?tab=students&student=${u.id}`} style={{ color: '#667eea', textDecoration: 'none' }}
+                                                onMouseOver={e => e.target.style.textDecoration = 'underline'}
+                                                onMouseOut={e => e.target.style.textDecoration = 'none'}
+                                            >{u.name}</a>
+                                        </ActivityTd>
+                                        <ActivityTd style={{ textTransform: 'capitalize' }}>{u.role}</ActivityTd>
+                                        <ActivityTd>{u.club_name || '-'}</ActivityTd>
+                                        <ActivityTd style={{ color: u.last_login_at ? '#4ade80' : '#ff6b6b' }}>
+                                            {formatDate(u.last_login_at)}
+                                        </ActivityTd>
+                                        <ActivityTd style={{ color: '#888' }}>{new Date(u.created_at).toLocaleDateString()}</ActivityTd>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </ActivityTable>
+                    </div>
+                </Card>
+            )}
+
             <Card>
                 <SectionHeader>
                     <SectionTitle>Clubs</SectionTitle>
