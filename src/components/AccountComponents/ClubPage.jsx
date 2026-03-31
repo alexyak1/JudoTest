@@ -4,6 +4,7 @@ import { FiPlus, FiChevronDown, FiChevronUp, FiTrash2, FiCalendar, FiEdit2 } fro
 import { apiRequest } from '../../utils/api';
 import { getWeightClasses } from '../../utils/categories';
 import { useAuth } from '../../hooks/useAuth';
+import StudentProfile from './StudentProfile';
 
 const StatRow = styled.div`
     display: grid;
@@ -300,6 +301,8 @@ const ClubPage = () => {
     const [confirmRemoveParticipant, setConfirmRemoveParticipant] = useState(null);
     const [confirmDeleteComp, setConfirmDeleteComp] = useState(null);
     const [clubMembers, setClubMembers] = useState([]);
+    const [selectedMember, setSelectedMember] = useState(null);
+    const [rankingShowAll, setRankingShowAll] = useState(false);
     const [filter, setFilter] = useState('year');
     const [dateFrom, setDateFrom] = useState(`${new Date().getFullYear()}-01-01`);
     const [dateTo, setDateTo] = useState(`${new Date().getFullYear()}-12-31`);
@@ -330,6 +333,13 @@ const ClubPage = () => {
     };
 
     useEffect(() => { fetchData(); }, [filter, dateFrom, dateTo]);
+
+    const viewMember = async (userId) => {
+        try {
+            const data = await apiRequest(`/user/club-member/${userId}`);
+            setSelectedMember(data);
+        } catch {}
+    };
 
     const handleResultChange = async (compId, newResult) => {
         try {
@@ -390,6 +400,19 @@ const ClubPage = () => {
         return true;
     });
 
+    if (selectedMember) {
+        return (
+            <>
+                <button onClick={() => setSelectedMember(null)} style={{
+                    background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)',
+                    color: '#a0a0a0', borderRadius: '8px', padding: '0.5rem 1rem', cursor: 'pointer',
+                    fontSize: '0.9rem', marginBottom: '1.5rem', transition: 'all 0.3s',
+                }}>Back to Club</button>
+                <StudentProfile user={selectedMember} isOwnProfile={false} canEdit={false} />
+            </>
+        );
+    }
+
     return (
         <>
             <Card>
@@ -438,6 +461,84 @@ const ClubPage = () => {
                     </StatRow>
                 )}
             </Card>
+
+            {competitions.length > 0 && (() => {
+                const personMap = {};
+                const activeComps = competitions.filter(c => !c.deleted && c.user_id);
+                const filtered = filter === 'all' ? activeComps : activeComps.filter(c => {
+                    if (filter === 'year') return c.date?.startsWith(String(new Date().getFullYear()));
+                    if (filter === 'custom') return (!dateFrom || c.date >= dateFrom) && (!dateTo || c.date <= dateTo);
+                    return true;
+                });
+                filtered.forEach(c => {
+                    if (!c.user_id || !c.user_name) return;
+                    if (!personMap[c.user_id]) personMap[c.user_id] = { id: c.user_id, name: c.user_name, total: 0, gold: 0, silver: 0, bronze: 0 };
+                    const p = personMap[c.user_id];
+                    p.total++;
+                    if (c.result === 'gold') p.gold++;
+                    if (c.result === 'silver') p.silver++;
+                    if (c.result === 'bronze') p.bronze++;
+                });
+                const ranking = Object.values(personMap)
+                    .filter(p => p.total > 0)
+                    .sort((a, b) => b.gold - a.gold || b.silver - a.silver || b.bronze - a.bronze || b.total - a.total);
+
+                if (ranking.length === 0) return null;
+
+                const PAGE_SIZE = 10;
+                const visible = rankingShowAll ? ranking : ranking.slice(0, PAGE_SIZE);
+                const hasMore = ranking.length > PAGE_SIZE;
+                const thStyle = { color: '#666', fontWeight: 500, textAlign: 'left', padding: '0.4rem 0.5rem', borderBottom: '1px solid rgba(255,255,255,0.06)', fontSize: '0.75rem' };
+                const tdStyle = { padding: '0.4rem 0.5rem', borderBottom: '1px solid rgba(255,255,255,0.03)' };
+
+                return (
+                    <Card>
+                        <SectionHeader>
+                            <SectionTitle>Top Competitors ({ranking.length})</SectionTitle>
+                        </SectionHeader>
+                        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
+                            <thead>
+                                <tr>
+                                    <th style={thStyle}>#</th>
+                                    <th style={thStyle}>Name</th>
+                                    <th style={{ ...thStyle, textAlign: 'center' }}>Comps</th>
+                                    <th style={{ ...thStyle, textAlign: 'center', color: '#ffd700' }}>G</th>
+                                    <th style={{ ...thStyle, textAlign: 'center', color: '#c0c0c0' }}>S</th>
+                                    <th style={{ ...thStyle, textAlign: 'center', color: '#cd7f32' }}>B</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {visible.map((p, i) => (
+                                    <tr key={i}>
+                                        <td style={{ ...tdStyle, color: '#888' }}>{i + 1}</td>
+                                        <td style={tdStyle}>
+                                            <span onClick={() => viewMember(p.id)} style={{ color: '#667eea', cursor: 'pointer', textDecoration: 'none' }}
+                                                onMouseOver={e => e.target.style.textDecoration = 'underline'}
+                                                onMouseOut={e => e.target.style.textDecoration = 'none'}
+                                            >{p.name}</span>
+                                        </td>
+                                        <td style={{ ...tdStyle, color: '#888', textAlign: 'center' }}>{p.total}</td>
+                                        <td style={{ ...tdStyle, color: p.gold ? '#ffd700' : '#333', textAlign: 'center', fontWeight: p.gold ? 700 : 400 }}>{p.gold || '-'}</td>
+                                        <td style={{ ...tdStyle, color: p.silver ? '#c0c0c0' : '#333', textAlign: 'center', fontWeight: p.silver ? 700 : 400 }}>{p.silver || '-'}</td>
+                                        <td style={{ ...tdStyle, color: p.bronze ? '#cd7f32' : '#333', textAlign: 'center', fontWeight: p.bronze ? 700 : 400 }}>{p.bronze || '-'}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                        {hasMore && (
+                            <div style={{ textAlign: 'center', marginTop: '0.8rem' }}>
+                                <button onClick={() => setRankingShowAll(!rankingShowAll)} style={{
+                                    background: 'rgba(102,126,234,0.1)', border: '1px solid rgba(102,126,234,0.25)',
+                                    color: '#667eea', borderRadius: '6px', padding: '0.4rem 1rem',
+                                    cursor: 'pointer', fontSize: '0.8rem',
+                                }}>
+                                    {rankingShowAll ? 'Show Top 10' : `Show All (${ranking.length})`}
+                                </button>
+                            </div>
+                        )}
+                    </Card>
+                );
+            })()}
 
             <Card>
                 <SectionHeader>

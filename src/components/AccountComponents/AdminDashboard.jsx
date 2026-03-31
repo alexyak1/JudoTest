@@ -570,7 +570,33 @@ const AdminDashboard = () => {
                             {users.map(user => (
                                 <tr key={user.id}>
                                     <Td>{user.name}</Td>
-                                    <Td>{user.email || '-'}</Td>
+                                    <Td>
+                                        <input
+                                            defaultValue={user.email || ''}
+                                            placeholder="no email"
+                                            style={{
+                                                background: 'transparent', border: 'none', borderBottom: '1px solid rgba(255,255,255,0.1)',
+                                                color: '#fff', fontSize: '0.85rem', padding: '0.2rem 0', width: '100%', minWidth: '120px', outline: 'none',
+                                            }}
+                                            onFocus={e => e.target.style.borderBottomColor = '#667eea'}
+                                            onBlur={async (e) => {
+                                                e.target.style.borderBottomColor = 'rgba(255,255,255,0.1)';
+                                                const newEmail = e.target.value.trim().toLowerCase();
+                                                if (newEmail === (user.email || '').toLowerCase()) return;
+                                                try {
+                                                    await apiRequest(`/admin/users/${user.id}/email`, {
+                                                        method: 'PUT',
+                                                        body: JSON.stringify({ email: newEmail }),
+                                                    });
+                                                    fetchData();
+                                                } catch (err) {
+                                                    e.target.value = user.email || '';
+                                                    alert(err.message || 'Failed to update email');
+                                                }
+                                            }}
+                                            onKeyDown={e => { if (e.key === 'Enter') e.target.blur(); }}
+                                        />
+                                    </Td>
                                     <Td>
                                         <ClubSelect
                                             value={user.club_id || ''}
