@@ -14,6 +14,7 @@ import Verify from "./pages/verify";
 import ForgotPassword from "./pages/forgot-password";
 import ResetPassword from "./pages/reset-password";
 import AcceptInvite from "./pages/accept-invite";
+import AcceptClubInvite from "./pages/accept-club-invite";
 import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -46,6 +47,7 @@ function App() {
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/accept-invite" element={<AcceptInvite />} />
+          <Route path="/accept-club-invite" element={<AcceptClubInvite />} />
           <Route path="/account" element={
             <ProtectedRoute>
               <Account />

@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { FiPlus, FiChevronDown, FiChevronUp, FiTrash2, FiUserPlus, FiGitMerge } from 'react-icons/fi';
+import { FiPlus, FiChevronDown, FiChevronUp, FiTrash2, FiUserPlus } from 'react-icons/fi';
 import { apiRequest } from '../../utils/api';
 import { useAuth } from '../../hooks/useAuth';
 import StudentProfile from './StudentProfile';
 import ClubSection from './ClubSection';
-import MergeModal from './MergeModal';
 
 const Card = styled.div`
     background: rgba(255, 255, 255, 0.05);
@@ -392,7 +391,6 @@ const CoachDashboard = ({ studentId, onStudentChange }) => {
     const [statsFrom, setStatsFrom] = useState('');
     const [statsTo, setStatsTo] = useState('');
     const [categoryFilter, setCategoryFilter] = useState('all');
-    const [mergeOpen, setMergeOpen] = useState(false);
 
     const clubApproved = user?.club_status === 'approved';
 
@@ -647,14 +645,9 @@ const CoachDashboard = ({ studentId, onStudentChange }) => {
             <Card>
                 <SectionHeader>
                     <SectionTitle>{clubName} Students</SectionTitle>
-                    <div style={{ display: 'flex', gap: '0.5rem' }}>
-                        <AddBtn onClick={() => setMergeOpen(true)} style={{ background: 'rgba(102, 126, 234, 0.15)', border: '1px solid rgba(102, 126, 234, 0.3)', color: '#667eea' }}>
-                            <FiGitMerge size={14} /> Merge
-                        </AddBtn>
-                        <AddBtn onClick={() => setShowAddStudent(true)}>
-                            <FiPlus size={14} /> Add Student
-                        </AddBtn>
-                    </div>
+                    <AddBtn onClick={() => setShowAddStudent(true)}>
+                        <FiPlus size={14} /> Add Student
+                    </AddBtn>
                 </SectionHeader>
                 {students.length > 0 ? (
                     <StudentGrid>
@@ -694,14 +687,6 @@ const CoachDashboard = ({ studentId, onStudentChange }) => {
                 <AddStudentModal
                     onClose={() => setShowAddStudent(false)}
                     onAdded={() => { setShowAddStudent(false); refreshAll(); }}
-                />
-            )}
-
-            {mergeOpen && (
-                <MergeModal
-                    users={students}
-                    onClose={() => setMergeOpen(false)}
-                    onMerged={refreshAll}
                 />
             )}
 

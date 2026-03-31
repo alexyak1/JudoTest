@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { FiPlus, FiTrash2, FiGitMerge } from 'react-icons/fi';
+import { FiPlus, FiTrash2, FiGitMerge, FiMail } from 'react-icons/fi';
 import { apiRequest } from '../../utils/api';
 import StudentProfile from './StudentProfile';
 import MergeModal from './MergeModal';
@@ -215,6 +215,71 @@ const ActivityTd = styled.td`
     border-bottom: 1px solid rgba(255, 255, 255, 0.03);
 `;
 
+const InviteOverlay = styled.div`
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+`;
+
+const InviteModal = styled.div`
+    background: #1a1a2e;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 16px;
+    padding: 2rem;
+    max-width: 450px;
+    width: 90%;
+`;
+
+const InviteTitle = styled.h3`
+    color: #fff;
+    margin: 0 0 0.5rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+`;
+
+const InviteLabel = styled.label`
+    color: #ccc;
+    font-size: 0.85rem;
+    display: block;
+    margin-bottom: 0.4rem;
+`;
+
+const InviteBtnRow = styled.div`
+    display: flex;
+    gap: 0.6rem;
+    justify-content: flex-end;
+    margin-top: 1rem;
+`;
+
+const InviteConfirmBtn = styled.button`
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    color: #fff;
+    border-radius: 8px;
+    padding: 0.6rem 1.2rem;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 500;
+    &:hover { opacity: 0.85; }
+    &:disabled { opacity: 0.5; cursor: not-allowed; }
+`;
+
+const InviteCancelBtn = styled.button`
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #a0a0a0;
+    border-radius: 8px;
+    padding: 0.6rem 1.2rem;
+    cursor: pointer;
+    font-size: 0.9rem;
+    &:hover { border-color: #667eea; color: #fff; }
+`;
+
 const MergeBtn = styled.button`
     background: rgba(102, 126, 234, 0.15);
     border: 1px solid rgba(102, 126, 234, 0.3);
@@ -247,6 +312,10 @@ const AdminDashboard = () => {
     const [loading, setLoading] = useState(true);
     const [newClubName, setNewClubName] = useState('');
     const [mergeOpen, setMergeOpen] = useState(false);
+    const [inviteUser, setInviteUser] = useState(null);
+    const [inviteClubId, setInviteClubId] = useState('');
+    const [inviteStatus, setInviteStatus] = useState(null);
+    const [inviteSending, setInviteSending] = useState(false);
 
     const fetchData = async () => {
         try {
@@ -297,6 +366,29 @@ const AdminDashboard = () => {
         } catch {
             // ignore
         }
+    };
+
+    const sendClubInvite = async () => {
+        if (!inviteUser || !inviteClubId) return;
+        const club = clubs.find(c => c.id === parseInt(inviteClubId));
+        setInviteSending(true);
+        setInviteStatus(null);
+        try {
+            await apiRequest('/admin/invite-to-club', {
+                method: 'POST',
+                body: JSON.stringify({ user_id: inviteUser.id, club_id: parseInt(inviteClubId) }),
+            });
+            setInviteStatus({ ok: true, msg: `Invite sent to ${inviteUser.name} for "${club?.name}"` });
+        } catch (err) {
+            setInviteStatus({ ok: false, msg: err.message || 'Failed to send invite' });
+        }
+        setInviteSending(false);
+    };
+
+    const closeInvite = () => {
+        setInviteUser(null);
+        setInviteClubId('');
+        setInviteStatus(null);
     };
 
     const createClub = async () => {
@@ -501,8 +593,13 @@ const AdminDashboard = () => {
                                         </RoleSelect>
                                     </Td>
                                     <Td>
-                                        <div style={{ display: 'flex', gap: '0.4rem' }}>
+                                        <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
                                             <ViewBtn onClick={() => viewUserProfile(user.id)}>View</ViewBtn>
+                                            {user.email && (
+                                                <ViewBtn onClick={() => { setInviteUser(user); setInviteClubId(''); }} title="Invite to club">
+                                                    <FiMail size={12} /> Invite
+                                                </ViewBtn>
+                                            )}
                                             <ViewBtn onClick={async () => {
                                                 if (!window.confirm(`Delete ${user.name}? This removes all their data permanently.`)) return;
                                                 try {
@@ -520,6 +617,50 @@ const AdminDashboard = () => {
                     </Table>
                 </div>
             </Card>
+
+            {inviteUser && (
+                <InviteOverlay onClick={closeInvite}>
+                    <InviteModal onClick={e => e.stopPropagation()}>
+                        {inviteStatus?.ok ? (
+                            <>
+                                <InviteTitle style={{ color: '#4ade80' }}><FiMail size={18} /> Invite Sent</InviteTitle>
+                                <p style={{ color: '#4ade80', margin: '1rem 0', fontSize: '0.95rem' }}>{inviteStatus.msg}</p>
+                                <InviteBtnRow>
+                                    <InviteConfirmBtn onClick={closeInvite}>Done</InviteConfirmBtn>
+                                </InviteBtnRow>
+                            </>
+                        ) : (
+                            <>
+                                <InviteTitle><FiMail size={18} /> Invite to Club</InviteTitle>
+                                <MergeDesc style={{ marginBottom: '1rem' }}>
+                                    Send a club invitation email to <strong style={{ color: '#fff' }}>{inviteUser.name}</strong> ({inviteUser.email}).
+                                    When they click the link, they'll automatically join the selected club.
+                                </MergeDesc>
+                                <InviteLabel>Select club:</InviteLabel>
+                                <ClubSelect
+                                    value={inviteClubId}
+                                    onChange={e => setInviteClubId(e.target.value)}
+                                    style={{ width: '100%', marginBottom: '1rem' }}
+                                >
+                                    <option value="">Choose a club...</option>
+                                    {clubs.map(c => (
+                                        <option key={c.id} value={c.id}>{c.name}</option>
+                                    ))}
+                                </ClubSelect>
+                                {inviteStatus && !inviteStatus.ok && (
+                                    <p style={{ color: '#ff6b6b', fontSize: '0.85rem', margin: '0 0 1rem' }}>{inviteStatus.msg}</p>
+                                )}
+                                <InviteBtnRow>
+                                    <InviteCancelBtn onClick={closeInvite}>Cancel</InviteCancelBtn>
+                                    <InviteConfirmBtn disabled={!inviteClubId || inviteSending} onClick={sendClubInvite}>
+                                        {inviteSending ? 'Sending...' : 'Send Invite'}
+                                    </InviteConfirmBtn>
+                                </InviteBtnRow>
+                            </>
+                        )}
+                    </InviteModal>
+                </InviteOverlay>
+            )}
         </>
     );
 };

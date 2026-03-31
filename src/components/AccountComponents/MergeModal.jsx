@@ -177,7 +177,7 @@ const MergeModal = ({ users, onClose, onMerged }) => {
         const load = async () => {
             setLoadingPreview(true);
             try {
-                const data = await apiRequest('/coach/merge-preview', {
+                const data = await apiRequest('/admin/merge-preview', {
                     method: 'POST',
                     body: JSON.stringify({ target_id: parseInt(targetId), source_id: parseInt(sourceId) }),
                 });
@@ -231,7 +231,7 @@ const MergeModal = ({ users, onClose, onMerged }) => {
 
         setMerging(true);
         try {
-            await apiRequest('/coach/merge-users', {
+            await apiRequest('/admin/merge-users', {
                 method: 'POST',
                 body: JSON.stringify({
                     target_id: target.id,
