@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { FiPlus, FiTrash2 } from 'react-icons/fi';
+import { FiPlus, FiTrash2, FiGitMerge } from 'react-icons/fi';
 import { apiRequest } from '../../utils/api';
 import StudentProfile from './StudentProfile';
+import MergeModal from './MergeModal';
 
 const Table = styled.table`
     width: 100%;
@@ -214,6 +215,30 @@ const ActivityTd = styled.td`
     border-bottom: 1px solid rgba(255, 255, 255, 0.03);
 `;
 
+const MergeBtn = styled.button`
+    background: rgba(102, 126, 234, 0.15);
+    border: 1px solid rgba(102, 126, 234, 0.3);
+    color: #667eea;
+    border-radius: 8px;
+    padding: 0.6rem 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.85rem;
+    font-weight: 500;
+    white-space: nowrap;
+    transition: all 0.3s;
+    &:hover { background: rgba(102, 126, 234, 0.25); }
+`;
+
+const MergeDesc = styled.p`
+    color: #a0a0a0;
+    font-size: 0.85rem;
+    margin: 0;
+    line-height: 1.5;
+`;
+
 const AdminDashboard = () => {
     const [users, setUsers] = useState([]);
     const [clubs, setClubs] = useState([]);
@@ -221,6 +246,7 @@ const AdminDashboard = () => {
     const [selectedUser, setSelectedUser] = useState(null);
     const [loading, setLoading] = useState(true);
     const [newClubName, setNewClubName] = useState('');
+    const [mergeOpen, setMergeOpen] = useState(false);
 
     const fetchData = async () => {
         try {
@@ -414,6 +440,26 @@ const AdminDashboard = () => {
                     </AddBtn>
                 </AddRow>
             </Card>
+
+            <Card>
+                <SectionHeader>
+                    <SectionTitle>Merge Accounts</SectionTitle>
+                    <MergeBtn onClick={() => setMergeOpen(true)}>
+                        <FiGitMerge size={14} /> Merge Users
+                    </MergeBtn>
+                </SectionHeader>
+                <MergeDesc>
+                    When a coach created a profile and the person later registered themselves, merge them here. The user-created account keeps its name, email, photo, and login. You pick which belts and competitions to keep.
+                </MergeDesc>
+            </Card>
+
+            {mergeOpen && (
+                <MergeModal
+                    users={users}
+                    onClose={() => setMergeOpen(false)}
+                    onMerged={fetchData}
+                />
+            )}
 
             <Card>
                 <SectionTitle>All Users</SectionTitle>
