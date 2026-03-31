@@ -771,6 +771,7 @@ const StudentProfile = ({ user, isOwnProfile, canEdit, onUpdate, onUpdateUser })
                 />
             )}
 
+            {isOwnProfile && (
             <ProfileCard>
                 <Section>
                     <SectionHeader>
@@ -802,6 +803,7 @@ const StudentProfile = ({ user, isOwnProfile, canEdit, onUpdate, onUpdateUser })
                     )}
                 </Section>
             </ProfileCard>
+            )}
 
         </>
     );

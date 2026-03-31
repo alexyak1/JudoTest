@@ -7,6 +7,7 @@ import CoachDashboard from '../components/AccountComponents/CoachDashboard';
 import AdminDashboard from '../components/AccountComponents/AdminDashboard';
 import CoachesList from '../components/AccountComponents/CoachesList';
 import ClubPage from '../components/AccountComponents/ClubPage';
+import RankingPage from '../components/AccountComponents/RankingPage';
 import PendingRequests from '../components/AccountComponents/PendingRequests';
 
 const Container = styled.div`
@@ -93,6 +94,11 @@ export default function Account() {
                             Club
                         </Tab>
                     )}
+                    {!isCoach && !isAdmin && hasClub && (
+                        <Tab active={activeTab === 'ranking'} onClick={() => setActiveTab('ranking')}>
+                            Ranking
+                        </Tab>
+                    )}
                     {isCoach && (
                         <Tab active={activeTab === 'students'} onClick={() => setActiveTab('students')}>
                             Students
@@ -120,6 +126,10 @@ export default function Account() {
 
             {activeTab === 'club' && (isCoach || isAdmin || hasClub) && (
                 <ClubPage />
+            )}
+
+            {activeTab === 'ranking' && !isCoach && !isAdmin && hasClub && (
+                <RankingPage />
             )}
 
             {activeTab === 'students' && isCoach && (
