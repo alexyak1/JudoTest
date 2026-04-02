@@ -972,18 +972,17 @@ const EditBeltModal = ({ belt, editable, apiPrefix, onClose, onSave, onDelete })
         e.preventDefault();
         setSaving(true);
         try {
-            await apiRequest(`${apiPrefix}/belts/${belt.id}`, { method: 'DELETE' });
             const body = { color, graduation_date: graduationDate };
             if (examinerId === 'other') {
                 body.examiner_name = customExaminer;
             } else if (examinerId) {
                 body.examiner_id = parseInt(examinerId);
             }
-            const newBelt = await apiRequest(`${apiPrefix}/belts`, {
-                method: 'POST',
+            const updatedBelt = await apiRequest(`${apiPrefix}/belts/${belt.id}`, {
+                method: 'PUT',
                 body: JSON.stringify(body),
             });
-            onSave(newBelt);
+            onSave(updatedBelt);
         } catch {
             setSaving(false);
         }
