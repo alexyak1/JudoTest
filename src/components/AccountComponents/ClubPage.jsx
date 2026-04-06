@@ -824,14 +824,18 @@ const CompForm = ({ onClose, onSave }) => {
 };
 
 const EditCompForm = ({ comp, onClose, onSave }) => {
+    const hasRange = comp.date && comp.date.includes(' - ');
     const [name, setName] = useState(comp.name);
-    const [date, setDate] = useState(comp.date);
+    const [startDate, setStartDate] = useState(hasRange ? comp.date.split(' - ')[0].trim() : (comp.date || ''));
+    const [endDate, setEndDate] = useState(hasRange ? comp.date.split(' - ')[1].trim() : '');
+    const [multiDay, setMultiDay] = useState(hasRange);
     const [link, setLink] = useState(comp.link || '');
     const [saving, setSaving] = useState(false);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setSaving(true);
+        const date = multiDay && endDate ? `${startDate} - ${endDate}` : startDate;
         try {
             await apiRequest('/coach/competitions/update-event', {
                 method: 'PUT',
@@ -853,7 +857,17 @@ const EditCompForm = ({ comp, onClose, onSave }) => {
                     </div>
                     <div>
                         <Label>Date</Label>
-                        <Input value={date} onChange={e => setDate(e.target.value)} placeholder="e.g. 2026-03-21 or 21-22 Mar" required />
+                        <Input type="date" value={startDate} onChange={e => setStartDate(e.target.value)} required />
+                        <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginTop: '0.4rem', cursor: 'pointer', color: '#888', fontSize: '0.8rem' }}>
+                            <input type="checkbox" checked={multiDay} onChange={e => { setMultiDay(e.target.checked); if (!e.target.checked) setEndDate(''); }} style={{ accentColor: '#667eea' }} />
+                            Multi-day event
+                        </label>
+                        {multiDay && (
+                            <div style={{ marginTop: '0.4rem' }}>
+                                <Label>End Date</Label>
+                                <Input type="date" value={endDate} onChange={e => setEndDate(e.target.value)} required />
+                            </div>
+                        )}
                     </div>
                     <div>
                         <Label>Link</Label>
