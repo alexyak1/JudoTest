@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { FiEdit2, FiPlus, FiTrash2 } from 'react-icons/fi';
+import { FiEdit2, FiPlus, FiTrash2, FiClock } from 'react-icons/fi';
 import ProfileEditForm from './ProfileEditForm';
 import AddBeltForm from './AddBeltForm';
 import AddCompetitionForm from './AddCompetitionForm';
@@ -361,6 +361,8 @@ const StudentProfile = ({ user, isOwnProfile, canEdit, onUpdate, onUpdateUser })
     const licenseApiPrefix = isOwnProfile ? '/user' : `/coach/coaches/${user.id}`;
     const competitions = displayUser.competitions || [];
     const quizResults = displayUser.quiz_results || [];
+    const today = new Date().toISOString().split('T')[0];
+    const isFutureDate = (date) => date && date.slice(0, 10) > today;
 
     return (
         <>
@@ -529,14 +531,17 @@ const StudentProfile = ({ user, isOwnProfile, canEdit, onUpdate, onUpdateUser })
                             </thead>
                             <tbody>
                                 {competitions.map(comp => (
-                                    <tr key={comp.id}>
+                                    <tr key={comp.id} style={isFutureDate(comp.date) ? { borderLeft: '3px solid #38bdf8' } : {}}>
                                         <Td>
                                             {comp.link
                                                 ? <a href={comp.link} target="_blank" rel="noopener noreferrer" style={{color: '#667eea', textDecoration: 'none'}}>{comp.name}</a>
                                                 : comp.name
                                             }
                                         </Td>
-                                        <Td>{comp.date}</Td>
+                                        <Td>
+                                            {comp.date}
+                                            {isFutureDate(comp.date) && <span style={{ color: '#38bdf8', fontSize: '0.65rem', marginLeft: '0.4rem', background: 'rgba(56,189,248,0.12)', padding: '0.1rem 0.35rem', borderRadius: '4px' }}>upcoming</span>}
+                                        </Td>
                                         {editable && (
                                             <Td>
                                                 <select

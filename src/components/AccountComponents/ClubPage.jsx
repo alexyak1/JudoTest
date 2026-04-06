@@ -1,18 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { FiPlus, FiChevronDown, FiChevronUp, FiTrash2, FiCalendar, FiEdit2 } from 'react-icons/fi';
+import { FiPlus, FiChevronDown, FiChevronUp, FiTrash2, FiCalendar, FiEdit2, FiClock } from 'react-icons/fi';
 import { apiRequest } from '../../utils/api';
 import { getWeightClasses } from '../../utils/categories';
 import { useAuth } from '../../hooks/useAuth';
 
 const StatRow = styled.div`
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(5, 1fr);
     gap: 0.6rem;
     margin-bottom: 1rem;
 
     @media (max-width: 768px) {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(3, 1fr);
     }
 `;
 
@@ -379,6 +379,9 @@ const ClubPage = () => {
         return Object.values(compMap).sort((a, b) => b.date.localeCompare(a.date));
     })();
 
+    const today = new Date().toISOString().split('T')[0];
+    const isFutureDate = (date) => date && date.slice(0, 10) > today;
+
     // Filter competitions for display based on date
     const filteredGrouped = filter === 'all' ? grouped : grouped.filter(c => {
         if (filter === 'year') {
@@ -435,6 +438,10 @@ const ClubPage = () => {
                             <StatValue color="#cd7f32">{stats.bronze}</StatValue>
                             <StatLabel><MedalDot color="#cd7f32" />Bronze</StatLabel>
                         </StatCard>
+                        <StatCard>
+                            <StatValue color="#38bdf8">{filteredGrouped.filter(c => isFutureDate(c.date)).length}</StatValue>
+                            <StatLabel><FiClock size={8} style={{ marginRight: '0.3rem', verticalAlign: 'middle' }} />Upcoming</StatLabel>
+                        </StatCard>
                     </StatRow>
                 )}
             </Card>
@@ -451,11 +458,12 @@ const ClubPage = () => {
 
                 {filteredGrouped.length > 0 ? (
                     filteredGrouped.map((comp, idx) => (
-                        <CompRow key={idx}>
+                        <CompRow key={idx} style={isFutureDate(comp.date) ? { borderLeft: '3px solid #38bdf8' } : {}}>
                             <CompHeader onClick={() => setExpandedComp(expandedComp === idx ? null : idx)}>
                                 <div>
                                     <CompName style={comp.deleted ? { opacity: 0.4, textDecoration: 'line-through' } : {}}>{comp.name}</CompName>
                                     <CompDate>{comp.date}</CompDate>
+                                    {isFutureDate(comp.date) && <span style={{ color: '#38bdf8', fontSize: '0.65rem', marginLeft: '0.4rem', background: 'rgba(56,189,248,0.12)', padding: '0.1rem 0.35rem', borderRadius: '4px' }}>upcoming</span>}
                                     {comp.deleted && <span style={{ color: '#ff6b6b', fontSize: '0.7rem', marginLeft: '0.4rem' }}>deleted</span>}
                                     <span style={{ color: '#555', fontSize: '0.75rem', marginLeft: '0.4rem' }}>
                                         ({comp.participants.length})
