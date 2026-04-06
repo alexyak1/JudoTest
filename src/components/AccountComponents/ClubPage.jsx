@@ -582,7 +582,9 @@ const ClubPage = () => {
                                                         )}
                                                     </Td>
                                                     <Td>
-                                                        {canEdit ? (
+                                                        {isFutureDate(comp.date) ? (
+                                                            <span style={{ color: '#555', fontSize: '0.75rem' }}>—</span>
+                                                        ) : canEdit ? (
                                                             <ResultSelect value={p.result} onChange={e => handleResultChange(p.id, e.target.value)}>
                                                                 <option value="participated">Participated</option>
                                                                 <option value="gold">Gold</option>

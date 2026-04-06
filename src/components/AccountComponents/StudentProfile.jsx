@@ -614,7 +614,9 @@ const StudentProfile = ({ user, isOwnProfile, canEdit, onUpdate, onUpdateUser })
                                             </Td>
                                         )}
                                         <Td>
-                                            {editable ? (
+                                            {isFutureDate(comp.date) ? (
+                                                <span style={{ color: '#555', fontSize: '0.75rem' }}>—</span>
+                                            ) : editable ? (
                                                 <select
                                                     defaultValue={comp.result}
                                                     onChange={async e => {

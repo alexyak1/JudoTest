@@ -174,13 +174,16 @@ const AddCompetitionForm = ({ onClose, onSave, apiPrefix = '/user' }) => {
         setLink('');
     };
 
+    const today = new Date().toISOString().slice(0, 10);
+    const isUpcoming = startDate > today;
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setSaving(true);
         try {
             const newComp = await apiRequest(`${apiPrefix}/competitions`, {
                 method: 'POST',
-                body: JSON.stringify({ name, date: endDate ? `${startDate} - ${endDate}` : startDate, link, category, result }),
+                body: JSON.stringify({ name, date: endDate ? `${startDate} - ${endDate}` : startDate, link, category, result: isUpcoming ? 'participated' : result }),
             });
             onSave(newComp);
         } catch (err) {
@@ -263,14 +266,16 @@ const AddCompetitionForm = ({ onClose, onSave, apiPrefix = '/user' }) => {
                             ))}
                         </Select>
                     </div>
-                    <div>
-                        <Label>Result</Label>
-                        <Select value={result} onChange={e => setResult(e.target.value)}>
-                            {RESULTS.map(r => (
-                                <option key={r} value={r}>{r.charAt(0).toUpperCase() + r.slice(1)}</option>
-                            ))}
-                        </Select>
-                    </div>
+                    {!isUpcoming && (
+                        <div>
+                            <Label>Result</Label>
+                            <Select value={result} onChange={e => setResult(e.target.value)}>
+                                {RESULTS.map(r => (
+                                    <option key={r} value={r}>{r.charAt(0).toUpperCase() + r.slice(1)}</option>
+                                ))}
+                            </Select>
+                        </div>
+                    )}
                     <ButtonRow>
                         <CancelBtn type="button" onClick={onClose}>Cancel</CancelBtn>
                         <SaveBtn type="submit" disabled={saving}>{saving ? 'Saving...' : 'Add'}</SaveBtn>
