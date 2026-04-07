@@ -174,7 +174,8 @@ export default function Test() {
 		async function setBeltColor(childdata) {
 			// Track belt selection for quiz
 			trackBeltAction('quiz_belt_selection', 'quiz', childdata);
-			
+			setBelt(childdata);
+
 			let quizQuestions = await getTechniques(childdata)
 			setQuizQuestions(quizQuestions)
 			onNextClick()
