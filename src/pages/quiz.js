@@ -15,7 +15,7 @@ export default function Test() {
 	const baseUrl = `http://${host}:8787`;
 
 	// Use URL-based belt selection with analytics tracking
-	const { belt: urlBelt, setBelt } = useBeltWithUrl('yellow', 'quiz');
+	const { belt: urlBelt } = useBeltWithUrl('yellow', 'quiz');
 	
 	// Track page views with belt information
 	usePageTracking('quiz', urlBelt);
@@ -138,7 +138,8 @@ export default function Test() {
 		const [quizComplete, setQuizComplete] = useState(false)
 		const [quizQuestions, setQuizQuestions] = useState([])
 		const [resultSaved, setResultSaved] = useState(false)
-		const { isAuthenticated } = useAuth()
+		const [selectedBelt, setSelectedBelt] = useState(urlBelt)
+		const { isAuthenticated, refreshUser } = useAuth()
 
 		useEffect(() => {
 			setAnswerStatus(null)
@@ -155,11 +156,11 @@ export default function Test() {
 				apiRequest('/user/quiz-results', {
 					method: 'POST',
 					body: JSON.stringify({
-						belt: urlBelt,
+						belt: selectedBelt,
 						total_questions: quizQuestions.length,
 						correct_answers: correctAnswerCount,
 					}),
-				}).then(() => setResultSaved(true))
+				}).then(() => { setResultSaved(true); refreshUser(); })
 				  .catch(() => {});
 			}
 		}, [quizComplete])
@@ -174,7 +175,7 @@ export default function Test() {
 		async function setBeltColor(childdata) {
 			// Track belt selection for quiz
 			trackBeltAction('quiz_belt_selection', 'quiz', childdata);
-			setBelt(childdata);
+			setSelectedBelt(childdata);
 
 			let quizQuestions = await getTechniques(childdata)
 			setQuizQuestions(quizQuestions)
