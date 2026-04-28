@@ -391,6 +391,10 @@ const CoachDashboard = ({ studentId, onStudentChange }) => {
     const [statsFrom, setStatsFrom] = useState('');
     const [statsTo, setStatsTo] = useState('');
     const [categoryFilter, setCategoryFilter] = useState('all');
+    const [eventsFilter, setEventsFilter] = useState('30days');
+    const [eventsFrom, setEventsFrom] = useState('');
+    const [eventsTo, setEventsTo] = useState('');
+    const [eventsTab, setEventsTab] = useState('belts');
 
     const clubApproved = user?.club_status === 'approved';
 
@@ -556,8 +560,176 @@ const CoachDashboard = ({ studentId, onStudentChange }) => {
 
     const clubName = user?.club?.name || 'Club';
 
+    // Events feed: belts + competitions filtered by date
+    const eventsThreshold = (() => {
+        const today = new Date();
+        if (eventsFilter === '30days') {
+            const t = new Date(today);
+            t.setDate(t.getDate() - 30);
+            return t.toISOString().slice(0, 10);
+        }
+        if (eventsFilter === '12months') {
+            const t = new Date(today);
+            t.setFullYear(t.getFullYear() - 1);
+            return t.toISOString().slice(0, 10);
+        }
+        return null;
+    })();
+
+    const eventDateMatches = (dateStr) => {
+        if (!dateStr) return false;
+        const d = String(dateStr).slice(0, 10);
+        if (eventsFilter === 'all') return true;
+        if (eventsFilter === 'year') return d.startsWith(String(new Date().getFullYear()));
+        if (eventsFilter === 'custom') return (!eventsFrom || d >= eventsFrom) && (!eventsTo || d <= eventsTo);
+        if (eventsThreshold) return d >= eventsThreshold;
+        return true;
+    };
+
+    const beltEvents = [];
+    allMembers.forEach(m => {
+        (m.belts || []).forEach(b => {
+            if (eventDateMatches(b.graduation_date)) {
+                beltEvents.push({ ...b, memberName: m.name, memberId: m.id, memberRole: m.role });
+            }
+        });
+    });
+    beltEvents.sort((a, b) => String(b.graduation_date || '').localeCompare(String(a.graduation_date || '')));
+
+    const compEvents = clubCompetitions
+        .filter(c => eventDateMatches(c.date))
+        .slice()
+        .sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')));
+
+    const FilterChip = ({ value, label }) => (
+        <button onClick={() => setEventsFilter(value)} style={{
+            background: eventsFilter === value ? 'rgba(102,126,234,0.2)' : 'rgba(255,255,255,0.04)',
+            border: `1px solid ${eventsFilter === value ? 'rgba(102,126,234,0.4)' : 'rgba(255,255,255,0.08)'}`,
+            color: eventsFilter === value ? '#667eea' : '#888',
+            borderRadius: '6px', padding: '0.3rem 0.6rem', fontSize: '0.8rem', cursor: 'pointer',
+        }}>{label}</button>
+    );
+
+    const beltSwatch = (color) => {
+        const map = {
+            white: '#f0f0f0', yellow: '#f5d44a', orange: '#e08a3c', green: '#4a9d4a',
+            blue: '#3a78c8', brown: '#7a4a2a', black: '#1a1a1a',
+        };
+        return map[(color || '').toLowerCase()] || '#888';
+    };
+
+    const resultColor = (r) => {
+        switch (r) {
+            case 'gold': return '#ffd700';
+            case 'silver': return '#c0c0c0';
+            case 'bronze': return '#cd7f32';
+            default: return '#888';
+        }
+    };
+
     return (
         <>
+            <Card>
+                <SectionHeader>
+                    <SectionTitle>Recent Events</SectionTitle>
+                </SectionHeader>
+                <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center', flexWrap: 'wrap', marginBottom: '0.8rem' }}>
+                    <FilterChip value="30days" label="Last 30 days" />
+                    <FilterChip value="12months" label="Last 12 months" />
+                    <FilterChip value="year" label={`This year (${new Date().getFullYear()})`} />
+                    <FilterChip value="all" label="All time" />
+                    <FilterChip value="custom" label="Custom" />
+                    {eventsFilter === 'custom' && (
+                        <>
+                            <input type="date" value={eventsFrom} onChange={e => setEventsFrom(e.target.value)} style={{
+                                background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)',
+                                borderRadius: '6px', padding: '0.3rem 0.5rem', color: '#fff', fontSize: '0.8rem', outline: 'none',
+                            }} />
+                            <span style={{ color: '#555' }}>-</span>
+                            <input type="date" value={eventsTo} onChange={e => setEventsTo(e.target.value)} style={{
+                                background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)',
+                                borderRadius: '6px', padding: '0.3rem 0.5rem', color: '#fff', fontSize: '0.8rem', outline: 'none',
+                            }} />
+                        </>
+                    )}
+                </div>
+                <div style={{ display: 'flex', gap: '0.4rem', marginBottom: '0.8rem', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                    <button onClick={() => setEventsTab('belts')} style={{
+                        background: 'none', border: 'none', cursor: 'pointer',
+                        color: eventsTab === 'belts' ? '#667eea' : '#888',
+                        borderBottom: `2px solid ${eventsTab === 'belts' ? '#667eea' : 'transparent'}`,
+                        padding: '0.5rem 0.8rem', fontSize: '0.85rem', fontWeight: 500,
+                    }}>New Belts ({beltEvents.length})</button>
+                    <button onClick={() => setEventsTab('competitions')} style={{
+                        background: 'none', border: 'none', cursor: 'pointer',
+                        color: eventsTab === 'competitions' ? '#667eea' : '#888',
+                        borderBottom: `2px solid ${eventsTab === 'competitions' ? '#667eea' : 'transparent'}`,
+                        padding: '0.5rem 0.8rem', fontSize: '0.85rem', fontWeight: 500,
+                    }}>Competitions ({compEvents.length})</button>
+                </div>
+                {eventsTab === 'belts' && (
+                    beltEvents.length > 0 ? (
+                        <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
+                            {beltEvents.map(b => (
+                                <div key={`belt-${b.id}`} style={{
+                                    display: 'flex', alignItems: 'center', gap: '0.7rem',
+                                    padding: '0.6rem 0.5rem', borderBottom: '1px solid rgba(255,255,255,0.04)', fontSize: '0.85rem',
+                                }}>
+                                    <span style={{
+                                        width: '14px', height: '14px', borderRadius: '50%',
+                                        background: beltSwatch(b.color), border: '1px solid rgba(255,255,255,0.15)', flexShrink: 0,
+                                    }} />
+                                    <span onClick={() => viewStudent(b.memberId)} style={{ color: '#667eea', cursor: 'pointer', fontWeight: 500, minWidth: '120px' }}>
+                                        {b.memberName}
+                                        {b.memberRole === 'coach' && <span style={{ color: '#888', fontSize: '0.7rem', marginLeft: '0.3rem' }}>(coach)</span>}
+                                    </span>
+                                    <span style={{ color: '#fff', textTransform: 'capitalize', minWidth: '60px' }}>{b.color}</span>
+                                    <span style={{ color: '#888', minWidth: '90px' }}>{b.graduation_date}</span>
+                                    <span style={{ color: '#888', flex: 1, textAlign: 'right', fontSize: '0.8rem' }}>
+                                        {b.examiner_name ? `by ${b.examiner_name}` : ''}
+                                    </span>
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <p style={{ color: '#555', fontSize: '0.85rem', fontStyle: 'italic', margin: '0.5rem 0' }}>No belt graduations in this period</p>
+                    )
+                )}
+                {eventsTab === 'competitions' && (
+                    compEvents.length > 0 ? (
+                        <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
+                            {compEvents.map(c => (
+                                <div key={`comp-${c.id}`} style={{
+                                    display: 'flex', alignItems: 'center', gap: '0.7rem',
+                                    padding: '0.6rem 0.5rem', borderBottom: '1px solid rgba(255,255,255,0.04)', fontSize: '0.85rem',
+                                }}>
+                                    <span onClick={() => viewStudent(c.user_id)} style={{ color: '#667eea', cursor: 'pointer', fontWeight: 500, minWidth: '120px' }}>
+                                        {c.user_name}
+                                    </span>
+                                    <span style={{ color: '#fff', flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                        {c.link ? (
+                                            <a href={c.link} target="_blank" rel="noreferrer" style={{ color: '#fff', textDecoration: 'none' }}
+                                               onMouseOver={e => e.target.style.textDecoration = 'underline'}
+                                               onMouseOut={e => e.target.style.textDecoration = 'none'}>{c.name}</a>
+                                        ) : c.name}
+                                    </span>
+                                    <span style={{ color: '#888', minWidth: '90px', fontSize: '0.8rem' }}>{c.date}</span>
+                                    <span style={{
+                                        color: resultColor(c.result),
+                                        fontWeight: 600,
+                                        minWidth: '60px',
+                                        textTransform: 'capitalize',
+                                        textAlign: 'right',
+                                    }}>{c.result || '-'}</span>
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <p style={{ color: '#555', fontSize: '0.85rem', fontStyle: 'italic', margin: '0.5rem 0' }}>No competitions in this period</p>
+                    )
+                )}
+            </Card>
+
             <Card>
                 <SectionHeader>
                     <SectionTitle>Top Competitors</SectionTitle>
