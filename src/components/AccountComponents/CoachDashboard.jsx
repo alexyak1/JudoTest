@@ -395,6 +395,7 @@ const CoachDashboard = ({ studentId, onStudentChange }) => {
     const [eventsFrom, setEventsFrom] = useState('');
     const [eventsTo, setEventsTo] = useState('');
     const [eventsTab, setEventsTab] = useState('belts');
+    const [studentSearch, setStudentSearch] = useState('');
 
     const clubApproved = user?.club_status === 'approved';
 
@@ -824,9 +825,30 @@ const CoachDashboard = ({ studentId, onStudentChange }) => {
                         <FiPlus size={14} /> Add Student
                     </AddBtn>
                 </SectionHeader>
-                {students.length > 0 ? (
+                {students.length > 0 && (
+                    <input
+                        type="search"
+                        value={studentSearch}
+                        onChange={e => setStudentSearch(e.target.value)}
+                        placeholder="Search students..."
+                        style={{
+                            width: '100%', boxSizing: 'border-box',
+                            background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)',
+                            borderRadius: '8px', padding: '0.5rem 0.8rem',
+                            color: '#fff', fontSize: '0.85rem', outline: 'none',
+                            marginBottom: '0.8rem',
+                        }}
+                    />
+                )}
+                {students.length > 0 ? (() => {
+                    const q = studentSearch.trim().toLowerCase();
+                    const filtered = q ? students.filter(s => (s.name || '').toLowerCase().includes(q)) : students;
+                    if (filtered.length === 0) {
+                        return <EmptyState>No students match "{studentSearch}"</EmptyState>;
+                    }
+                    return (
                     <StudentGrid>
-                        {students.map(student => {
+                        {filtered.map(student => {
                             const s = getPersonStats(student);
                             return (
                                 <StudentCard key={student.id} onClick={() => viewStudent(student.id)}>
@@ -853,7 +875,8 @@ const CoachDashboard = ({ studentId, onStudentChange }) => {
                             );
                         })}
                     </StudentGrid>
-                ) : (
+                    );
+                })() : (
                     <EmptyState>No students assigned yet</EmptyState>
                 )}
             </Card>
