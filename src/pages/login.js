@@ -117,6 +117,7 @@ const BottomLink = styled.p`
 export default function Login() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [remember, setRemember] = useState(true);
     const [error, setError] = useState('');
     const [submitting, setSubmitting] = useState(false);
     const { login } = useAuth();
@@ -127,7 +128,7 @@ export default function Login() {
         setError('');
         setSubmitting(true);
         try {
-            await login(email, password);
+            await login(email, password, remember);
             navigate('/account');
         } catch (err) {
             setError(err.message || 'Login failed');
@@ -157,6 +158,19 @@ export default function Login() {
                         onChange={(e) => setPassword(e.target.value)}
                         required
                     />
+                    <label style={{
+                        display: 'flex', alignItems: 'center', gap: '0.5rem',
+                        color: '#a0a0a0', fontSize: '0.9rem', cursor: 'pointer',
+                        fontFamily: "'Inter', sans-serif",
+                    }}>
+                        <input
+                            type="checkbox"
+                            checked={remember}
+                            onChange={(e) => setRemember(e.target.checked)}
+                            style={{ accentColor: '#667eea', width: '16px', height: '16px', cursor: 'pointer' }}
+                        />
+                        Remember me for 30 days
+                    </label>
                     <Button type="submit" disabled={submitting}>
                         {submitting ? 'Signing in...' : 'Sign In'}
                     </Button>

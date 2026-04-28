@@ -27,10 +27,10 @@ export const AuthProvider = ({ children }) => {
         loadUser();
     }, [loadUser]);
 
-    const login = async (email, password) => {
+    const login = async (email, password, remember = false) => {
         const data = await apiRequest('/auth/login', {
             method: 'POST',
-            body: JSON.stringify({ email, password }),
+            body: JSON.stringify({ email, password, remember }),
         });
         localStorage.setItem('token', data.token);
         // Fetch full user with all associations
