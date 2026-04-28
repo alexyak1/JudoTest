@@ -5,7 +5,7 @@ services:
       dockerfile: Dockerfile
     container_name: judo-quiz-frontend
     ports:
-      - "8181:80"
+      - "80:80"
     environment:
       - REACT_APP_API_URL=http://localhost:8787
     networks:

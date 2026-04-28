@@ -1,0 +1,4 @@
+services:
+  judo-quiz-app:
+    ports: !override
+      - "8181:80"
