@@ -614,6 +614,9 @@ const CoachDashboard = ({ studentId, onStudentChange }) => {
         const map = {
             white: '#f0f0f0', yellow: '#f5d44a', orange: '#e08a3c', green: '#4a9d4a',
             blue: '#3a78c8', brown: '#7a4a2a', black: '#1a1a1a',
+            'yellow-orange': 'linear-gradient(to right, #f5d44a 50%, #e08a3c 50%)',
+            'orange-green': 'linear-gradient(to right, #e08a3c 50%, #4a9d4a 50%)',
+            'green-blue': 'linear-gradient(to right, #4a9d4a 50%, #3a78c8 50%)',
         };
         return map[(color || '').toLowerCase()] || '#888';
     };
