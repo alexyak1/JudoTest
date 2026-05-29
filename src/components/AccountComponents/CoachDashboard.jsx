@@ -814,7 +814,7 @@ const CoachDashboard = ({ studentId, onStudentChange }) => {
                                         textAlign: 'right',
                                     }}>{c.result || '-'}</span>
                                     <button
-                                        onClick={() => setPhotosModal({ id: c.id, name: c.name })}
+                                        onClick={() => setPhotosModal({ eventName: c.name, eventDate: c.date, name: c.name })}
                                         title="Photos"
                                         style={{
                                             background: 'transparent', border: 'none',
@@ -1013,7 +1013,8 @@ const CoachDashboard = ({ studentId, onStudentChange }) => {
 
             {photosModal && (
                 <CompetitionPhotosModal
-                    competitionId={photosModal.id}
+                    eventName={photosModal.eventName}
+                    eventDate={photosModal.eventDate}
                     competitionName={photosModal.name}
                     onClose={() => {
                         setPhotosModal(null);

@@ -530,7 +530,7 @@ const ClubPage = () => {
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
                                     {!comp.deleted && comp.participants.length > 0 && (
                                         <button
-                                            onClick={(e) => { e.stopPropagation(); setPhotosModal({ id: comp.participants[0].id, name: comp.name }); }}
+                                            onClick={(e) => { e.stopPropagation(); setPhotosModal({ eventName: comp.name, eventDate: comp.date, name: comp.name }); }}
                                             title="Photos"
                                             style={{
                                                 background: 'rgba(102,126,234,0.12)',
@@ -557,7 +557,7 @@ const ClubPage = () => {
                                         {comp.link ? <CompLink href={comp.link} target="_blank" rel="noopener noreferrer">{comp.link}</CompLink> : <span />}
                                         {!comp.deleted && comp.participants.length > 0 && (
                                             <div style={{ display: 'flex', gap: '0.8rem', marginLeft: 'auto' }}>
-                                                <span onClick={(e) => { e.stopPropagation(); setPhotosModal({ id: comp.participants[0].id, name: comp.name }); }} style={{ color: '#888', cursor: 'pointer', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                                                <span onClick={(e) => { e.stopPropagation(); setPhotosModal({ eventName: comp.name, eventDate: comp.date, name: comp.name }); }} style={{ color: '#888', cursor: 'pointer', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
                                                     <FiImage size={12} /> Photos
                                                 </span>
                                                 {canEdit && (
@@ -776,7 +776,8 @@ const ClubPage = () => {
 
             {photosModal && (
                 <CompetitionPhotosModal
-                    competitionId={photosModal.id}
+                    eventName={photosModal.eventName}
+                    eventDate={photosModal.eventDate}
                     competitionName={photosModal.name}
                     onClose={() => setPhotosModal(null)}
                 />
@@ -789,6 +790,8 @@ const AddParticipantSearch = ({ comp, members, onAdded }) => {
     const [search, setSearch] = useState('');
     const [selectedIds, setSelectedIds] = useState([]);
     const [adding, setAdding] = useState(false);
+    const [creating, setCreating] = useState(false);
+    const [createError, setCreateError] = useState('');
     const [expanded, setExpanded] = useState(false);
 
     const filtered = search
@@ -813,6 +816,30 @@ const AddParticipantSearch = ({ comp, members, onAdded }) => {
             onAdded();
         } catch {}
         setAdding(false);
+    };
+
+    const createAndAdd = async () => {
+        const name = search.trim();
+        if (!name) return;
+        setCreating(true);
+        setCreateError('');
+        try {
+            const student = await apiRequest('/coach/create-student', {
+                method: 'POST',
+                body: JSON.stringify({ name }),
+            });
+            await apiRequest('/coach/competitions', {
+                method: 'POST',
+                body: JSON.stringify({ name: comp.name, date: comp.date, link: comp.link || '', student_ids: [student.id] }),
+            });
+            setSearch('');
+            setSelectedIds([]);
+            setExpanded(false);
+            onAdded();
+        } catch (err) {
+            setCreateError(err.message || 'Failed to create');
+        }
+        setCreating(false);
     };
 
     if (!expanded) {
@@ -850,7 +877,26 @@ const AddParticipantSearch = ({ comp, members, onAdded }) => {
                         {m._type === 'coach' && <span style={{ color: '#667eea', fontSize: '0.65rem' }}>(coach)</span>}
                     </label>
                 ))}
-                {filtered.length === 0 && <span style={{ color: '#555', fontSize: '0.75rem' }}>No matches</span>}
+                {filtered.length === 0 && (
+                    <div style={{ padding: '0.3rem 0.3rem 0' }}>
+                        {search.trim() ? (
+                            <>
+                                <AddBtn
+                                    onClick={createAndAdd}
+                                    disabled={creating}
+                                    style={{ padding: '0.3rem 0.6rem', fontSize: '0.75rem' }}
+                                >
+                                    <FiPlus size={12} /> {creating ? 'Creating...' : `Create "${search.trim()}" and add`}
+                                </AddBtn>
+                                {createError && (
+                                    <div style={{ color: '#ff6b6b', fontSize: '0.7rem', marginTop: '0.3rem' }}>{createError}</div>
+                                )}
+                            </>
+                        ) : (
+                            <span style={{ color: '#555', fontSize: '0.75rem' }}>No matches</span>
+                        )}
+                    </div>
+                )}
             </div>
             <div style={{ display: 'flex', gap: '0.4rem', marginTop: '0.4rem' }}>
                 <AddBtn onClick={addSelected} disabled={adding || selectedIds.length === 0} style={{ padding: '0.3rem 0.6rem', fontSize: '0.75rem' }}>

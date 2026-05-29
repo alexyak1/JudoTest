@@ -540,7 +540,7 @@ const StudentProfile = ({ user, isOwnProfile, canEdit, onUpdate, onUpdateUser })
                                                 : comp.name
                                             }
                                             <button
-                                                onClick={() => setPhotosModal({ id: comp.id, name: comp.name })}
+                                                onClick={() => setPhotosModal({ eventName: comp.name, eventDate: comp.date, name: comp.name })}
                                                 title="Photos"
                                                 style={{
                                                     marginLeft: '0.5rem',
@@ -686,7 +686,8 @@ const StudentProfile = ({ user, isOwnProfile, canEdit, onUpdate, onUpdateUser })
 
             {photosModal && (
                 <CompetitionPhotosModal
-                    competitionId={photosModal.id}
+                    eventName={photosModal.eventName}
+                    eventDate={photosModal.eventDate}
                     competitionName={photosModal.name}
                     onClose={() => setPhotosModal(null)}
                 />

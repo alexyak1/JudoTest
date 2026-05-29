@@ -104,7 +104,7 @@ const absoluteUrl = (url) => {
     return `${API_BASE}${url}`;
 };
 
-const CompetitionPhotosModal = ({ competitionId, competitionName, onClose, onCountChange }) => {
+const CompetitionPhotosModal = ({ eventName, eventDate, competitionName, onClose, onCountChange }) => {
     const { user: currentUser } = useAuth();
     const [photos, setPhotos] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -113,13 +113,14 @@ const CompetitionPhotosModal = ({ competitionId, competitionName, onClose, onCou
     const inputRef = useRef(null);
 
     const isCoachOrAdmin = currentUser && (currentUser.role === 'coach' || currentUser.role === 'admin');
+    const eventQuery = `name=${encodeURIComponent(eventName)}&date=${encodeURIComponent(eventDate)}`;
 
     useEffect(() => {
-        apiRequest(`/user/competitions/${competitionId}/photos`)
+        apiRequest(`/user/club-event-photos?${eventQuery}`)
             .then((data) => setPhotos(data || []))
             .catch(() => setMsg({ text: 'Failed to load photos', error: true }))
             .finally(() => setLoading(false));
-    }, [competitionId]);
+    }, [eventQuery]);
 
     const notifyCount = (next) => {
         if (onCountChange) onCountChange(next.length);
@@ -137,7 +138,7 @@ const CompetitionPhotosModal = ({ competitionId, competitionName, onClose, onCou
             const formData = new FormData();
             formData.append('photo', file);
             try {
-                const res = await fetch(`${API_BASE}/user/competitions/${competitionId}/photos`, {
+                const res = await fetch(`${API_BASE}/user/club-event-photos?${eventQuery}`, {
                     method: 'POST',
                     headers: { 'Authorization': `Bearer ${token}` },
                     body: formData,
