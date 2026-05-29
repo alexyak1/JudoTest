@@ -157,6 +157,19 @@ const Table = styled.table`
     width: 100%;
     border-collapse: collapse;
     min-width: 300px;
+
+    @media (max-width: 768px) {
+        min-width: 0;
+        display: block;
+
+        thead { display: none; }
+        tbody, tr { display: block; width: 100%; }
+
+        tr {
+            padding: 0.6rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+    }
 `;
 
 const Th = styled.th`
@@ -174,6 +187,24 @@ const Td = styled.td`
     padding: 0.35rem 0.5rem;
     border-bottom: 1px solid rgba(255, 255, 255, 0.03);
     font-size: 0.8rem;
+
+    @media (max-width: 768px) {
+        display: inline-block;
+        padding: 0.2rem 0.6rem 0.2rem 0;
+        border: none;
+        vertical-align: middle;
+
+        &:first-child {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+            padding: 0;
+        }
+
+        &:last-child {
+            float: right;
+        }
+    }
 `;
 
 const ResultSelect = styled.select`
@@ -496,7 +527,29 @@ const ClubPage = () => {
                                         ({comp.participants.length})
                                     </span>
                                 </div>
-                                {expandedComp === idx ? <FiChevronUp color="#888" size={16} /> : <FiChevronDown color="#888" size={16} />}
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                                    {!comp.deleted && comp.participants.length > 0 && (
+                                        <button
+                                            onClick={(e) => { e.stopPropagation(); setPhotosModal({ id: comp.participants[0].id, name: comp.name }); }}
+                                            title="Photos"
+                                            style={{
+                                                background: 'rgba(102,126,234,0.12)',
+                                                border: '1px solid rgba(102,126,234,0.4)',
+                                                borderRadius: '6px',
+                                                color: '#a5b4fc',
+                                                padding: '0.4rem 0.55rem',
+                                                cursor: 'pointer',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: '0.3rem',
+                                                fontSize: '0.75rem',
+                                            }}
+                                        >
+                                            <FiImage size={14} />
+                                        </button>
+                                    )}
+                                    {expandedComp === idx ? <FiChevronUp color="#888" size={16} /> : <FiChevronDown color="#888" size={16} />}
+                                </div>
                             </CompHeader>
                             {expandedComp === idx && (
                                 <CompDetails>
