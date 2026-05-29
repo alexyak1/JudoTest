@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { FiPlus, FiChevronDown, FiChevronUp, FiTrash2, FiCalendar, FiEdit2, FiClock } from 'react-icons/fi';
+import { FiPlus, FiChevronDown, FiChevronUp, FiTrash2, FiCalendar, FiEdit2, FiClock, FiImage } from 'react-icons/fi';
 import { apiRequest } from '../../utils/api';
 import { getWeightClasses } from '../../utils/categories';
 import { useAuth } from '../../hooks/useAuth';
+import CompetitionPhotosModal from './CompetitionPhotosModal';
 
 const StatRow = styled.div`
     display: grid;
@@ -299,6 +300,7 @@ const ClubPage = () => {
     const [editingComp, setEditingComp] = useState(null);
     const [confirmRemoveParticipant, setConfirmRemoveParticipant] = useState(null);
     const [confirmDeleteComp, setConfirmDeleteComp] = useState(null);
+    const [photosModal, setPhotosModal] = useState(null);
     const [clubMembers, setClubMembers] = useState([]);
     const [filter, setFilter] = useState('year');
     const [dateFrom, setDateFrom] = useState(`${new Date().getFullYear()}-01-01`);
@@ -393,11 +395,36 @@ const ClubPage = () => {
         return true;
     });
 
+    const tvToken = user?.club?.tv_token;
+    const tvUrl = tvToken ? `${window.location.origin}/tvshow/${tvToken}` : null;
+    const copyTvUrl = async () => {
+        if (!tvUrl) return;
+        try {
+            await navigator.clipboard.writeText(tvUrl);
+        } catch {}
+    };
+
     return (
         <>
             <Card>
                 <SectionHeader>
                     <SectionTitle>{user?.club?.name || 'Club'} Statistics</SectionTitle>
+                    {tvUrl && (
+                        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                            <a href={tvUrl} target="_blank" rel="noopener noreferrer" style={{
+                                color: '#667eea', textDecoration: 'none', fontSize: '0.8rem',
+                                display: 'flex', alignItems: 'center', gap: '0.3rem',
+                            }}>
+                                <FiImage size={12} /> Open TV slideshow
+                            </a>
+                            <button onClick={copyTvUrl} title="Copy link" style={{
+                                background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)',
+                                borderRadius: '4px', color: '#aaa', fontSize: '0.7rem', padding: '0.2rem 0.5rem', cursor: 'pointer',
+                            }}>
+                                Copy link
+                            </button>
+                        </div>
+                    )}
                 </SectionHeader>
 
                 <FilterRow>
@@ -475,14 +502,21 @@ const ClubPage = () => {
                                 <CompDetails>
                                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.4rem' }}>
                                         {comp.link ? <CompLink href={comp.link} target="_blank" rel="noopener noreferrer">{comp.link}</CompLink> : <span />}
-                                        {canEdit && !comp.deleted && (
-                                            <div style={{ display: 'flex', gap: '0.8rem' }}>
-                                                <span onClick={(e) => { e.stopPropagation(); setEditingComp(comp); }} style={{ color: '#888', cursor: 'pointer', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                                                    <FiEdit2 size={12} /> Edit
+                                        {!comp.deleted && comp.participants.length > 0 && (
+                                            <div style={{ display: 'flex', gap: '0.8rem', marginLeft: 'auto' }}>
+                                                <span onClick={(e) => { e.stopPropagation(); setPhotosModal({ id: comp.participants[0].id, name: comp.name }); }} style={{ color: '#888', cursor: 'pointer', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                                                    <FiImage size={12} /> Photos
                                                 </span>
-                                                <span onClick={(e) => { e.stopPropagation(); setConfirmDeleteComp(comp); }} style={{ color: '#666', cursor: 'pointer', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                                                    <FiTrash2 size={12} /> Delete
-                                                </span>
+                                                {canEdit && (
+                                                    <>
+                                                        <span onClick={(e) => { e.stopPropagation(); setEditingComp(comp); }} style={{ color: '#888', cursor: 'pointer', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                                                            <FiEdit2 size={12} /> Edit
+                                                        </span>
+                                                        <span onClick={(e) => { e.stopPropagation(); setConfirmDeleteComp(comp); }} style={{ color: '#666', cursor: 'pointer', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                                                            <FiTrash2 size={12} /> Delete
+                                                        </span>
+                                                    </>
+                                                )}
                                             </div>
                                         )}
                                         {comp.deleted && isAdmin && (
@@ -685,6 +719,14 @@ const ClubPage = () => {
                         </ButtonRow>
                     </Modal>
                 </Overlay>
+            )}
+
+            {photosModal && (
+                <CompetitionPhotosModal
+                    competitionId={photosModal.id}
+                    competitionName={photosModal.name}
+                    onClose={() => setPhotosModal(null)}
+                />
             )}
         </>
     );

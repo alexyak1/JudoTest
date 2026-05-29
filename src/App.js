@@ -15,6 +15,7 @@ import ForgotPassword from "./pages/forgot-password";
 import ResetPassword from "./pages/reset-password";
 import AcceptInvite from "./pages/accept-invite";
 import AcceptClubInvite from "./pages/accept-club-invite";
+import TVShow from "./components/TVShow/TVShow";
 import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -48,6 +49,7 @@ function App() {
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/accept-invite" element={<AcceptInvite />} />
           <Route path="/accept-club-invite" element={<AcceptClubInvite />} />
+          <Route path="/tvshow/:token" element={<TVShow />} />
           <Route path="/account" element={
             <ProtectedRoute>
               <Account />

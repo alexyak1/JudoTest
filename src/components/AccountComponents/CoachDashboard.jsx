@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { FiPlus, FiChevronDown, FiChevronUp, FiTrash2, FiUserPlus } from 'react-icons/fi';
+import { FiPlus, FiChevronDown, FiChevronUp, FiTrash2, FiUserPlus, FiImage, FiCheck, FiX } from 'react-icons/fi';
 import { apiRequest } from '../../utils/api';
 import { useAuth } from '../../hooks/useAuth';
 import StudentProfile from './StudentProfile';
 import ClubSection from './ClubSection';
+import CompetitionPhotosModal from './CompetitionPhotosModal';
+
+const API_BASE = `http://${window.location.hostname}:8787`;
 
 const Card = styled.div`
     background: rgba(255, 255, 255, 0.05);
@@ -396,8 +399,50 @@ const CoachDashboard = ({ studentId, onStudentChange }) => {
     const [eventsTo, setEventsTo] = useState('');
     const [eventsTab, setEventsTab] = useState('belts');
     const [studentSearch, setStudentSearch] = useState('');
+    const [photosModal, setPhotosModal] = useState(null);
+    const [pendingPhotos, setPendingPhotos] = useState([]);
 
     const clubApproved = user?.club_status === 'approved';
+
+    const fetchPendingPhotos = async () => {
+        try {
+            const data = await apiRequest('/coach/photos/pending');
+            setPendingPhotos(data || []);
+        } catch {
+            setPendingPhotos([]);
+        }
+    };
+
+    useEffect(() => {
+        if (clubApproved) fetchPendingPhotos();
+    }, [clubApproved]);
+
+    const absoluteUrl = (url) => {
+        if (!url) return '';
+        if (url.startsWith('http')) return url;
+        return `${API_BASE}${url}`;
+    };
+
+    const approvePending = async (photo) => {
+        const next = pendingPhotos.filter(p => p.id !== photo.id);
+        setPendingPhotos(next);
+        try {
+            await apiRequest(`/coach/photos/${photo.id}/approve`, { method: 'PUT' });
+        } catch {
+            setPendingPhotos(pendingPhotos);
+        }
+    };
+
+    const rejectPending = async (photo) => {
+        if (!window.confirm('Reject and delete this photo?')) return;
+        const next = pendingPhotos.filter(p => p.id !== photo.id);
+        setPendingPhotos(next);
+        try {
+            await apiRequest(`/coach/photos/${photo.id}`, { method: 'DELETE' });
+        } catch {
+            setPendingPhotos(pendingPhotos);
+        }
+    };
 
     const fetchStudents = async () => {
         try {
@@ -633,6 +678,49 @@ const CoachDashboard = ({ studentId, onStudentChange }) => {
 
     return (
         <>
+            {pendingPhotos.length > 0 && (
+                <Card>
+                    <SectionHeader>
+                        <SectionTitle>Photos awaiting approval ({pendingPhotos.length})</SectionTitle>
+                    </SectionHeader>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: '0.75rem' }}>
+                        {pendingPhotos.map(p => (
+                            <div key={p.id} style={{
+                                background: 'rgba(255,255,255,0.04)',
+                                border: '1px solid #facc15',
+                                borderRadius: '8px',
+                                overflow: 'hidden',
+                                display: 'flex', flexDirection: 'column',
+                            }}>
+                                <a href={absoluteUrl(p.url)} target="_blank" rel="noopener noreferrer" style={{ display: 'block', aspectRatio: '1', overflow: 'hidden', background: '#000' }}>
+                                    <img src={absoluteUrl(p.url)} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                </a>
+                                <div style={{ padding: '0.5rem 0.6rem', fontSize: '0.75rem', color: '#ddd' }}>
+                                    <div style={{ fontWeight: 600, marginBottom: '0.15rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.competition_name}</div>
+                                    <div style={{ color: '#9ca3af' }}>{p.uploader_name}</div>
+                                </div>
+                                <div style={{ display: 'flex', gap: '0.25rem', padding: '0 0.5rem 0.5rem' }}>
+                                    <button onClick={() => approvePending(p)} style={{
+                                        flex: 1, background: 'rgba(34,197,94,0.85)', color: '#fff', border: 'none',
+                                        borderRadius: '4px', padding: '0.3rem', cursor: 'pointer',
+                                        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.25rem', fontSize: '0.75rem',
+                                    }}>
+                                        <FiCheck size={13} /> Approve
+                                    </button>
+                                    <button onClick={() => rejectPending(p)} title="Reject" style={{
+                                        background: 'transparent', color: '#9ca3af', border: '1px solid rgba(255,255,255,0.1)',
+                                        borderRadius: '4px', padding: '0.3rem 0.5rem', cursor: 'pointer',
+                                        display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem',
+                                    }}>
+                                        <FiX size={13} />
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </Card>
+            )}
+
             <Card>
                 <SectionHeader>
                     <SectionTitle>Recent Events</SectionTitle>
@@ -725,6 +813,17 @@ const CoachDashboard = ({ studentId, onStudentChange }) => {
                                         textTransform: 'capitalize',
                                         textAlign: 'right',
                                     }}>{c.result || '-'}</span>
+                                    <button
+                                        onClick={() => setPhotosModal({ id: c.id, name: c.name })}
+                                        title="Photos"
+                                        style={{
+                                            background: 'transparent', border: 'none',
+                                            color: '#9ca3af', cursor: 'pointer',
+                                            padding: '0.1rem 0.3rem', display: 'flex', alignItems: 'center',
+                                        }}
+                                    >
+                                        <FiImage size={14} />
+                                    </button>
                                 </div>
                             ))}
                         </div>
@@ -910,6 +1009,17 @@ const CoachDashboard = ({ studentId, onStudentChange }) => {
                         </ButtonRow>
                     </Modal>
                 </Overlay>
+            )}
+
+            {photosModal && (
+                <CompetitionPhotosModal
+                    competitionId={photosModal.id}
+                    competitionName={photosModal.name}
+                    onClose={() => {
+                        setPhotosModal(null);
+                        fetchPendingPhotos();
+                    }}
+                />
             )}
         </>
     );

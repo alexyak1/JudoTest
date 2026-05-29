@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { FiEdit2, FiPlus, FiTrash2, FiClock } from 'react-icons/fi';
+import { FiEdit2, FiPlus, FiTrash2, FiClock, FiImage } from 'react-icons/fi';
 import ProfileEditForm from './ProfileEditForm';
 import AddBeltForm from './AddBeltForm';
 import AddCompetitionForm from './AddCompetitionForm';
 import AddLicenseForm from './AddLicenseForm';
+import CompetitionPhotosModal from './CompetitionPhotosModal';
 import { getWeightClasses } from '../../utils/categories';
 import { apiRequest } from '../../utils/api';
 
@@ -276,6 +277,7 @@ const StudentProfile = ({ user, isOwnProfile, canEdit, onUpdate, onUpdateUser })
     const [editingBelt, setEditingBelt] = useState(null);
     const [addingCompetition, setAddingCompetition] = useState(false);
     const [addingLicense, setAddingLicense] = useState(false);
+    const [photosModal, setPhotosModal] = useState(null);
     const [localUser, setLocalUser] = useState(user);
     const [clubs, setClubs] = useState([]);
     const [joiningClub, setJoiningClub] = useState(false);
@@ -537,6 +539,21 @@ const StudentProfile = ({ user, isOwnProfile, canEdit, onUpdate, onUpdateUser })
                                                 ? <a href={comp.link} target="_blank" rel="noopener noreferrer" style={{color: '#667eea', textDecoration: 'none'}}>{comp.name}</a>
                                                 : comp.name
                                             }
+                                            <button
+                                                onClick={() => setPhotosModal({ id: comp.id, name: comp.name })}
+                                                title="Photos"
+                                                style={{
+                                                    marginLeft: '0.5rem',
+                                                    background: 'transparent',
+                                                    border: 'none',
+                                                    color: '#9ca3af',
+                                                    cursor: 'pointer',
+                                                    padding: '0.1rem 0.2rem',
+                                                    verticalAlign: 'middle',
+                                                }}
+                                            >
+                                                <FiImage size={14} />
+                                            </button>
                                         </Td>
                                         <Td>
                                             {comp.date}
@@ -664,6 +681,14 @@ const StudentProfile = ({ user, isOwnProfile, canEdit, onUpdate, onUpdateUser })
                     apiPrefix={apiPrefix}
                     onClose={() => setAddingCompetition(false)}
                     onSave={handleCompetitionAdded}
+                />
+            )}
+
+            {photosModal && (
+                <CompetitionPhotosModal
+                    competitionId={photosModal.id}
+                    competitionName={photosModal.name}
+                    onClose={() => setPhotosModal(null)}
                 />
             )}
 
