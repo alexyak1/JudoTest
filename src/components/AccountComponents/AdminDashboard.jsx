@@ -427,6 +427,14 @@ const AdminDashboard = () => {
 
     const getUserCountForClub = (clubId) => users.filter(u => u.club_id === clubId).length;
 
+    // Newest of the two timestamps: last_seen_at is missing for users who
+    // haven't hit the API since the field was introduced.
+    const lastActive = (u) => {
+        if (!u.last_seen_at) return u.last_login_at || null;
+        if (!u.last_login_at) return u.last_seen_at;
+        return new Date(u.last_seen_at) > new Date(u.last_login_at) ? u.last_seen_at : u.last_login_at;
+    };
+
     const formatDate = (d) => {
         if (!d) return 'Never';
         const date = new Date(d);
@@ -468,7 +476,7 @@ const AdminDashboard = () => {
                         </StatCard>
                         <StatCard>
                             <StatValue color="#ff6b6b">{dashboard.never_logged_in}</StatValue>
-                            <StatLabel>Never Logged In</StatLabel>
+                            <StatLabel>Never Active</StatLabel>
                         </StatCard>
                     </StatRow>
                     <div style={{ maxHeight: '250px', overflowY: 'auto' }}>
@@ -478,6 +486,7 @@ const AdminDashboard = () => {
                                     <ActivityTh>Name</ActivityTh>
                                     <ActivityTh>Role</ActivityTh>
                                     <ActivityTh>Club</ActivityTh>
+                                    <ActivityTh>Last Seen</ActivityTh>
                                     <ActivityTh>Last Login</ActivityTh>
                                     <ActivityTh>Joined</ActivityTh>
                                 </tr>
@@ -493,7 +502,10 @@ const AdminDashboard = () => {
                                         </ActivityTd>
                                         <ActivityTd style={{ textTransform: 'capitalize' }}>{u.role}</ActivityTd>
                                         <ActivityTd>{u.club_name || '-'}</ActivityTd>
-                                        <ActivityTd style={{ color: u.last_login_at ? '#4ade80' : '#ff6b6b' }}>
+                                        <ActivityTd style={{ color: lastActive(u) ? '#4ade80' : '#ff6b6b' }}>
+                                            {formatDate(lastActive(u))}
+                                        </ActivityTd>
+                                        <ActivityTd style={{ color: '#888' }}>
                                             {formatDate(u.last_login_at)}
                                         </ActivityTd>
                                         <ActivityTd style={{ color: '#888' }}>{new Date(u.created_at).toLocaleDateString()}</ActivityTd>
