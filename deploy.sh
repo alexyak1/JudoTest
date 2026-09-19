@@ -91,5 +91,5 @@ esac
 
 echo ""
 log "Deployment complete!"
-log "Frontend: http://judoquiz.com"
-log "Backend:  http://judoquiz.com:8787"
+log "Frontend: https://judoquiz.com"
+log "Backend:  https://judoquiz.com/api  (proxied; still direct on :8787)"
