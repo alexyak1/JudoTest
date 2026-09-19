@@ -58,12 +58,12 @@ certbot certonly \
     --agree-tos --no-eff-email --non-interactive \
     --keep-until-expiring
 
-# certbot ships these two; nginx.ssl.conf includes them.
-[ -f /etc/letsencrypt/options-ssl-nginx.conf ] || \
-    curl -fsS -o /etc/letsencrypt/options-ssl-nginx.conf \
-    https://raw.githubusercontent.com/certbot/certbot/main/certbot-nginx/certbot_nginx/_internal/tls_configs/options-ssl-nginx.conf
-[ -f /etc/letsencrypt/ssl-dhparams.pem ] || \
-    openssl dhparam -out /etc/letsencrypt/ssl-dhparams.pem 2048
+# nginx.ssl.conf carries its TLS settings inline, so there is nothing to fetch
+# and no dhparam to generate. Just confirm certbot produced what we will mount.
+for f in fullchain.pem privkey.pem; do
+    [ -f "/etc/letsencrypt/live/$DOMAIN/$f" ] || fail "Missing /etc/letsencrypt/live/$DOMAIN/$f"
+done
+log "Certificate files present."
 
 # --- 4. Let the container's nginx user read the key -------------------------
 # certbot locks live/ and archive/ to root only. nginx runs as the unprivileged
