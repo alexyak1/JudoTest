@@ -1,59 +1,30 @@
 import React, { memo, useCallback } from 'react';
-import { usePriorityLazyLoad } from '../hooks/useLazyLoad';
+import { TechniqueMedia } from './TechniqueMedia';
 
-const PRIORITY_COUNT = 6; // Load first 6 images immediately (typical above-the-fold)
+const EAGER_COUNT = 6; // first row or two; the rest lazy-load natively
 
 const TechniqueCard = memo(({
   item,
-  imageSrc,
-  imagePath,
+  posterSrc,
+  videoSrc,
+  fps,
   index = 0,
   onCardClick
 }) => {
-  const { ref, isLoaded, isInView, hasError } = usePriorityLazyLoad(
-    imageSrc, index, PRIORITY_COUNT, { rootMargin: '200px' }
-  );
-
   const handleClick = useCallback(() => {
-    onCardClick(item.name, imagePath);
-  }, [item.name, imagePath, onCardClick]);
+    onCardClick(item.name, posterSrc, videoSrc, fps);
+  }, [item.name, posterSrc, videoSrc, fps, onCardClick]);
 
   return (
-    <div className="technique-card" onClick={handleClick} ref={ref}>
+    <div className="technique-card" onClick={handleClick}>
       <h3>{item.name}</h3>
       <div className="technique-container">
-        {!imageSrc ? (
-          <div className="loading-placeholder">
-            Image not available
-          </div>
-        ) : hasError ? (
-          <div className="loading-placeholder">
-            Failed to load image
-          </div>
-        ) : isLoaded ? (
-          <img
-            src={imageSrc}
-            alt={item.name}
-            className="img-technique"
-            loading="lazy"
-            decoding="async"
-            style={{
-              width: '100%',
-              height: '100%',
-              objectFit: 'contain',
-              borderRadius: '8px',
-            }}
-          />
-        ) : (
-          <div className="loading-placeholder" style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            minHeight: '200px',
-          }}>
-            {isInView ? 'Loading...' : null}
-          </div>
-        )}
+        <TechniqueMedia
+          posterSrc={posterSrc}
+          videoSrc={videoSrc}
+          alt={item.name}
+          eager={index < EAGER_COUNT}
+        />
       </div>
     </div>
   );

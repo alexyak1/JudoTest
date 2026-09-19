@@ -1,27 +1,28 @@
 import React, { memo, useCallback } from 'react';
-import { LazyKataImage } from './LazyKataImage';
+import { TechniqueMedia } from './TechniqueMedia';
 
-const KataTechniqueCard = memo(({ 
-  item, 
-  imageSrc, 
+const EAGER_COUNT = 3;
+
+const KataTechniqueCard = memo(({
+  item,
+  posterSrc,
+  videoSrc,
+  fps,
   onCardClick,
   index = 0
 }) => {
   const handleClick = useCallback(() => {
-    onCardClick(item.name, imageSrc);
-  }, [item.name, imageSrc, onCardClick]);
+    onCardClick(item.name, posterSrc, videoSrc, fps);
+  }, [item.name, posterSrc, videoSrc, fps, onCardClick]);
 
   return (
     <div className="technique-card" onClick={handleClick}>
       <div className="technique-container">
-        <LazyKataImage
-          src={imageSrc}
+        <TechniqueMedia
+          posterSrc={posterSrc}
+          videoSrc={videoSrc}
           alt={item.name}
-          className="img-technique"
-          style={{ width: '100%', height: '200px' }}
-          index={index}
-          priorityCount={3}
-          placeholder="🥋"
+          eager={index < EAGER_COUNT}
         />
       </div>
       <h3>{item.name}</h3>

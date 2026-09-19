@@ -1,6 +1,12 @@
 import React, { useEffect, memo } from 'react';
+import { TechniquePlayer } from './TechniquePlayer';
 
-const ImageModal = memo(({ isOpen, onClose, title, imageSrc, altText }) => {
+/**
+ * Shows a technique full size. When the technique has a video it opens in the
+ * frame-stepping player, so a throw can be held on one moment -- the main
+ * thing the old GIFs could not do. Stills fall back to the poster image.
+ */
+const ImageModal = memo(({ isOpen, onClose, title, imageSrc, videoSrc, fps, altText }) => {
   useEffect(() => {
     if (!isOpen) return;
     const handleKeyDown = (e) => {
@@ -20,7 +26,16 @@ const ImageModal = memo(({ isOpen, onClose, title, imageSrc, altText }) => {
           <button className="modal-close" aria-label="Close" onClick={onClose}>×</button>
         </div>
         <div className="modal-body">
-          <img className="modal-image" src={imageSrc} alt={altText} />
+          {videoSrc ? (
+            <TechniquePlayer
+              src={videoSrc}
+              poster={imageSrc}
+              fps={fps}
+              title={altText}
+            />
+          ) : (
+            <img className="modal-image" src={imageSrc} alt={altText} />
+          )}
         </div>
       </div>
     </div>

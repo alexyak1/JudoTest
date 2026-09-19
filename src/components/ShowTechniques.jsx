@@ -6,8 +6,23 @@ import { useTechniquesCache } from '../hooks/useGlobalCache';
 import { trackBeltAction } from '../hooks/useBeltWithUrl';
 import '../components/MobileOptimization.css';
 
-// Import all images at build time
-const images = require.context('../pages/judo_techniques', true, /\.gif$/);
+// Import technique media at build time. Posters are stills the grid always
+// shows; videos are fetched only when a technique is played. Techniques whose
+// source was a single frame have a poster but no video.
+const posters = require.context('../pages/judo_techniques', true, /\.webp$/);
+const videos = require.context('../pages/judo_techniques', true, /\.mp4$/);
+
+// Per-clip frame rate, written by scripts/convert_media.py. Needed so the
+// player steps real frames -- these clips run anywhere from 2 to 30fps.
+const manifest = require('../pages/media-manifest.json');
+
+const resolve = (ctx, path) => {
+    try {
+        return ctx(path);
+    } catch (e) {
+        return null;
+    }
+};
 
 const ShowTechniques = memo(({ belt }) => {
     const [modal, setModal] = useState({ open: false, title: '', src: '' });
@@ -55,23 +70,16 @@ const ShowTechniques = memo(({ belt }) => {
     }, [items, searchTerm]);
 
     // Memoized callbacks to prevent unnecessary re-renders
-    const openCard = useCallback((title, imagePath) => {
-        let imageSrc = '';
-        try {
-            imageSrc = images(imagePath);
-        } catch (e) {
-            imageSrc = '';
-        }
-        setModal({ open: true, title, src: imageSrc });
-        
+    const openCard = useCallback((title, posterSrc, videoSrc, fps) => {
+        setModal({ open: true, title, src: posterSrc, videoSrc, fps });
+
         // Track technique view
         trackBeltAction('technique_view', 'techniques', belt, {
-            technique_name: title,
-            image_path: imagePath
+            technique_name: title
         });
     }, [belt]);
 
-    const closeCard = useCallback(() => setModal({ open: false, title: '', src: '' }), []);
+    const closeCard = useCallback(() => setModal({ open: false, title: '', src: '', videoSrc: null, fps: undefined }), []);
 
     const handleSearchChange = useCallback((e) => setSearchTerm(e.target.value), []);
 
@@ -116,20 +124,16 @@ const ShowTechniques = memo(({ belt }) => {
             {filteredItems.length > 0 ? (
                 <div ref={techniquesGridRef} className="techniques-grid">
                     {filteredItems.map((filteredItem, index) => {
-                        const imagePath = `./${filteredItem.belt}/${filteredItem.name}.gif`;
-                        let imageSrc;
-                        try {
-                            imageSrc = images(imagePath);
-                        } catch (err) {
-                            imageSrc = null;
-                        }
+                        const base = `./${filteredItem.belt}/${filteredItem.name}`;
+                        const key = `judo_techniques/${filteredItem.belt}/${filteredItem.name}`;
 
                         return (
                             <TechniqueCard
                                 key={filteredItem.id}
                                 item={filteredItem}
-                                imageSrc={imageSrc}
-                                imagePath={imagePath}
+                                posterSrc={resolve(posters, `${base}.webp`)}
+                                videoSrc={resolve(videos, `${base}.mp4`)}
+                                fps={manifest[key]?.fps}
                                 index={index}
                                 onCardClick={openCard}
                             />
@@ -151,6 +155,8 @@ const ShowTechniques = memo(({ belt }) => {
                 onClose={closeCard}
                 title={modal.title}
                 imageSrc={modal.src}
+                videoSrc={modal.videoSrc}
+                fps={modal.fps}
                 altText={modal.title}
             />
         </div>

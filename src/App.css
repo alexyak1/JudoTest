@@ -264,6 +264,50 @@
   text-transform: capitalize;
 }
 
+/* Poster/video swap area. The <img> and <video> share .img-technique sizing so
+   the card does not jump when hover swaps one for the other. */
+.technique-media {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.technique-media .img-technique {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 8px;
+  display: block;
+}
+
+/* Marks a card as playable; hidden while the video is running. */
+.technique-play-badge {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.55);
+  color: #ffffff;
+  font-size: 0.8rem;
+  padding-left: 2px;
+  pointer-events: none;
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  transition: background 0.2s ease;
+}
+
+.technique-card:hover .technique-play-badge {
+  background: rgba(0, 0, 0, 0.75);
+}
+
 /* Modal styles */
 .modal-overlay {
   position: fixed;

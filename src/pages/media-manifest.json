@@ -1,0 +1,278 @@
+{
+ "judo_techniques/blue/Ashi-guruma": {
+  "duration": 10.375,
+  "fps": 8.0
+ },
+ "judo_techniques/blue/Hane-goshi": {
+  "duration": 4.0,
+  "fps": 2.0
+ },
+ "judo_techniques/blue/Kata-gatame": {
+  "duration": 6.0,
+  "fps": 24.0
+ },
+ "judo_techniques/blue/O-guruma": {
+  "duration": 8.25,
+  "fps": 8.0
+ },
+ "judo_techniques/blue/Soto-makikomi": {
+  "duration": 3.7,
+  "fps": 30.0
+ },
+ "judo_techniques/blue/Sumi-gaeshi": {
+  "duration": 8.714,
+  "fps": 7.0
+ },
+ "judo_techniques/blue/Tsubame-geashi": {
+  "duration": 6.3,
+  "fps": 10.0
+ },
+ "judo_techniques/blue/Uchi-mata(hip)": {
+  "duration": 4.0,
+  "fps": 2.0
+ },
+ "judo_techniques/blue/Uki-gatame": {
+  "duration": 9.0,
+  "fps": 14.0
+ },
+ "judo_techniques/blue/Uki-waza": {
+  "duration": 9.429,
+  "fps": 7.0
+ },
+ "judo_techniques/blue/Ura-nage": {
+  "duration": 3.8,
+  "fps": 20.0
+ },
+ "judo_techniques/blue/Ushiro-goshi": {
+  "duration": 4.5,
+  "fps": 2.0
+ },
+ "judo_techniques/blue/Yoko-gake": {
+  "duration": 2.1,
+  "fps": 10.0
+ },
+ "judo_techniques/blue/Yoko-guruma": {
+  "duration": 14.067,
+  "fps": 30.0
+ },
+ "judo_techniques/blue/Yoko-otoshi": {
+  "duration": 11.571,
+  "fps": 7.0
+ },
+ "judo_techniques/brown/Kata-guruma": {
+  "duration": 3.6,
+  "fps": 3.333
+ },
+ "judo_techniques/brown/O-soto-guruma": {
+  "duration": 3.06,
+  "fps": 16.667
+ },
+ "judo_techniques/brown/Sumi-otoshi": {
+  "duration": 2.7,
+  "fps": 3.333
+ },
+ "judo_techniques/brown/Uki-otoshi": {
+  "duration": 3.5,
+  "fps": 2.0
+ },
+ "judo_techniques/brown/Utsuri-goshi": {
+  "duration": 4.0,
+  "fps": 2.0
+ },
+ "judo_techniques/brown/Yoko-wakare": {
+  "duration": 5.0,
+  "fps": 30.0
+ },
+ "judo_techniques/green/Harai-tsuri-komi-ashi": {
+  "duration": 4.0,
+  "fps": 2.0
+ },
+ "judo_techniques/green/Okuri-ashi-harai(barai)": {
+  "duration": 3.5,
+  "fps": 2.0
+ },
+ "judo_techniques/green/Sasae-tsuri-komi-ashi": {
+  "duration": 7.9,
+  "fps": 10.0
+ },
+ "judo_techniques/green/Seoi-otoshi": {
+  "duration": 3.6,
+  "fps": 20.0
+ },
+ "judo_techniques/green/Sode-tsuri-komi-goshi": {
+  "duration": 1.574,
+  "fps": 10.167
+ },
+ "judo_techniques/green/Tani-otoshi": {
+  "duration": 2.5,
+  "fps": 20.0
+ },
+ "judo_techniques/green/Tomoe-nage": {
+  "duration": 3.5,
+  "fps": 2.0
+ },
+ "judo_techniques/green/Uki-goshi": {
+  "duration": 3.5,
+  "fps": 2.0
+ },
+ "judo_techniques/green/Yoko-sumi-gaeshi": {
+  "duration": 7.5,
+  "fps": 2.0
+ },
+ "judo_techniques/green/Yoko-tomoe-nage": {
+  "duration": 2.567,
+  "fps": 30.0
+ },
+ "judo_techniques/green/tsurikomigoshi": {
+  "duration": 4.0,
+  "fps": 2.0
+ },
+ "judo_techniques/orange/De-ashi-harai": {
+  "duration": 8.7,
+  "fps": 10.0
+ },
+ "judo_techniques/orange/Harai-goshi": {
+  "duration": 4.0,
+  "fps": 2.0
+ },
+ "judo_techniques/orange/Ippon-seoi-nage": {
+  "duration": 8.7,
+  "fps": 10.0
+ },
+ "judo_techniques/orange/Ko-soto-gake": {
+  "duration": 8.625,
+  "fps": 8.0
+ },
+ "judo_techniques/orange/Kubi-nage": {
+  "duration": 1.5,
+  "fps": 2.0
+ },
+ "judo_techniques/orange/Morote-seoi-nage": {
+  "duration": 5.0,
+  "fps": 10.0
+ },
+ "judo_techniques/orange/O-soto-gari": {
+  "duration": 4.4,
+  "fps": 10.0
+ },
+ "judo_techniques/orange/Tai-otoshi": {
+  "duration": 3.55,
+  "fps": 20.0
+ },
+ "judo_techniques/orange/Tsuri-goshi": {
+  "duration": 2.643,
+  "fps": 14.0
+ },
+ "judo_techniques/orange/Tsuri-komi-goshi": {
+  "duration": 8.4,
+  "fps": 10.0
+ },
+ "judo_techniques/orange/Uchi-mata": {
+  "duration": 4.0,
+  "fps": 2.0
+ },
+ "judo_techniques/yellow/Eri-seoi-nage": {
+  "duration": 3.5,
+  "fps": 2.0
+ },
+ "judo_techniques/yellow/Hiza-guruma": {
+  "duration": 8.867,
+  "fps": 15.0
+ },
+ "judo_techniques/yellow/Kami-shiho-gatame": {
+  "duration": 5.133,
+  "fps": 15.0
+ },
+ "judo_techniques/yellow/Ko-soto-gari": {
+  "duration": 10.533,
+  "fps": 15.0
+ },
+ "judo_techniques/yellow/Ko-uchi-gari": {
+  "duration": 9.8,
+  "fps": 15.0
+ },
+ "judo_techniques/yellow/Koshi-guruma": {
+  "duration": 8.133,
+  "fps": 15.0
+ },
+ "judo_techniques/yellow/Kuzure-kesa-gatame": {
+  "duration": 8.667,
+  "fps": 15.0
+ },
+ "judo_techniques/yellow/O-goshi": {
+  "duration": 10.2,
+  "fps": 15.0
+ },
+ "judo_techniques/yellow/O-soto-otoshi": {
+  "duration": 9.867,
+  "fps": 15.0
+ },
+ "judo_techniques/yellow/O-uchi-gari": {
+  "duration": 8.467,
+  "fps": 15.0
+ },
+ "judo_techniques/yellow/Tate-shiho-gatame": {
+  "duration": 7.467,
+  "fps": 15.0
+ },
+ "kata_techniques/nage-no-kata/Harai-goshi": {
+  "duration": 21.0,
+  "fps": 10.0
+ },
+ "kata_techniques/nage-no-kata/Kata-guruma": {
+  "duration": 20.0,
+  "fps": 10.0
+ },
+ "kata_techniques/nage-no-kata/Okuri-ashi-harai": {
+  "duration": 23.0,
+  "fps": 10.0
+ },
+ "kata_techniques/nage-no-kata/Sasae-tsurikomi-ashi": {
+  "duration": 5.0,
+  "fps": 10.0
+ },
+ "kata_techniques/nage-no-kata/Seoi-nage": {
+  "duration": 19.8,
+  "fps": 10.0
+ },
+ "kata_techniques/nage-no-kata/Sumi-gaeshi": {
+  "duration": 24.0,
+  "fps": 10.0
+ },
+ "kata_techniques/nage-no-kata/Tomoe-nage": {
+  "duration": 18.6,
+  "fps": 10.0
+ },
+ "kata_techniques/nage-no-kata/Tsurikomi-goshi": {
+  "duration": 21.0,
+  "fps": 10.0
+ },
+ "kata_techniques/nage-no-kata/Uchi-mata": {
+  "duration": 25.0,
+  "fps": 10.0
+ },
+ "kata_techniques/nage-no-kata/Uki-goshi": {
+  "duration": 17.8,
+  "fps": 10.0
+ },
+ "kata_techniques/nage-no-kata/Uki-otoshi": {
+  "duration": 21.0,
+  "fps": 10.0
+ },
+ "kata_techniques/nage-no-kata/Uki-waza": {
+  "duration": 25.0,
+  "fps": 10.0
+ },
+ "kata_techniques/nage-no-kata/Ura-nage": {
+  "duration": 17.2,
+  "fps": 10.0
+ },
+ "kata_techniques/nage-no-kata/Yoko-gake": {
+  "duration": 28.0,
+  "fps": 10.0
+ },
+ "kata_techniques/nage-no-kata/Yoko-guruma": {
+  "duration": 20.0,
+  "fps": 10.0
+ }
+}

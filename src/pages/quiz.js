@@ -6,8 +6,18 @@ import { useAuth } from "../hooks/useAuth";
 import { apiRequest } from "../utils/api";
 import '../quiz.css';
 
-// Import all images at build time
-const images = require.context('./judo_techniques', true, /\.gif$/);
+// Import technique media at build time. Each question loads one technique, so
+// the video is worth autoplaying here -- recognising a throw depends on motion.
+const posters = require.context('./judo_techniques', true, /\.webp$/);
+const videos = require.context('./judo_techniques', true, /\.mp4$/);
+
+const resolve = (ctx, path) => {
+	try {
+		return ctx(path);
+	} catch (e) {
+		return null;
+	}
+};
 
 export default function Test() {
 	const { useState, useEffect, Fragment } = React
@@ -54,9 +64,10 @@ export default function Test() {
 				techniques[threeRandomNumbers[2]].name,
 				techniques[i].name
 			]
-			const imagePath = `./${techniques[i].belt}/${techniques[i].name}.gif`;
+			const base = `./${techniques[i].belt}/${techniques[i].name}`;
 			quizQuestions.push({
-				'image': images(imagePath),
+				'image': resolve(posters, `${base}.webp`),
+				'video': resolve(videos, `${base}.mp4`),
 				'correctAnswer': techniques[i].name,
 				'correctAnswerId': i,
 				'answers': answers.sort(() => Math.random() - 0.5)
@@ -111,12 +122,26 @@ export default function Test() {
 			return (
 				<div className="question">
 					<div className="questionText">What technique is on the picture?</div>
-					<img
-						key={question.image}
-						className="img-technique"
-						src={question.image}
-						alt="Judo technique">
-					</img>
+					{question.video ? (
+						<video
+							key={question.video}
+							className="img-technique"
+							src={question.video}
+							poster={question.image}
+							autoPlay
+							muted
+							loop
+							playsInline
+							aria-label="Judo technique"
+						/>
+					) : (
+						<img
+							key={question.image}
+							className="img-technique"
+							src={question.image}
+							alt="Judo technique">
+						</img>
+					)}
 					<div className="answers">
 						{question.answers.map((answer, index) => {
 							return <div
