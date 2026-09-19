@@ -449,3 +449,91 @@ button.restart {
     width: 80%;
   }
 }
+/* Landing-page copy. Sits under the belt grid: it is the text a crawler reads
+   and the orientation a first-time visitor reads before picking a belt. */
+.quiz-seo {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 820px;
+  margin: 1rem auto 4rem;
+  padding: 0 2rem;
+  text-align: left;
+  color: #b8b8b8;
+  font-family: 'Inter', sans-serif;
+  font-size: 1rem;
+  line-height: 1.75;
+}
+
+.quiz-seo h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: #ffffff;
+  margin: 2.5rem 0 0.75rem;
+}
+
+.quiz-seo h2:first-child {
+  margin-top: 0;
+}
+
+.quiz-seo p {
+  margin: 0 0 1rem;
+}
+
+.quiz-seo a {
+  color: #667eea;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.quiz-seo a:hover {
+  color: #764ba2;
+  text-decoration: underline;
+}
+
+.quiz-seo strong {
+  color: #e8e8e8;
+  font-weight: 600;
+}
+
+.quiz-seo-list {
+  list-style: none;
+  margin: 0 0 1rem;
+  padding: 0;
+}
+
+.quiz-seo-list li {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 0.75rem;
+  padding: 1rem 1.25rem;
+  margin-bottom: 0.75rem;
+}
+
+.quiz-seo-faq dt {
+  color: #ffffff;
+  font-weight: 600;
+  margin-top: 1.25rem;
+}
+
+.quiz-seo-faq dd {
+  margin: 0.25rem 0 0;
+}
+
+@media (max-width: 768px) {
+  .quiz-seo {
+    padding: 0 1.25rem;
+    font-size: 0.95rem;
+  }
+
+  .quiz-seo h2 {
+    font-size: 1.25rem;
+  }
+}
+
+.quiz-seo-lang {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}

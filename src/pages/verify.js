@@ -3,6 +3,8 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { apiRequest } from '../utils/api';
 import styled from 'styled-components';
+import { useSeo } from "../utils/seo";
+import { API_BASE } from "../utils/apiBase";
 
 const Container = styled.div`
     display: flex;
@@ -56,6 +58,13 @@ const Button = styled.button`
 `;
 
 export default function Verify() {
+    useSeo({
+        title: 'Verify your email | JudoQuiz',
+        description: 'Account page on JudoQuiz, the free judo technique quiz.',
+        path: '/verify',
+        noindex: true,
+    });
+
     const [searchParams] = useSearchParams();
     const [status, setStatus] = useState('loading');
     const [message, setMessage] = useState('');
@@ -72,7 +81,6 @@ export default function Verify() {
         }
 
         // Try email verification first
-        const API_BASE = `http://${window.location.hostname}:8787`;
 
         fetch(`${API_BASE}/auth/verify-email?token=${token}`)
             .then(async res => {

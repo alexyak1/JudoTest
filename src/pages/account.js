@@ -9,6 +9,7 @@ import CoachesList from '../components/AccountComponents/CoachesList';
 import ClubPage from '../components/AccountComponents/ClubPage';
 import RankingPage from '../components/AccountComponents/RankingPage';
 import PendingRequests from '../components/AccountComponents/PendingRequests';
+import { useSeo } from "../utils/seo";
 
 const Container = styled.div`
     max-width: 900px;
@@ -56,6 +57,13 @@ const Tab = styled.button`
 `;
 
 export default function Account() {
+    useSeo({
+        title: 'Your account | JudoQuiz',
+        description: 'Account page on JudoQuiz, the free judo technique quiz.',
+        path: '/account',
+        noindex: true,
+    });
+
     const { user, refreshUser, updateUser, isCoach, isAdmin } = useAuth();
     const [searchParams, setSearchParams] = useSearchParams();
 
@@ -81,7 +89,6 @@ export default function Account() {
 
     return (
         <Container>
-            <title>Judo Quiz | Account</title>
             <PageTitle>My Account</PageTitle>
 
             {showTabs && (

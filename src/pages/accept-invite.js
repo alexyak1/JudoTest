@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useSearchParams, Link, useNavigate } from 'react-router-dom';
 import { apiRequest } from '../utils/api';
 import styled from 'styled-components';
+import { useSeo } from "../utils/seo";
 
 const Container = styled.div`
     display: flex;
@@ -91,6 +92,13 @@ const BottomLink = styled.p`
 `;
 
 export default function AcceptInvite() {
+    useSeo({
+        title: 'Accept invite | JudoQuiz',
+        description: 'Account page on JudoQuiz, the free judo technique quiz.',
+        path: '/accept-invite',
+        noindex: true,
+    });
+
     const [searchParams] = useSearchParams();
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -142,7 +150,6 @@ export default function AcceptInvite() {
 
     return (
         <Container>
-            <title>JudoQuiz | Accept Invite</title>
             <Card>
                 <Title>Welcome!</Title>
                 <Subtitle>Your coach invited you. Set a password to access your account.</Subtitle>

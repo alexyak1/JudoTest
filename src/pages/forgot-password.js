@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { apiRequest } from '../utils/api';
 import styled from 'styled-components';
+import { useSeo } from "../utils/seo";
 
 const Container = styled.div`
     display: flex;
@@ -102,6 +103,13 @@ const BottomLink = styled.p`
 `;
 
 export default function ForgotPassword() {
+    useSeo({
+        title: 'Forgot password | JudoQuiz',
+        description: 'Account page on JudoQuiz, the free judo technique quiz.',
+        path: '/forgot-password',
+        noindex: true,
+    });
+
     const [email, setEmail] = useState('');
     const [sent, setSent] = useState(false);
     const [submitting, setSubmitting] = useState(false);
@@ -143,7 +151,6 @@ export default function ForgotPassword() {
 
     return (
         <Container>
-            <title>Judo Quiz | Forgot Password</title>
             <Card>
                 <Title>Forgot Password</Title>
                 <Subtitle>Enter your email and we'll send you a reset link</Subtitle>

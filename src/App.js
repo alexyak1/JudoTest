@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import './App.css';
 import Navbar from "./components/NavigationComponents";
 import Footer from "./components/NavigationComponents/footer";
@@ -15,18 +15,12 @@ import ForgotPassword from "./pages/forgot-password";
 import ResetPassword from "./pages/reset-password";
 import AcceptInvite from "./pages/accept-invite";
 import AcceptClubInvite from "./pages/accept-club-invite";
+import NotFound from "./pages/not-found";
 import TVShow from "./components/TVShow/TVShow";
 import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
-  useEffect(() => {
-    // Redirect HTTPS to HTTP if the protocol is HTTPS
-    if (window.location.protocol === "https:") {
-      window.location.href = "http://" + window.location.hostname + window.location.pathname + window.location.search;
-    }
-  }, []);  // Empty dependency array ensures this runs only once, on component mount
-
   return (
     <Router
       future={{
@@ -37,8 +31,11 @@ function App() {
       <AuthProvider>
         <Navbar />
         <Routes>
-          <Route path="/" element={<Quiz />} />
-          <Route path="/quiz" element={<Quiz />} />
+          <Route path="/" element={<Quiz lang="en" />} />
+          <Route path="/quiz" element={<Quiz lang="en" />} />
+          {/* Swedish translation of the landing page. The ranking query is
+              typed into google.se in Swedish, so it gets a real page. */}
+          <Route path="/sv" element={<Quiz lang="sv" />} />
           <Route path="/techniques" element={<Techniques />} />
           <Route path="/kata" element={<Kata />} />
           <Route path="/randori" element={<RandoriTimer />} />
@@ -55,6 +52,7 @@ function App() {
               <Account />
             </ProtectedRoute>
           } />
+          <Route path="*" element={<NotFound />} />
         </Routes>
         <Footer />
       </AuthProvider>

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useSearchParams, Link, useNavigate } from 'react-router-dom';
 import { apiRequest } from '../utils/api';
 import styled from 'styled-components';
+import { useSeo } from "../utils/seo";
 
 const Container = styled.div`
     display: flex;
@@ -101,6 +102,13 @@ const BottomLink = styled.p`
 `;
 
 export default function ResetPassword() {
+    useSeo({
+        title: 'Reset password | JudoQuiz',
+        description: 'Account page on JudoQuiz, the free judo technique quiz.',
+        path: '/reset-password',
+        noindex: true,
+    });
+
     const [searchParams] = useSearchParams();
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -167,7 +175,6 @@ export default function ResetPassword() {
 
     return (
         <Container>
-            <title>Judo Quiz | Reset Password</title>
             <Card>
                 <Title>Set New Password</Title>
                 <Subtitle>Enter your new password below</Subtitle>

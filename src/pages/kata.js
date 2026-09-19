@@ -2,8 +2,15 @@ import React, { useMemo } from "react";
 import { ShowKataTechniques } from "../components/ShowKataTechniques";
 import { ToTop } from "../components/NavigationComponents/toTop";
 import { useAllKataCache } from "../hooks/useGlobalCache";
+import { useSeo } from "../utils/seo";
 
 export default function Kata() {
+    useSeo({
+        title: 'Judo Kata - Nage-no-kata Techniques by Series | JudoQuiz',
+        description: 'The judo kata techniques grouped by series: Te-waza, Koshi-waza, Ashi-waza, Ma-sutemi-waza and Yoko-sutemi-waza, each with video.',
+        path: '/kata',
+    });
+
     const kata_series = [
         "Te-waza", "Koshi-waza", "Ashi-Waza", "Masutemi-Waza", "Yoko-stemi-Waza"
     ];
@@ -20,7 +27,6 @@ export default function Kata() {
     if (isLoading && Object.keys(allKataData).length === 0) {
         return (
             <div className='app'>
-                <title>Judo quiz | Kata</title>
                 <div className="loading-placeholder" style={{ padding: '40px', textAlign: 'center' }}>
                     Loading kata techniques...
                 </div>
@@ -31,9 +37,8 @@ export default function Kata() {
 
     return (
         <div className='app'>
-        <title>Judo quiz | Kata</title>
             <div>
-                
+                <h1 style={{ color: '#ffffff', fontSize: '1.8rem', fontWeight: '600', fontFamily: 'Inter, sans-serif', textAlign: 'center', marginBottom: '2rem' }}>Judo kata techniques</h1>
                 {kata_series.map(kata_serie => (
                     <div key={kata_serie}>
                         <h2>{kata_serie}</h2>

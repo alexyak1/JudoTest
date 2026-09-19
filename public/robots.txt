@@ -1,3 +1,16 @@
 # https://www.robotstxt.org/robotstxt.html
 User-agent: *
-Disallow:
+Allow: /
+
+# Token-bearing URLs. These stay blocked outright rather than relying on
+# noindex -- a token has no business reaching a crawler in the first place.
+Disallow: /accept-invite
+Disallow: /accept-club-invite
+Disallow: /reset-password
+Disallow: /verify
+Disallow: /tvshow/
+
+# /login, /register and /account are deliberately left crawlable: they carry a
+# noindex meta tag, and Google has to be able to fetch a page to honour it.
+
+Sitemap: http://judoquiz.com/sitemap.xml

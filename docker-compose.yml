@@ -1,13 +1,27 @@
 services:
   judo-quiz-app:
-    build: 
+    build:
       context: .
       dockerfile: Dockerfile
     container_name: judo-quiz-frontend
     ports:
       - "80:80"
+      # Safe to publish before certificates exist: nothing listens on 443 until
+      # nginx.ssl.conf is swapped in, so the port simply refuses connections.
+      - "443:443"
     environment:
       - REACT_APP_API_URL=http://localhost:8787
+    volumes:
+      # Certificates issued by certbot on the host, read-only in the container.
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+      # Shared webroot for the ACME http-01 challenge. certbot writes the
+      # challenge file on the host, nginx serves it from the same directory.
+      - /var/www/certbot:/var/www/certbot:ro
+    extra_hosts:
+      # The backend runs in the Techniques compose project, on its own network,
+      # published on the host's :8787. The /api proxy reaches it through the
+      # host gateway because there is no shared Docker network between them.
+      - "host.docker.internal:host-gateway"
     networks:
       - judo-network
     restart: unless-stopped

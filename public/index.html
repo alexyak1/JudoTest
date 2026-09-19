@@ -5,12 +5,12 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#000000" />
-  <meta name="description" content="Free online judo timer and randori timer. Perfect for judo training sessions with fight/rest intervals. Sport timer for martial arts practice." />
-  <meta name="keywords" content="judo timer, randori timer, sport timer, martial arts timer, judo training timer, fight timer, rest timer, judo practice, martial arts training, interval timer" />
+  <meta name="description" content="Free judo quiz with video questions. Test your knowledge of judo techniques from yellow to brown belt, name every throw and track your progress." />
   <meta name="author" content="yakimoto dojo" />
 
-  <!-- Title of the page -->
-  <title>Judo Timer | Randori Timer | Sport Timer - Free Online Training Timer</title>
+  <!-- Homepage defaults. Every route overwrites these from src/utils/seo.js as
+       soon as the app mounts; these are what a crawler sees pre-render. -->
+  <title>Judo Quiz - Test Your Judo Techniques by Belt | JudoQuiz</title>
 
   <!-- Favicon -->
   <link rel="icon" href="logo.png" />
@@ -29,37 +29,64 @@
   </script>
 
   <!-- Open Graph meta tags for social media sharing -->
-  <meta property="og:title" content="Judo Timer | Randori Timer | Sport Timer - Free Online Training Timer" />
-  <meta property="og:description" content="Free online judo timer and randori timer. Perfect for judo training sessions with fight/rest intervals. Sport timer for martial arts practice." />
-  <meta property="og:image" content="logo.png" />
-  <meta property="og:url" content="https://www.yoursite.com/" />
+  <meta property="og:site_name" content="JudoQuiz" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Judo Quiz - Test Your Judo Techniques by Belt | JudoQuiz" />
+  <meta property="og:description" content="Free judo quiz with video questions. Test your knowledge of judo techniques from yellow to brown belt, name every throw and track your progress." />
+  <meta property="og:image" content="http://judoquiz.com/logo.png" />
+  <meta property="og:url" content="http://judoquiz.com/" />
   <meta name="twitter:card" content="summary_large_image" />
-  
+
   <!-- Additional SEO meta tags -->
   <meta name="robots" content="index, follow" />
   <meta name="googlebot" content="index, follow" />
-  <link rel="canonical" href="https://www.yoursite.com/" />
-  
+  <link rel="canonical" href="http://judoquiz.com/" />
+
   <!-- Structured Data for SEO -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
-    "@type": "WebApplication",
-    "name": "Judo Timer | Randori Timer",
-    "description": "Free online judo timer and randori timer for martial arts training sessions",
-    "url": "https://www.yoursite.com/",
-    "applicationCategory": "SportsApplication",
-    "operatingSystem": "Web Browser",
-    "offers": {
-      "@type": "Offer",
-      "price": "0",
-      "priceCurrency": "USD"
-    },
-    "keywords": "judo timer, randori timer, sport timer, martial arts timer, judo training timer, fight timer, rest timer",
-    "author": {
-      "@type": "Organization",
-      "name": "yakimoto dojo"
-    }
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": "http://judoquiz.com/#website",
+        "name": "JudoQuiz",
+        "url": "http://judoquiz.com/",
+        "description": "Free judo quiz, technique library and randori timer.",
+        "inLanguage": "en"
+      },
+      {
+        "@type": "WebApplication",
+        "@id": "http://judoquiz.com/#app",
+        "name": "Judo Quiz",
+        "description": "Free judo quiz that tests recognition of judo throws and groundwork from yellow belt to brown belt using video questions.",
+        "url": "http://judoquiz.com/",
+        "applicationCategory": "EducationalApplication",
+        "operatingSystem": "Web Browser",
+        "isPartOf": { "@id": "http://judoquiz.com/#website" },
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        },
+        "author": {
+          "@type": "Organization",
+          "name": "yakimoto dojo"
+        }
+      },
+      {
+        "@type": "Quiz",
+        "@id": "http://judoquiz.com/#quiz",
+        "name": "Judo Technique Quiz",
+        "url": "http://judoquiz.com/quiz",
+        "educationalLevel": "Yellow, orange, green, blue and brown belt",
+        "about": {
+          "@type": "Thing",
+          "name": "Judo techniques"
+        },
+        "isPartOf": { "@id": "http://judoquiz.com/#website" }
+      }
+    ]
   }
   </script>
 </head>

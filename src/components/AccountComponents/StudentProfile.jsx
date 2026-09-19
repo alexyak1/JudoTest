@@ -8,8 +8,8 @@ import AddLicenseForm from './AddLicenseForm';
 import CompetitionPhotosModal from './CompetitionPhotosModal';
 import { getWeightClasses } from '../../utils/categories';
 import { apiRequest } from '../../utils/api';
+import { API_BASE } from "../../utils/apiBase";
 
-const API_BASE = `http://${window.location.hostname}:8787`;
 
 const getFullPhotoURL = (url) => {
     if (!url) return null;

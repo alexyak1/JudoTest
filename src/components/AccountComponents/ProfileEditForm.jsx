@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
 import { apiRequest } from '../../utils/api';
+import { API_BASE } from "../../utils/apiBase";
 
-const API_BASE = `http://${window.location.hostname}:8787`;
 
 const Overlay = styled.div`
     position: fixed;

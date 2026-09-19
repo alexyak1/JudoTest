@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { API_BASE } from "../utils/apiBase";
 
 // Request throttler to prevent too many simultaneous requests
 class RequestThrottler {
@@ -161,7 +162,6 @@ export const useGlobalCache = (url, options = {}, forceRefresh = false) => {
  * @returns {object} { data, loading, error, refetch }
  */
 export const useTechniquesCache = (belt) => {
-  const host = window.location.hostname;
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -184,8 +184,8 @@ export const useTechniquesCache = (belt) => {
       
       // Build URL - no belt param returns all techniques
       const url = belt === 'all' 
-        ? `http://${host}:8787/techniques`
-        : `http://${host}:8787/techniques?belt=${belt}`;
+        ? `${API_BASE}/techniques`
+        : `${API_BASE}/techniques?belt=${belt}`;
       
       const response = await fetch(url);
       if (!response.ok) {
@@ -202,7 +202,7 @@ export const useTechniquesCache = (belt) => {
     } finally {
       setLoading(false);
     }
-  }, [belt, host]);
+  }, [belt]);
 
   useEffect(() => {
     fetchData();
@@ -226,8 +226,7 @@ export const useTechniquesCache = (belt) => {
  * @returns {object} { data, loading, error, refetch }
  */
 export const useKataCache = (kataType) => {
-  const host = window.location.hostname;
-  const url = `http://${host}:8787/kata?type=${kataType}`;
+  const url = `${API_BASE}/kata?type=${kataType}`;
   
   return useGlobalCache(url);
 };
@@ -247,8 +246,7 @@ export const useAllKataCache = (kataSeries) => {
     if (!kataSeries || kataSeries.length === 0 || isInitialized) return;
 
     setIsInitialized(true);
-    const host = window.location.hostname;
-    const baseUrl = `http://${host}:8787`;
+    const baseUrl = API_BASE;
     
     // Initialize loading states
     const initialLoadingStates = {};
@@ -329,8 +327,7 @@ export const useAllKataCache = (kataSeries) => {
 
   const refetch = useCallback(() => {
     // Clear cache for kata data
-    const host = window.location.hostname;
-    const baseUrl = `http://${host}:8787`;
+    const baseUrl = API_BASE;
     
     kataSeries.forEach(series => {
       const cacheKey = `${baseUrl}/kata?type=${series}`;

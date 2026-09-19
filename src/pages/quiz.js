@@ -4,7 +4,10 @@ import ProgressBar from "../components/Test/progressBar"
 import { useBeltWithUrl, usePageTracking, trackBeltAction } from "../hooks/useBeltWithUrl";
 import { useAuth } from "../hooks/useAuth";
 import { apiRequest } from "../utils/api";
+import { useSeo } from "../utils/seo";
+import { QUIZ_COPY, QUIZ_PATHS, QUIZ_ALTERNATES } from "../i18n/quizCopy";
 import '../quiz.css';
+import { API_BASE } from "../utils/apiBase";
 
 // Import technique media at build time. Each question loads one technique, so
 // the video is worth autoplaying here -- recognising a throw depends on motion.
@@ -19,16 +22,24 @@ const resolve = (ctx, path) => {
 	}
 };
 
-export default function Test() {
+export default function Test({ lang = 'en' }) {
 	const { useState, useEffect, Fragment } = React
-	const host = window.location.hostname;
-	const baseUrl = `http://${host}:8787`;
+	const baseUrl = API_BASE;
+	const copy = QUIZ_COPY[lang] || QUIZ_COPY.en;
 
 	// Use URL-based belt selection with analytics tracking
 	const { belt: urlBelt } = useBeltWithUrl('yellow', 'quiz');
-	
+
 	// Track page views with belt information
 	usePageTracking('quiz', urlBelt);
+
+	useSeo({
+		title: copy.seo.title,
+		description: copy.seo.description,
+		path: QUIZ_PATHS[lang] || QUIZ_PATHS.en,
+		lang: copy.lang,
+		alternates: QUIZ_ALTERNATES,
+	});
 
 	async function getTechniques(beltColor) {
 		let data;
@@ -227,14 +238,58 @@ export default function Test() {
 				<div className='quiz-landing'>
 					<div className="quiz-header">
 						<h1 className="quiz-title">
-							<span className="gradient-text-1">Technique</span>
-							<span className="gradient-text-2">Quiz</span>
+							<span className="gradient-text-1">{copy.titleA}</span>
+							<span className="gradient-text-2">{copy.titleB}</span>
 						</h1>
-						<p className="quiz-description">
-							Test your knowledge and perfect your understanding of judo techniques across all belt levels
-						</p>
+						<p className="quiz-description">{copy.tagline}</p>
 					</div>
 					<BeltSelector setBeltColor={setBeltColor}></BeltSelector>
+
+					<section className="quiz-seo">
+						<h2>{copy.howHeading}</h2>
+						<p>{copy.howBody1}</p>
+						<p>
+							{copy.howBody2Pre}
+							<a href="/login">{copy.howBody2Link}</a>
+							{copy.howBody2Post}
+						</p>
+
+						<h2>{copy.beltsHeading}</h2>
+						<ul className="quiz-seo-list">
+							{copy.belts.map(({ belt, count, summary, examples }) => (
+								<li key={belt}>
+									<strong>{belt} &mdash; {count} {copy.beltUnit}.</strong> {summary}: {examples}.
+								</li>
+							))}
+						</ul>
+						<p>
+							{copy.allBeltsPre}
+							<strong>{copy.allBeltsStrong}</strong>
+							{copy.allBeltsPost}
+							<a href="/techniques">{copy.techniquesLink}</a>
+							{copy.allBeltsMid}
+							<a href="/kata">{copy.kataLink}</a>
+							{copy.allBeltsEnd}
+						</p>
+
+						<h2>{copy.faqHeading}</h2>
+						<dl className="quiz-seo-faq">
+							{copy.faq.map(({ q, a }) => (
+								<Fragment key={q}>
+									<dt>{q}</dt>
+									<dd>{a}</dd>
+								</Fragment>
+							))}
+						</dl>
+
+						{/* A crawlable link between the two translations. hreflang tells
+						    Google they are a pair; this lets a person switch too. */}
+						<p className="quiz-seo-lang">
+							<a href={lang === 'sv' ? QUIZ_PATHS.en : QUIZ_PATHS.sv}>
+								{copy.otherLangLabel}
+							</a>
+						</p>
+					</section>
 				</div >
 			)
 		}
@@ -278,7 +333,6 @@ export default function Test() {
 
 	return (
 		<div>
-			<title>Judo quiz | Quiz </title>
 			<Quiz> </Quiz>
 		</div>
 	)

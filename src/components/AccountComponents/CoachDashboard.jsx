@@ -6,8 +6,8 @@ import { useAuth } from '../../hooks/useAuth';
 import StudentProfile from './StudentProfile';
 import ClubSection from './ClubSection';
 import CompetitionPhotosModal from './CompetitionPhotosModal';
+import { API_BASE } from "../../utils/apiBase";
 
-const API_BASE = `http://${window.location.hostname}:8787`;
 
 const Card = styled.div`
     background: rgba(255, 255, 255, 0.05);
@@ -954,7 +954,7 @@ const CoachDashboard = ({ studentId, onStudentChange }) => {
                                     <CardHeader>
                                         <MiniAvatar>
                                             {student.photo_url
-                                                ? <img src={student.photo_url.startsWith('http') ? student.photo_url : `http://${window.location.hostname}:8787${student.photo_url}`} alt={student.name} />
+                                                ? <img src={student.photo_url.startsWith('http') ? student.photo_url : `${API_BASE}${student.photo_url}`} alt={student.name} />
                                                 : student.name?.charAt(0)?.toUpperCase()
                                             }
                                         </MiniAvatar>

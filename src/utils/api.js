@@ -1,4 +1,4 @@
-const API_BASE = `http://${window.location.hostname}:8787`;
+import { API_BASE } from "./apiBase";
 
 export const apiRequest = async (path, options = {}) => {
     const token = localStorage.getItem('token');

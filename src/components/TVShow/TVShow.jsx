@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
+import { API_BASE } from "../../utils/apiBase";
 
-const API_BASE = `http://${window.location.hostname}:8787`;
 const POLL_INTERVAL_MS = 5000;
 const SLIDE_INTERVAL_MS = 6000;
 const FADE_MS = 800;

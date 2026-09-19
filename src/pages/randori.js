@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './randori.css';
+import { useSeo } from '../utils/seo';
 
 // SVG Icons
 const Icons = {
@@ -76,6 +77,15 @@ const Icons = {
 };
 
 const RandoriTimer = () => {
+  // The timer keywords used to sit on the site-wide <title>, so the homepage
+  // (which is the quiz) advertised a timer and this page advertised nothing.
+  // They belong here, on the page that actually is the timer.
+  useSeo({
+    title: 'Judo Timer - Free Randori & Sport Interval Timer | JudoQuiz',
+    description: 'Free online judo timer for randori and training. Set fight and rest intervals, get an audible bell, and run rounds from any phone or laptop.',
+    path: '/randori',
+  });
+
   // Load saved settings
   const getSavedSettings = () => {
     try {

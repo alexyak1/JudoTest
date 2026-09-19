@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <!-- The English and Swedish landing pages are a translation pair: each one
+       declares the full set, itself included, which is what Google requires. -->
+  <url>
+    <loc>http://judoquiz.com/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://judoquiz.com/"/>
+    <xhtml:link rel="alternate" hreflang="sv" href="http://judoquiz.com/sv"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="http://judoquiz.com/"/>
+    <lastmod>2026-09-19</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>http://judoquiz.com/sv</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://judoquiz.com/"/>
+    <xhtml:link rel="alternate" hreflang="sv" href="http://judoquiz.com/sv"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="http://judoquiz.com/"/>
+    <lastmod>2026-09-19</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>http://judoquiz.com/quiz</loc>
+    <lastmod>2026-09-19</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>http://judoquiz.com/techniques</loc>
+    <lastmod>2026-09-19</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>http://judoquiz.com/techniques?belt=orange</loc>
+    <lastmod>2026-09-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>http://judoquiz.com/techniques?belt=green</loc>
+    <lastmod>2026-09-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>http://judoquiz.com/techniques?belt=blue</loc>
+    <lastmod>2026-09-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>http://judoquiz.com/techniques?belt=brown</loc>
+    <lastmod>2026-09-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>http://judoquiz.com/kata</loc>
+    <lastmod>2026-09-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>http://judoquiz.com/randori</loc>
+    <lastmod>2026-09-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+</urlset>

@@ -3,8 +3,8 @@ import styled from 'styled-components';
 import { FiUpload, FiTrash2, FiCheck, FiX } from 'react-icons/fi';
 import { apiRequest } from '../../utils/api';
 import { useAuth } from '../../hooks/useAuth';
+import { API_BASE } from "../../utils/apiBase";
 
-const API_BASE = `http://${window.location.hostname}:8787`;
 
 const Backdrop = styled.div`
     position: fixed; inset: 0;

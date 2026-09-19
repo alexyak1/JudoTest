@@ -4,6 +4,7 @@ import { FiTrash2, FiPlus, FiUserPlus } from 'react-icons/fi';
 import { apiRequest } from '../../utils/api';
 import { useAuth } from '../../hooks/useAuth';
 import StudentProfile from './StudentProfile';
+import { API_BASE } from "../../utils/apiBase";
 
 const Card = styled.div`
     background: rgba(255, 255, 255, 0.05);
@@ -270,7 +271,7 @@ const CoachesList = () => {
                             <CardHeader>
                                 <Avatar>
                                     {coach.photo_url
-                                        ? <img src={coach.photo_url.startsWith('http') ? coach.photo_url : `http://${window.location.hostname}:8787${coach.photo_url}`} alt={coach.name} />
+                                        ? <img src={coach.photo_url.startsWith('http') ? coach.photo_url : `${API_BASE}${coach.photo_url}`} alt={coach.name} />
                                         : coach.name?.charAt(0)?.toUpperCase()
                                     }
                                 </Avatar>

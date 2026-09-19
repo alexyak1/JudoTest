@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
+import { useSeo } from "../utils/seo";
+import { API_BASE } from "../utils/apiBase";
 
 const Container = styled.div`
     display: flex;
@@ -54,6 +56,13 @@ const Button = styled.button`
 `;
 
 export default function AcceptClubInvite() {
+    useSeo({
+        title: 'Accept club invite | JudoQuiz',
+        description: 'Account page on JudoQuiz, the free judo technique quiz.',
+        path: '/accept-club-invite',
+        noindex: true,
+    });
+
     const [searchParams] = useSearchParams();
     const [status, setStatus] = useState('loading');
     const [message, setMessage] = useState('');
@@ -69,7 +78,6 @@ export default function AcceptClubInvite() {
             return;
         }
 
-        const API_BASE = `http://${window.location.hostname}:8787`;
 
         fetch(`${API_BASE}/auth/accept-club-invite?token=${token}&action=${action}`)
             .then(async res => {

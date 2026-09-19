@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { apiRequest } from '../utils/api';
 import styled from 'styled-components';
+import { useSeo } from "../utils/seo";
 
 const Container = styled.div`
     display: flex;
@@ -119,6 +120,13 @@ const BottomLink = styled.p`
 `;
 
 export default function Register() {
+    useSeo({
+        title: 'Create an account | JudoQuiz',
+        description: 'Account page on JudoQuiz, the free judo technique quiz.',
+        path: '/register',
+        noindex: true,
+    });
+
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -190,7 +198,6 @@ export default function Register() {
 
     return (
         <Container>
-            <title>Judo Quiz | Register</title>
             <Card>
                 <Title>Create Account</Title>
                 <Subtitle>Join the judo community</Subtitle>
