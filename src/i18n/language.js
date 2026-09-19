@@ -74,15 +74,26 @@ export function detectBrowserLang() {
  *   3. The browser's language list.
  *   4. English.
  *
+ * Reports which rule fired as well as the answer. Analytics needs the two
+ * apart: "the browser asked for Swedish" is the number that says whether
+ * detection is worth having, and it means nothing mixed in with visitors who
+ * followed a ?lang=sv link or chose Swedish themselves last week.
+ *
  * @param {string} search  location.search, including the leading '?'.
- * @returns {'en'|'sv'}
+ * @returns {{lang: 'en'|'sv', source: 'query'|'stored'|'browser'|'default'}}
  */
 export function resolveLandingLang(search = '') {
   const forced = new URLSearchParams(search).get('lang');
   if (SUPPORTED_LANGS.includes(forced)) {
     storeLang(forced);
-    return forced;
+    return { lang: forced, source: 'query' };
   }
 
-  return getStoredLang() || detectBrowserLang() || DEFAULT_LANG;
+  const stored = getStoredLang();
+  if (stored) return { lang: stored, source: 'stored' };
+
+  const detected = detectBrowserLang();
+  if (detected) return { lang: detected, source: 'browser' };
+
+  return { lang: DEFAULT_LANG, source: 'default' };
 }

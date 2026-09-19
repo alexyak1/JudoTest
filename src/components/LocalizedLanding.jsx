@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import Quiz from "../pages/quiz";
 import { QUIZ_PATHS } from "../i18n/quizCopy";
-import { resolveLandingLang } from "../i18n/language";
+import { resolveLandingLang, DEFAULT_LANG } from "../i18n/language";
 
 /**
  * The site root, in whichever translation the visitor reads.
@@ -24,11 +24,32 @@ export default function LocalizedLanding() {
 
   // useState, not a bare call, so an in-app re-render cannot re-resolve the
   // language and yank someone off the page they are already reading.
-  const [lang] = useState(() => resolveLandingLang(search));
+  const [{ lang, source }] = useState(() => resolveLandingLang(search));
+  const redirecting = lang !== DEFAULT_LANG;
 
-  if (lang === "sv") {
-    return <Navigate to={QUIZ_PATHS.sv} replace />;
+  // Without this, an auto-redirected visitor is indistinguishable in GA from
+  // one who arrived at /sv straight from google.se -- the redirect leaves no
+  // trace of its own, and both end up as an ordinary /sv page_view.
+  //
+  // window.gtag is the queueing stub defined inline in index.html, so it
+  // exists from first paint whether or not gtag.js has finished loading; the
+  // event sits in dataLayer until it has.
+  useEffect(() => {
+    if (!redirecting) return;
+    if (typeof window === "undefined" || !window.gtag) return;
+
+    window.gtag("event", "language_redirect", {
+      event_category: "i18n",
+      event_label: `${DEFAULT_LANG}_to_${lang}`,
+      detected_language: lang,
+      // Which rule sent them: 'browser' is the one that measures detection.
+      redirect_source: source,
+    });
+  }, [redirecting, lang, source]);
+
+  if (redirecting) {
+    return <Navigate to={QUIZ_PATHS[lang]} replace />;
   }
 
-  return <Quiz lang="en" />;
+  return <Quiz lang={DEFAULT_LANG} />;
 }

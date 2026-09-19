@@ -82,22 +82,33 @@ export const useBeltWithUrl = (defaultBelt = 'yellow', pageName = 'techniques') 
 
 /**
  * Hook for tracking page views with belt information
+ *
+ * The landing page exists in two translations on two URLs (/ and /sv) that
+ * both report pageName 'quiz', so without `lang` they are one undivided
+ * number here and there is no way to see whether the Swedish page is read.
+ * It is appended to the label as well as sent as a parameter, so the split is
+ * visible in GA without first registering a custom dimension.
+ *
  * @param {string} pageName - Page name
  * @param {string} belt - Current belt
+ * @param {string} [lang] - Translation being shown, for pages that have more
+ *                          than one. Omitted on single-language pages, whose
+ *                          labels keep their existing shape.
  */
-export const usePageTracking = (pageName, belt) => {
+export const usePageTracking = (pageName, belt, lang = null) => {
   useEffect(() => {
     if (typeof window !== 'undefined' && window.gtag) {
       window.gtag('event', 'page_view', {
         event_category: 'page_interaction',
-        event_label: `${pageName}_${belt}`,
+        event_label: lang ? `${pageName}_${belt}_${lang}` : `${pageName}_${belt}`,
+        ...(lang ? { page_language: lang } : {}),
         custom_map: {
           page: pageName,
           belt_color: belt
         }
       });
     }
-  }, [pageName, belt]);
+  }, [pageName, belt, lang]);
 };
 
 /**

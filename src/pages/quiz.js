@@ -31,8 +31,10 @@ export default function Test({ lang = 'en' }) {
 	// Use URL-based belt selection with analytics tracking
 	const { belt: urlBelt } = useBeltWithUrl('yellow', 'quiz');
 
-	// Track page views with belt information
-	usePageTracking('quiz', urlBelt);
+	// Track page views with belt information. The language goes with it: this
+	// page is the one that has a second translation at /sv, and both report as
+	// 'quiz' otherwise.
+	usePageTracking('quiz', urlBelt, lang);
 
 	useSeo({
 		title: copy.seo.title,
