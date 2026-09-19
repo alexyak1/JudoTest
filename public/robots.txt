@@ -13,4 +13,4 @@ Disallow: /tvshow/
 # /login, /register and /account are deliberately left crawlable: they carry a
 # noindex meta tag, and Google has to be able to fetch a page to honour it.
 
-Sitemap: http://judoquiz.com/sitemap.xml
+Sitemap: https://judoquiz.com/sitemap.xml

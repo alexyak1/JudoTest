@@ -1,55 +1,83 @@
 #!/bin/bash
 #
-# One-time HTTPS setup for judoquiz.com. Run ON THE SERVER (91.99.101.21), as
-# root, from /root/judoquiz/JudoTest.
+# HTTPS setup for judoquiz.com. Run ON THE SERVER, as root, from
+# /root/judoquiz/JudoTest.
 #
-# Order matters: nginx refuses to start when ssl_certificate points at a file
-# that is not there, so the certificate has to exist BEFORE nginx.ssl.conf is
-# swapped in. Doing it the other way round takes the site down instead of
-# leaving it on http.
+# nginx.conf is the TLS config and is what gets deployed. It cannot start
+# without a certificate, and certbot cannot issue a certificate without nginx
+# answering an http challenge -- so on a machine with no certificate this
+# writes a throwaway self-signed one purely to get nginx up, then lets certbot
+# replace it. That is why there is no second "http-only" config to swap around.
 #
-# Re-runnable: certbot skips a cert that is still valid.
+# Safe to re-run: certbot skips a certificate that is still valid, and the
+# self-signed placeholder is only ever written when nothing else is there.
 
 set -euo pipefail
 
 DOMAIN="judoquiz.com"
 EMAIL="iakimchuk.a@gmail.com"
 WEBROOT="/var/www/certbot"
+LIVE="/etc/letsencrypt/live/$DOMAIN"
 
 log() { echo -e "\033[0;32m[$(date +%H:%M:%S)]\033[0m $1"; }
 fail() { echo -e "\033[0;31m[ERROR]\033[0m $1"; exit 1; }
 
 [ "$(id -u)" -eq 0 ] || fail "Run as root."
-[ -f nginx.ssl.conf ] || fail "Run from the JudoTest directory."
+[ -f nginx.conf ] || fail "Run from the JudoTest directory."
 
-# --- 1. certbot on the host -------------------------------------------------
+# --- 1. certbot -------------------------------------------------------------
 if ! command -v certbot >/dev/null 2>&1; then
     log "Installing certbot..."
     apt-get update -qq && apt-get install -y -qq certbot
 fi
 
-# --- 2. Webroot the container can serve the challenge from ------------------
+# --- 2. Placeholder certificate, only if there is nothing at all ------------
+# Without this, a fresh machine deadlocks: no cert means nginx will not start,
+# and nginx not starting means the ACME challenge cannot be answered.
+if [ ! -f "$LIVE/fullchain.pem" ]; then
+    log "No certificate yet -- writing a temporary self-signed one so nginx can start..."
+    mkdir -p "$LIVE"
+    openssl req -x509 -newkey rsa:2048 -nodes -days 1 \
+        -subj "/CN=$DOMAIN" \
+        -keyout "$LIVE/privkey.pem" \
+        -out "$LIVE/fullchain.pem" 2>/dev/null
+    log "Placeholder written. certbot will replace it below."
+fi
+
+# --- 3. Webroot for the ACME challenge --------------------------------------
 log "Preparing ACME webroot at $WEBROOT..."
 mkdir -p "$WEBROOT/.well-known/acme-challenge"
 chmod -R 755 "$WEBROOT"
 
-# The running container must already mount the webroot and serve
-# /.well-known/acme-challenge/ over http. That is what the current nginx.conf
-# and docker-compose.yml do, so deploy those first if you have not yet.
-log "Restarting container so the webroot mount is present..."
+# Rebuild, don't just restart. nginx.conf is baked into the image by the
+# Dockerfile, so `up -d` alone will happily keep running a stale image --
+# including one from a failed attempt that cannot start, which leaves port 80
+# dead and makes the challenge check below fail for an unrelated reason.
+log "Rebuilding the container so it matches the current config..."
+docker compose build
+
+# Validate through the SERVICE, not a stock nginx image run as root: this
+# inherits the real image, user, volumes and extra_hosts, so a permission or
+# name-resolution problem surfaces here instead of after the container is live.
+log "Validating nginx.conf in the real image..."
+docker compose run --rm --entrypoint nginx judo-quiz-app -t \
+    || fail "nginx.conf failed validation. Nothing restarted."
+
 docker compose up -d
 
 log "Verifying the challenge path is reachable over http..."
 echo "ok" > "$WEBROOT/.well-known/acme-challenge/preflight"
-sleep 2
-if ! curl -fsS "http://$DOMAIN/.well-known/acme-challenge/preflight" | grep -q ok; then
+sleep 3
+if ! curl -fsS -m 10 "http://$DOMAIN/.well-known/acme-challenge/preflight" | grep -q ok; then
     rm -f "$WEBROOT/.well-known/acme-challenge/preflight"
-    fail "Challenge path not reachable. Deploy the current nginx.conf and docker-compose.yml first, then re-run."
+    echo "Recent container logs:"
+    docker compose logs --tail=30 judo-quiz-app || true
+    fail "Challenge path not reachable over http. Logs above."
 fi
 rm -f "$WEBROOT/.well-known/acme-challenge/preflight"
 log "Challenge path OK."
 
-# --- 3. Issue the certificate ----------------------------------------------
+# --- 4. Issue (or renew) the certificate ------------------------------------
 log "Requesting certificate for $DOMAIN and www.$DOMAIN..."
 certbot certonly \
     --webroot -w "$WEBROOT" \
@@ -58,78 +86,13 @@ certbot certonly \
     --agree-tos --no-eff-email --non-interactive \
     --keep-until-expiring
 
-# nginx.ssl.conf carries its TLS settings inline, so there is nothing to fetch
-# and no dhparam to generate. Just confirm certbot produced what we will mount.
-for f in fullchain.pem privkey.pem; do
-    [ -f "/etc/letsencrypt/live/$DOMAIN/$f" ] || fail "Missing /etc/letsencrypt/live/$DOMAIN/$f"
-done
-log "Certificate files present."
+# certbot leaves its own files root-owned at 0600. That is correct and needs no
+# loosening: the Dockerfile lets nginx's MASTER process run as root so it can
+# read the key, then nginx forks workers as the unprivileged nginx user.
+log "Reloading nginx to pick up the certificate..."
+docker exec judo-quiz-frontend nginx -s reload
 
-# --- 4. Certificate permissions ---------------------------------------------
-# Nothing to do. certbot's defaults (live/ and archive/ 0700, privkey.pem 0600,
-# all root-owned) are exactly right: the Dockerfile lets nginx's master process
-# run as root, so it can read the key directly. An earlier version of this
-# script loosened these directories to 0755 to accommodate a container running
-# wholly as the nginx user -- that was the wrong end of the problem to fix.
-
-# --- 5. Swap in the TLS config ----------------------------------------------
-# Only ever back up once. On a re-run after a partial success, nginx.conf is
-# already the TLS config -- copying it over the backup would destroy the only
-# copy of the http-only config we can roll back to.
-if [ ! -f nginx.conf.http-backup ]; then
-    log "Backing up the http-only config to nginx.conf.http-backup..."
-    cp nginx.conf nginx.conf.http-backup
-else
-    log "Existing nginx.conf.http-backup kept."
-fi
-
-restore_http() {
-    log "Restoring the http-only config..."
-    cp nginx.conf.http-backup nginx.conf
-    docker compose build >/dev/null 2>&1 && docker compose up -d >/dev/null 2>&1
-    log "Site restored on http."
-}
-
-# nginx resolves a literal proxy_pass hostname once, AT STARTUP, through the
-# system resolver -- which reads /etc/hosts. docker-compose.yml puts
-# host.docker.internal there via extra_hosts, so a test container needs the
-# same mapping or it fails on a name the real container resolves fine.
-#
-# (Deliberately not switching proxy_pass to a resolver+variable to dodge this:
-# nginx's `resolver` speaks DNS and ignores /etc/hosts entirely, which is the
-# one place host.docker.internal exists. That would turn a startup failure into
-# a runtime failure -- strictly worse.)
-HOST_GW=(--add-host "host.docker.internal:host-gateway")
-
-log "Checking the proxy target resolves and the backend answers..."
-if ! docker run --rm "${HOST_GW[@]}" nginx:alpine \
-        sh -c 'getent hosts host.docker.internal >/dev/null && nc -z -w5 host.docker.internal 8787'; then
-    fail "Cannot reach the backend on host.docker.internal:8787 from a container.
-       Check the Techniques stack is up (cd ../Techniques && docker compose ps)
-       and that :8787 is published. Nothing changed; site is still up on http."
-fi
-log "Backend reachable."
-
-cp nginx.ssl.conf nginx.conf
-
-log "Building the image with the TLS config..."
-docker compose build || { restore_http; fail "Image build failed."; }
-
-# Validate through the SERVICE, not a stock nginx:alpine run as root. This
-# inherits the real image, user, volumes and extra_hosts, so a permission or
-# resolution problem surfaces here rather than after the swap. Validating a
-# stock image as root is exactly what let earlier failures reach production.
-log "Validating the TLS config in the real image..."
-if ! docker compose run --rm --entrypoint nginx judo-quiz-app -t; then
-    restore_http
-    fail "TLS config failed validation in the real image. Site restored on http."
-fi
-log "Config valid in the real image."
-
-log "Starting with TLS..."
-docker compose up -d
-
-# nginx needs a moment after the rebuild; do not call it dead on the first try.
+# --- 5. Confirm it actually works from outside ------------------------------
 log "Waiting for HTTPS to answer..."
 HTTPS_OK=0
 for _ in 1 2 3 4 5 6; do
@@ -140,46 +103,32 @@ done
 if [ "$HTTPS_OK" -eq 1 ]; then
     log "HTTPS is live."
 else
-    # Is nginx itself serving TLS, or is the port blocked on the way in?
-    # Opposite problems needing opposite fixes, so ask the container directly.
+    # nginx broken, or port blocked on the way in? Opposite problems needing
+    # opposite fixes, so ask the container directly rather than guessing.
     if docker exec judo-quiz-frontend curl -sk -o /dev/null -m 5 https://127.0.0.1/; then
         echo
-        echo "nginx IS serving TLS correctly inside the container, but port 443"
-        echo "is not reachable from outside. That is a firewall, not this config."
-        echo "Open 443/tcp in the Hetzner cloud firewall (and ufw, if active):"
-        echo "    ufw allow 443/tcp"
-        echo
-        echo "Leaving TLS in place -- it will work as soon as 443 is open."
+        echo "nginx IS serving TLS inside the container, but 443 is unreachable"
+        echo "from outside. That is a firewall, not this config. Open 443/tcp in"
+        echo "the Hetzner cloud firewall (and 'ufw allow 443/tcp' if ufw is on)."
         exit 1
     fi
-
     echo
-    echo "nginx is NOT serving TLS inside the container. Recent logs:"
+    echo "nginx is NOT serving TLS. Recent logs:"
     docker compose logs --tail=30 judo-quiz-app || true
-    restore_http
-    fail "TLS did not come up. Site restored on http; logs above."
+    fail "TLS did not come up. Logs above."
 fi
 
 # --- 6. Renewal -------------------------------------------------------------
-# Renewal only needs nginx to keep serving the webroot over http, which the TLS
-# config still does. The container must be told to pick up the renewed file.
+# certbot's own timer handles renewal; it only needs nginx to keep serving the
+# webroot over http, which the TLS config still does. The container just has to
+# be told to pick up the new file.
 log "Installing renewal hook..."
 mkdir -p /etc/letsencrypt/renewal-hooks/deploy
 cat > /etc/letsencrypt/renewal-hooks/deploy/reload-judoquiz.sh <<'HOOK'
 #!/bin/bash
-# nginx's master runs as root in this container, so the renewed key needs no
-# permission fixups -- just pick it up.
+# nginx's master runs as root here, so a renewed key needs no permission fixups.
 docker exec judo-quiz-frontend nginx -s reload
 HOOK
 chmod +x /etc/letsencrypt/renewal-hooks/deploy/reload-judoquiz.sh
 
 log "Done. Verify renewal with: certbot renew --dry-run"
-echo
-echo "NEXT: flip the canonical URLs from http to https in these four places,"
-echo "      then redeploy the frontend:"
-echo "        JudoTest/src/utils/seo.js       SITE_ORIGIN"
-echo "        JudoTest/public/index.html      canonical, og:url, og:image, JSON-LD"
-echo "        JudoTest/public/sitemap.xml     every <loc> and hreflang href"
-echo "        JudoTest/public/robots.txt      the Sitemap: line"
-echo "      Also set FRONTEND_URL=https://judoquiz.com in Techniques/.env"
-echo "      so account emails link to https."

@@ -1,11 +1,11 @@
 import { useEffect } from 'react';
 
-// Single source of truth for the canonical origin. Google indexed the bare
-// domain over http, so that is what canonicals must point at today -- a
-// canonical aimed at a URL that doesn't answer is worse than none at all.
-// Flip this to https://judoquiz.com the moment port 443 serves the site, and
-// flip public/index.html, public/sitemap.xml and public/robots.txt with it.
-export const SITE_ORIGIN = 'http://judoquiz.com';
+// Single source of truth for the canonical origin. Must always name a URL that
+// actually answers -- a canonical pointing somewhere unreachable is worse than
+// no canonical at all. If this ever changes, public/index.html,
+// public/sitemap.xml and public/robots.txt hold the same origin and must
+// change with it.
+export const SITE_ORIGIN = 'https://judoquiz.com';
 
 const upsertMeta = (attr, key, content) => {
   let el = document.head.querySelector(`meta[${attr}="${key}"]`);

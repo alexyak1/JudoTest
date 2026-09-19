@@ -6,8 +6,6 @@ services:
     container_name: judo-quiz-frontend
     ports:
       - "80:80"
-      # Safe to publish before certificates exist: nothing listens on 443 until
-      # nginx.ssl.conf is swapped in, so the port simply refuses connections.
       - "443:443"
     environment:
       - REACT_APP_API_URL=http://localhost:8787
