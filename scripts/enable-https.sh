@@ -77,8 +77,28 @@ chmod 755 /etc/letsencrypt/live /etc/letsencrypt/archive
 log "Backing up the http-only config to nginx.conf.http-backup..."
 cp nginx.conf nginx.conf.http-backup
 
+# nginx resolves a literal proxy_pass hostname once, AT STARTUP, through the
+# system resolver -- which reads /etc/hosts. docker-compose.yml puts
+# host.docker.internal there via extra_hosts, so the test container needs the
+# same mapping or it fails on a name the real container resolves fine.
+#
+# (Deliberately not switching proxy_pass to a resolver+variable to dodge this:
+# nginx's `resolver` speaks DNS and ignores /etc/hosts entirely, which is the
+# one place host.docker.internal exists. That would turn a startup failure into
+# a runtime failure -- strictly worse.)
+HOST_GW=(--add-host "host.docker.internal:host-gateway")
+
+log "Checking the proxy target resolves and the backend answers..."
+if ! docker run --rm "${HOST_GW[@]}" nginx:alpine \
+        sh -c 'getent hosts host.docker.internal >/dev/null && nc -z -w5 host.docker.internal 8787'; then
+    fail "Cannot reach the backend on host.docker.internal:8787 from a container.
+       Check the Techniques stack is up (cd ../Techniques && docker compose ps)
+       and that :8787 is published. Nothing changed; site is still up on http."
+fi
+log "Backend reachable."
+
 log "Testing the TLS config before committing to it..."
-docker run --rm \
+docker run --rm "${HOST_GW[@]}" \
     -v "$PWD/nginx.ssl.conf:/etc/nginx/conf.d/default.conf:ro" \
     -v /etc/letsencrypt:/etc/letsencrypt:ro \
     nginx:alpine nginx -t \
@@ -88,11 +108,26 @@ cp nginx.ssl.conf nginx.conf
 log "Rebuilding and restarting with TLS..."
 docker compose build && docker compose up -d
 
-sleep 3
-if curl -fsS -o /dev/null "https://$DOMAIN/"; then
+# nginx needs a moment after the rebuild; do not call it dead on the first try.
+log "Waiting for HTTPS to answer..."
+HTTPS_OK=0
+for _ in 1 2 3 4 5 6; do
+    if curl -fsS -m 10 -o /dev/null "https://$DOMAIN/"; then HTTPS_OK=1; break; fi
+    sleep 3
+done
+
+if [ "$HTTPS_OK" -eq 1 ]; then
     log "HTTPS is live."
 else
-    fail "HTTPS did not answer. Restore with: cp nginx.conf.http-backup nginx.conf && docker compose build && docker compose up -d"
+    echo
+    echo "HTTPS did not answer from this host after ~20s."
+    echo "Check the container first -- it may be a firewall on 443 rather than nginx:"
+    echo "    docker compose logs --tail=30 judo-quiz-app"
+    echo "    curl -sI https://$DOMAIN/    # from your laptop"
+    echo
+    echo "If nginx is genuinely broken, roll back with:"
+    echo "    cp nginx.conf.http-backup nginx.conf && docker compose build && docker compose up -d"
+    exit 1
 fi
 
 # --- 6. Renewal -------------------------------------------------------------

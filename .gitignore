@@ -26,3 +26,6 @@ deployment.log
 
 # local-only compose overrides
 docker-compose.override.yml
+
+# Created by scripts/enable-https.sh before it swaps in the TLS config.
+nginx.conf.http-backup
