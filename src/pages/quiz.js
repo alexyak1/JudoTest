@@ -6,6 +6,7 @@ import { useAuth } from "../hooks/useAuth";
 import { apiRequest } from "../utils/api";
 import { useSeo } from "../utils/seo";
 import { QUIZ_COPY, QUIZ_PATHS, QUIZ_ALTERNATES } from "../i18n/quizCopy";
+import { storeLang } from "../i18n/language";
 import '../quiz.css';
 import { API_BASE } from "../utils/apiBase";
 
@@ -283,9 +284,17 @@ export default function Test({ lang = 'en' }) {
 						</dl>
 
 						{/* A crawlable link between the two translations. hreflang tells
-						    Google they are a pair; this lets a person switch too. */}
+						    Google they are a pair; this lets a person switch too.
+
+						    Following it records the choice, which is what stops the
+						    detection at "/" from undoing it: a Swedish browser that
+						    picks English here has to keep getting English. The write
+						    is synchronous, so it lands before the link navigates. */}
 						<p className="quiz-seo-lang">
-							<a href={lang === 'sv' ? QUIZ_PATHS.en : QUIZ_PATHS.sv}>
+							<a
+								href={lang === 'sv' ? QUIZ_PATHS.en : QUIZ_PATHS.sv}
+								onClick={() => storeLang(lang === 'sv' ? 'en' : 'sv')}
+							>
 								{copy.otherLangLabel}
 							</a>
 						</p>

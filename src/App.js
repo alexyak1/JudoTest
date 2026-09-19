@@ -19,6 +19,7 @@ import NotFound from "./pages/not-found";
 import TVShow from "./components/TVShow/TVShow";
 import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
+import LocalizedLanding from "./components/LocalizedLanding";
 
 function App() {
   return (
@@ -31,7 +32,10 @@ function App() {
       <AuthProvider>
         <Navbar />
         <Routes>
-          <Route path="/" element={<Quiz lang="en" />} />
+          {/* The root serves English, but sends a visitor whose browser asks
+              for Swedish on to /sv. Both pages stay separately indexable; see
+              i18n/language.js for why the browser list and not the IP. */}
+          <Route path="/" element={<LocalizedLanding />} />
           <Route path="/quiz" element={<Quiz lang="en" />} />
           {/* Swedish translation of the landing page. The ranking query is
               typed into google.se in Swedish, so it gets a real page. */}
