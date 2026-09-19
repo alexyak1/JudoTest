@@ -36,10 +36,17 @@ RUN chown -R nginx:nginx /etc/nginx/conf.d
 RUN touch /var/run/nginx.pid
 RUN chown -R nginx:nginx /var/run/nginx.pid
 
-USER nginx
+# No `USER nginx` here, deliberately. nginx's own model is a root master
+# process that reads the certificates and binds the ports, which then forks
+# workers as the unprivileged nginx user (nginx.conf in this image already
+# says `user nginx;`). Running the master as nginx too means it cannot read
+# certbot's privkey.pem, which is mode 0600 and owned by root -- and the
+# alternative, loosening the private key to world-readable on the host, is a
+# worse trade than letting the master run as root the way upstream intends.
 
-# Expose port
+# Expose ports
 EXPOSE 80
+EXPOSE 443
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
