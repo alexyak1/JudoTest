@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './randori.css';
 import { useSeo } from '../utils/seo';
+import useWakeLock from '../hooks/useWakeLock';
 
 // SVG Icons
 const Icons = {
@@ -129,6 +130,9 @@ const RandoriTimer = () => {
   const [isMuted, setIsMuted] = useState(savedSettings?.isMuted || false);
 
   const timerRef = useRef(null);
+
+  // Hold the screen open for as long as a round is running.
+  const canKeepScreenAwake = useWakeLock(isRunning);
 
   // Save settings to localStorage
   useEffect(() => {
@@ -592,6 +596,12 @@ const RandoriTimer = () => {
             <span>Auto</span>
           </div>
         </div>
+
+        {!canKeepScreenAwake && isRunning && (
+          <p className="zen-wake-note">
+            This browser may still lock the screen - keep it awake in your device settings.
+          </p>
+        )}
       </div>
     </div>
   );

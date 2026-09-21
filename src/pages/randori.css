@@ -531,6 +531,19 @@
   animation: spin-slow 12s linear infinite;
 }
 
+/* Shown only where the Screen Wake Lock API is missing */
+.zen-wake-note {
+  position: relative;
+  z-index: 10;
+  margin: 10px 0 0;
+  text-align: center;
+  font-size: 0.65rem;
+  line-height: 1.4;
+  letter-spacing: 0.05em;
+  color: rgba(255, 255, 255, 0.35);
+  flex-shrink: 0;
+}
+
 /* Mobile Optimizations - Extra compact */
 @media screen and (max-width: 480px) {
   /* Hide footer on mobile for app-like experience */
