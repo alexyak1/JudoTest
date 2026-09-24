@@ -58,6 +58,10 @@ const setAlternates = (alternates) => {
  * @param {boolean} [seo.noindex]   Keep utility pages out of the index.
  * @param {string} [seo.lang]       Written language, for <html lang>.
  * @param {object} [seo.alternates] hreflang code -> path, for translated pages.
+ * @param {string} [seo.image]      Preview image for shares, absolute or
+ *                                  site-relative. Defaults back to the logo,
+ *                                  so a route that sets one does not leave it
+ *                                  behind on the next route.
  */
 export function useSeo({
   title,
@@ -66,6 +70,7 @@ export function useSeo({
   noindex = false,
   lang = 'en',
   alternates = null,
+  image = '/logo.png',
 }) {
   // Objects passed inline would be a new reference every render, so compare the
   // serialised form instead of the identity.
@@ -82,6 +87,7 @@ export function useSeo({
     upsertMeta('property', 'og:description', description);
     upsertMeta('property', 'og:url', url);
     upsertMeta('property', 'og:locale', lang === 'sv' ? 'sv_SE' : 'en_US');
+    upsertMeta('property', 'og:image', image.startsWith('http') ? image : `${SITE_ORIGIN}${image}`);
     upsertCanonical(url);
 
     setAlternates(alternatesKey ? JSON.parse(alternatesKey) : {});
@@ -91,5 +97,5 @@ export function useSeo({
     const robots = noindex ? 'noindex, follow' : 'index, follow';
     upsertMeta('name', 'robots', robots);
     upsertMeta('name', 'googlebot', robots);
-  }, [title, description, path, noindex, lang, alternatesKey]);
+  }, [title, description, path, noindex, lang, alternatesKey, image]);
 }

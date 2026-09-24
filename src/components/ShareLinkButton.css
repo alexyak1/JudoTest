@@ -1,0 +1,84 @@
+.share-link-btn {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  /* index.css gives every bare <button> a vertical margin and a light
+     background; both have to be undone for a control in the modal header. */
+  margin: 0;
+  padding: 0 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  font-family: Inter, sans-serif;
+  font-size: 0.85rem;
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.share-link-btn:hover,
+.share-link-btn:focus-visible {
+  background: rgba(102, 126, 234, 0.28);
+  border-color: rgba(102, 126, 234, 0.9);
+}
+
+.share-link-btn:focus-visible {
+  outline: 2px solid rgba(102, 126, 234, 0.9);
+  outline-offset: 2px;
+}
+
+.share-link-btn:active {
+  transform: translateY(1px);
+}
+
+.share-link-btn svg {
+  width: 17px;
+  height: 17px;
+  flex: none;
+  margin-right: 0; /* overrides the global `button svg` spacing */
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Confirmation reads as a state change on the same control, so the button
+   does not move or resize while the pointer is still on it. */
+.share-link-btn.is-copied {
+  background: rgba(72, 187, 120, 0.22);
+  border-color: rgba(72, 187, 120, 0.75);
+  color: #9ae6b4;
+}
+
+.share-link-btn-status {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Phones: the technique name needs the width more than the word does. */
+@media (max-width: 520px) {
+  .share-link-btn {
+    padding: 0 11px;
+  }
+
+  .share-link-btn-label {
+    display: none;
+  }
+
+  .share-link-btn.is-copied .share-link-btn-label {
+    display: inline;
+  }
+}

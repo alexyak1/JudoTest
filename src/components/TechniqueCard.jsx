@@ -12,8 +12,8 @@ const TechniqueCard = memo(({
   onCardClick
 }) => {
   const handleClick = useCallback(() => {
-    onCardClick(item.name, posterSrc, videoSrc, fps);
-  }, [item.name, posterSrc, videoSrc, fps, onCardClick]);
+    onCardClick(item);
+  }, [item, onCardClick]);
 
   return (
     <div className="technique-card" onClick={handleClick}>

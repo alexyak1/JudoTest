@@ -1,12 +1,13 @@
 import React, { useEffect, memo } from 'react';
 import { TechniquePlayer } from './TechniquePlayer';
+import ShareLinkButton from './ShareLinkButton';
 
 /**
  * Shows a technique full size. When the technique has a video it opens in the
  * frame-stepping player, so a throw can be held on one moment -- the main
  * thing the old GIFs could not do. Stills fall back to the poster image.
  */
-const ImageModal = memo(({ isOpen, onClose, title, imageSrc, videoSrc, fps, altText }) => {
+const ImageModal = memo(({ isOpen, onClose, title, imageSrc, videoSrc, fps, altText, shareUrl, onShare }) => {
   useEffect(() => {
     if (!isOpen) return;
     const handleKeyDown = (e) => {
@@ -23,7 +24,10 @@ const ImageModal = memo(({ isOpen, onClose, title, imageSrc, videoSrc, fps, altT
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <h3 className="modal-title">{title}</h3>
-          <button className="modal-close" aria-label="Close" onClick={onClose}>×</button>
+          <div className="modal-header-actions">
+            {shareUrl && <ShareLinkButton url={shareUrl} onShare={onShare} />}
+            <button className="modal-close" aria-label="Close" onClick={onClose}>×</button>
+          </div>
         </div>
         <div className="modal-body">
           {videoSrc ? (

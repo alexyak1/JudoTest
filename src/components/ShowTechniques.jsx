@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback, memo } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import ImageModal from './ImageModal';
 import { TechniqueCard } from './TechniqueCard';
 import { useDebouncedResize } from '../hooks/useDebouncedResize';
 import { useTechniquesCache } from '../hooks/useGlobalCache';
 import { trackBeltAction } from '../hooks/useBeltWithUrl';
+import { SITE_ORIGIN } from '../utils/seo';
 import '../components/MobileOptimization.css';
 
 // Import technique media at build time. Posters are stills the grid always
@@ -24,10 +26,30 @@ const resolve = (ctx, path) => {
     }
 };
 
+// Technique names are already URL-safe ("O-uchi-gari"), so the slug only
+// lowercases them. Matching is case-insensitive so an old or hand-typed link
+// with the original capitalisation still resolves.
+export const techniqueSlug = (name) => String(name).toLowerCase();
+
+// A technique's permalink: its own belt, so the link lands on the list that
+// contains it whatever belt the sharer happened to be browsing.
+export const techniqueShareUrl = (item) =>
+    `${SITE_ORIGIN}/techniques?belt=${item.belt}&technique=${techniqueSlug(item.name)}`;
+
+// Preview still for a shared technique, looked up by slug because the URL
+// carries the lowercased name while the file keeps its original casing.
+// Returns null when the belt or the name does not match a bundled poster.
+export const techniquePoster = (belt, slug) => {
+    if (!belt || !slug) return null;
+    const wanted = `./${belt}/${techniqueSlug(slug)}.webp`;
+    const match = posters.keys().find((k) => k.toLowerCase() === wanted);
+    return match ? posters(match) : null;
+};
+
 const ShowTechniques = memo(({ belt }) => {
-    const [modal, setModal] = useState({ open: false, title: '', src: '' });
+    const [searchParams, setSearchParams] = useSearchParams();
     const [searchTerm, setSearchTerm] = useState('');
-    
+
     const techniquesGridRef = useRef(null);
     const searchFilterRef = useRef(null);
     const isMobile = useDebouncedResize(150, 768);
@@ -69,17 +91,58 @@ const ShowTechniques = memo(({ belt }) => {
         );
     }, [items, searchTerm]);
 
-    // Memoized callbacks to prevent unnecessary re-renders
-    const openCard = useCallback((title, posterSrc, videoSrc, fps) => {
-        setModal({ open: true, title, src: posterSrc, videoSrc, fps });
+    // Which technique is open lives in the URL rather than in state, so the
+    // address bar is always shareable, a pasted link opens the right technique
+    // and browser back closes the modal.
+    const openSlug = searchParams.get('technique');
 
-        // Track technique view
+    const openItem = useMemo(() => {
+        if (!openSlug || !items) return null;
+        const wanted = techniqueSlug(openSlug);
+        return items.find((item) => techniqueSlug(item.name) === wanted) || null;
+    }, [openSlug, items]);
+
+    const openMedia = useMemo(() => {
+        if (!openItem) return null;
+        const base = `./${openItem.belt}/${openItem.name}`;
+        const key = `judo_techniques/${openItem.belt}/${openItem.name}`;
+        return {
+            posterSrc: resolve(posters, `${base}.webp`),
+            videoSrc: resolve(videos, `${base}.mp4`),
+            fps: manifest[key]?.fps,
+        };
+    }, [openItem]);
+
+    // Fires for a deep link just as much as for a click, which is the point --
+    // a shared technique should count as a view.
+    useEffect(() => {
+        if (!openItem) return;
         trackBeltAction('technique_view', 'techniques', belt, {
-            technique_name: title
+            technique_name: openItem.name
         });
-    }, [belt]);
+    }, [openItem, belt]);
 
-    const closeCard = useCallback(() => setModal({ open: false, title: '', src: '', videoSrc: null, fps: undefined }), []);
+    const openCard = useCallback((item) => {
+        const next = new URLSearchParams(searchParams);
+        next.set('technique', techniqueSlug(item.name));
+        // A push, not a replace: back should close the technique, not leave
+        // the page.
+        setSearchParams(next);
+    }, [searchParams, setSearchParams]);
+
+    const closeCard = useCallback(() => {
+        const next = new URLSearchParams(searchParams);
+        next.delete('technique');
+        setSearchParams(next, { replace: true });
+    }, [searchParams, setSearchParams]);
+
+    const trackShare = useCallback((channel) => {
+        if (!openItem) return;
+        trackBeltAction('technique_share', 'techniques', belt, {
+            technique_name: openItem.name,
+            share_channel: channel
+        });
+    }, [openItem, belt]);
 
     const handleSearchChange = useCallback((e) => setSearchTerm(e.target.value), []);
 
@@ -151,13 +214,15 @@ const ShowTechniques = memo(({ belt }) => {
             )}
 
             <ImageModal
-                isOpen={modal.open}
+                isOpen={!!openItem}
                 onClose={closeCard}
-                title={modal.title}
-                imageSrc={modal.src}
-                videoSrc={modal.videoSrc}
-                fps={modal.fps}
-                altText={modal.title}
+                title={openItem?.name || ''}
+                imageSrc={openMedia?.posterSrc}
+                videoSrc={openMedia?.videoSrc}
+                fps={openMedia?.fps}
+                altText={openItem?.name || ''}
+                shareUrl={openItem ? techniqueShareUrl(openItem) : null}
+                onShare={trackShare}
             />
         </div>
     );

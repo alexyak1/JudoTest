@@ -1,6 +1,7 @@
 import React, { useCallback } from "react";
+import { useSearchParams } from "react-router-dom";
 import TechniquesBeltSelector from "../components/TechniquesBeltSelector";
-import { ShowTechniques } from "../components/ShowTechniques";
+import { ShowTechniques, techniquePoster } from "../components/ShowTechniques";
 import { ToTop } from "../components/NavigationComponents/toTop";
 import { useBeltWithUrl, usePageTracking } from "../hooks/useBeltWithUrl";
 import { useSeo } from "../utils/seo";
@@ -23,7 +24,23 @@ export default function Techniques() {
     // Each belt is its own indexable page: same template, genuinely different
     // list of techniques, so each one canonicalises to its own ?belt= URL.
     const label = BELT_LABELS[belt] || 'All Belts';
-    useSeo({
+
+    // A shared technique link is its own page as far as sharing and indexing
+    // go: one named throw with its own video, not just the belt list again.
+    const [searchParams] = useSearchParams();
+    const openSlug = searchParams.get('technique');
+    // Only the first letter: the files are named "O-uchi-gari", not
+    // "O-Uchi-Gari", and the title should read the way the technique does.
+    const openName = openSlug
+        ? openSlug.charAt(0).toUpperCase() + openSlug.slice(1)
+        : null;
+
+    useSeo(openName ? {
+        title: `${openName} - Judo Technique Video, Frame by Frame | JudoQuiz`,
+        description: `Watch ${openName}, a ${label.toLowerCase()} judo technique, as video you can slow down and step through one frame at a time.`,
+        path: `/techniques?belt=${belt}&technique=${openSlug}`,
+        image: techniquePoster(belt, openSlug) || '/logo.png',
+    } : {
         title: `Judo Techniques - ${label} Syllabus with Video | JudoQuiz`,
         description: `Every ${label.toLowerCase()} judo technique with video: throws, hold-downs, strangles and armlocks, named in Japanese and grouped by grading level.`,
         path: belt === 'yellow' ? '/techniques' : `/techniques?belt=${belt}`,
