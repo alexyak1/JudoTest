@@ -321,6 +321,19 @@ const CancelBtn = styled.button`
     &:hover { border-color: #667eea; color: #fff; }
 `;
 
+const headerIconBtnStyle = {
+    background: 'rgba(102,126,234,0.12)',
+    border: '1px solid rgba(102,126,234,0.4)',
+    borderRadius: '6px',
+    color: '#a5b4fc',
+    padding: '0.4rem 0.55rem',
+    cursor: 'pointer',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.3rem',
+    fontSize: '0.75rem',
+};
+
 const ClubPage = () => {
     const { user, isCoach, isAdmin } = useAuth();
     const canEdit = isCoach || isAdmin;
@@ -532,21 +545,28 @@ const ClubPage = () => {
                                         <button
                                             onClick={(e) => { e.stopPropagation(); setPhotosModal({ eventName: comp.name, eventDate: comp.date, name: comp.name }); }}
                                             title="Photos"
-                                            style={{
-                                                background: 'rgba(102,126,234,0.12)',
-                                                border: '1px solid rgba(102,126,234,0.4)',
-                                                borderRadius: '6px',
-                                                color: '#a5b4fc',
-                                                padding: '0.4rem 0.55rem',
-                                                cursor: 'pointer',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                gap: '0.3rem',
-                                                fontSize: '0.75rem',
-                                            }}
+                                            style={headerIconBtnStyle}
                                         >
                                             <FiImage size={14} />
                                         </button>
+                                    )}
+                                    {!comp.deleted && canEdit && (
+                                        <>
+                                            <button
+                                                onClick={(e) => { e.stopPropagation(); setEditingComp(comp); }}
+                                                title="Edit competition"
+                                                style={headerIconBtnStyle}
+                                            >
+                                                <FiEdit2 size={14} />
+                                            </button>
+                                            <button
+                                                onClick={(e) => { e.stopPropagation(); setConfirmDeleteComp(comp); }}
+                                                title="Delete competition"
+                                                style={{ ...headerIconBtnStyle, background: 'rgba(255,107,107,0.1)', border: '1px solid rgba(255,107,107,0.35)', color: '#ff6b6b' }}
+                                            >
+                                                <FiTrash2 size={14} />
+                                            </button>
+                                        </>
                                     )}
                                     {expandedComp === idx ? <FiChevronUp color="#888" size={16} /> : <FiChevronDown color="#888" size={16} />}
                                 </div>
@@ -555,11 +575,13 @@ const ClubPage = () => {
                                 <CompDetails>
                                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.4rem' }}>
                                         {comp.link ? <CompLink href={comp.link} target="_blank" rel="noopener noreferrer">{comp.link}</CompLink> : <span />}
-                                        {!comp.deleted && comp.participants.length > 0 && (
+                                        {!comp.deleted && (comp.participants.length > 0 || canEdit) && (
                                             <div style={{ display: 'flex', gap: '0.8rem', marginLeft: 'auto' }}>
-                                                <span onClick={(e) => { e.stopPropagation(); setPhotosModal({ eventName: comp.name, eventDate: comp.date, name: comp.name }); }} style={{ color: '#888', cursor: 'pointer', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                                                    <FiImage size={12} /> Photos
-                                                </span>
+                                                {comp.participants.length > 0 && (
+                                                    <span onClick={(e) => { e.stopPropagation(); setPhotosModal({ eventName: comp.name, eventDate: comp.date, name: comp.name }); }} style={{ color: '#888', cursor: 'pointer', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                                                        <FiImage size={12} /> Photos
+                                                    </span>
+                                                )}
                                                 {canEdit && (
                                                     <>
                                                         <span onClick={(e) => { e.stopPropagation(); setEditingComp(comp); }} style={{ color: '#888', cursor: 'pointer', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
