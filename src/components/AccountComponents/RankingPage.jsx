@@ -4,6 +4,7 @@ import { FiCalendar } from 'react-icons/fi';
 import { apiRequest } from '../../utils/api';
 import { useAuth } from '../../hooks/useAuth';
 import StudentProfile from './StudentProfile';
+import { isUpcomingCompetition } from '../../utils/competitions';
 
 const Card = styled.div`
     background: rgba(255, 255, 255, 0.04);
@@ -79,8 +80,7 @@ const BackBtn = styled.button`
 const CATEGORY_GROUPS = {
     all: { label: 'All', match: () => true },
     children: { label: 'Children (U9-U18)', match: c => /^U(9|11|13|15|18)$/i.test((c.category || '').trim()) },
-    u21_senior: { label: 'U21 / Senior', match: c => /^(U21|senior)$/i.test((c.category || '').trim()) },
-    masters: { label: 'Masters (M1-M9)', match: c => /^M[1-9]$/i.test((c.category || '').trim()) },
+    seniors: { label: 'U21 / Senior / Masters', match: c => /^(U21|senior|M[1-9])$/i.test((c.category || '').trim()) },
 };
 
 const RankingPage = () => {
@@ -118,7 +118,7 @@ const RankingPage = () => {
 
     if (loading) return <p style={{ color: '#666', fontStyle: 'italic' }}>Loading...</p>;
 
-    const activeComps = competitions.filter(c => !c.deleted && c.user_id);
+    const activeComps = competitions.filter(c => !c.deleted && c.user_id && !isUpcomingCompetition(c));
     const filtered = (filter === 'all' ? activeComps : activeComps.filter(c => {
         if (filter === 'year') return c.date?.startsWith(String(new Date().getFullYear()));
         if (filter === 'custom') return (!dateFrom || c.date >= dateFrom) && (!dateTo || c.date <= dateTo);

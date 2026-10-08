@@ -7,6 +7,7 @@ import StudentProfile from './StudentProfile';
 import ClubSection from './ClubSection';
 import CompetitionPhotosModal from './CompetitionPhotosModal';
 import { API_BASE } from "../../utils/apiBase";
+import { isUpcomingCompetition } from '../../utils/competitions';
 
 
 const Card = styled.div`
@@ -394,6 +395,7 @@ const CoachDashboard = ({ studentId, onStudentChange }) => {
     const [statsFrom, setStatsFrom] = useState('');
     const [statsTo, setStatsTo] = useState('');
     const [categoryFilter, setCategoryFilter] = useState('all');
+    const [statsPage, setStatsPage] = useState(0);
     const [eventsFilter, setEventsFilter] = useState('30days');
     const [eventsFrom, setEventsFrom] = useState('');
     const [eventsTo, setEventsTo] = useState('');
@@ -569,6 +571,7 @@ const CoachDashboard = ({ studentId, onStudentChange }) => {
         if (!comps) return [];
         const year = String(new Date().getFullYear());
         return comps.filter(c => {
+            if (isUpcomingCompetition(c)) return false;
             if (statsFilter === 'all') return true;
             if (statsFilter === 'year') return c.date && c.date.startsWith(year);
             if (statsFilter === 'custom') return (!statsFrom || c.date >= statsFrom) && (!statsTo || c.date <= statsTo);
@@ -579,8 +582,7 @@ const CoachDashboard = ({ studentId, onStudentChange }) => {
     const CATEGORY_GROUPS = {
         all: { label: 'All', match: () => true },
         children: { label: 'Children (U9-U18)', match: c => /^U(9|11|13|15|18)$/i.test((c.category || '').trim()) },
-        u21_senior: { label: 'U21 / Senior', match: c => /^(U21|senior)$/i.test((c.category || '').trim()) },
-        masters: { label: 'Masters (M1-M9)', match: c => /^M[1-9]$/i.test((c.category || '').trim()) },
+        seniors: { label: 'U21 / Senior / Masters', match: c => /^(U21|senior|M[1-9])$/i.test((c.category || '').trim()) },
     };
 
     const allMembers = [...students, ...clubCoaches];
@@ -601,8 +603,12 @@ const CoachDashboard = ({ studentId, onStudentChange }) => {
     const topCompetitors = [...allMembers]
         .map(p => ({ ...p, stats: getPersonStats(p) }))
         .filter(p => p.stats.total > 0)
-        .sort((a, b) => b.stats.gold - a.stats.gold || b.stats.silver - a.stats.silver || b.stats.bronze - a.stats.bronze || a.stats.total - b.stats.total)
-        .slice(0, 10);
+        .sort((a, b) => b.stats.gold - a.stats.gold || b.stats.silver - a.stats.silver || b.stats.bronze - a.stats.bronze || a.stats.total - b.stats.total);
+
+    const STATS_PAGE_SIZE = 10;
+    const statsPageCount = Math.max(1, Math.ceil(topCompetitors.length / STATS_PAGE_SIZE));
+    const safeStatsPage = Math.min(statsPage, statsPageCount - 1);
+    const visibleCompetitors = topCompetitors.slice(safeStatsPage * STATS_PAGE_SIZE, (safeStatsPage + 1) * STATS_PAGE_SIZE);
 
     const clubName = user?.club?.name || 'Club';
 
@@ -807,12 +813,12 @@ const CoachDashboard = ({ studentId, onStudentChange }) => {
                                     </span>
                                     <span style={{ color: '#888', minWidth: '90px', fontSize: '0.8rem' }}>{c.date}</span>
                                     <span style={{
-                                        color: resultColor(c.result),
+                                        color: isUpcomingCompetition(c) ? '#38bdf8' : resultColor(c.result),
                                         fontWeight: 600,
                                         minWidth: '60px',
                                         textTransform: 'capitalize',
                                         textAlign: 'right',
-                                    }}>{c.result || '-'}</span>
+                                    }}>{isUpcomingCompetition(c) ? 'Upcoming' : (c.result || '-')}</span>
                                     <button
                                         onClick={() => setPhotosModal({ eventName: c.name, eventDate: c.date, name: c.name })}
                                         title="Photos"
@@ -838,19 +844,19 @@ const CoachDashboard = ({ studentId, onStudentChange }) => {
                     <SectionTitle>Top Competitors</SectionTitle>
                 </SectionHeader>
                 <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center', flexWrap: 'wrap', marginBottom: '0.8rem' }}>
-                    <button onClick={() => setStatsFilter('year')} style={{
+                    <button onClick={() => { setStatsFilter('year'); setStatsPage(0); }} style={{
                         background: statsFilter === 'year' ? 'rgba(102,126,234,0.2)' : 'rgba(255,255,255,0.04)',
                         border: `1px solid ${statsFilter === 'year' ? 'rgba(102,126,234,0.4)' : 'rgba(255,255,255,0.08)'}`,
                         color: statsFilter === 'year' ? '#667eea' : '#888',
                         borderRadius: '6px', padding: '0.3rem 0.6rem', fontSize: '0.8rem', cursor: 'pointer',
                     }}>{new Date().getFullYear()}</button>
-                    <button onClick={() => setStatsFilter('all')} style={{
+                    <button onClick={() => { setStatsFilter('all'); setStatsPage(0); }} style={{
                         background: statsFilter === 'all' ? 'rgba(102,126,234,0.2)' : 'rgba(255,255,255,0.04)',
                         border: `1px solid ${statsFilter === 'all' ? 'rgba(102,126,234,0.4)' : 'rgba(255,255,255,0.08)'}`,
                         color: statsFilter === 'all' ? '#667eea' : '#888',
                         borderRadius: '6px', padding: '0.3rem 0.6rem', fontSize: '0.8rem', cursor: 'pointer',
                     }}>All time</button>
-                    <button onClick={() => setStatsFilter('custom')} style={{
+                    <button onClick={() => { setStatsFilter('custom'); setStatsPage(0); }} style={{
                         background: statsFilter === 'custom' ? 'rgba(102,126,234,0.2)' : 'rgba(255,255,255,0.04)',
                         border: `1px solid ${statsFilter === 'custom' ? 'rgba(102,126,234,0.4)' : 'rgba(255,255,255,0.08)'}`,
                         color: statsFilter === 'custom' ? '#667eea' : '#888',
@@ -858,12 +864,12 @@ const CoachDashboard = ({ studentId, onStudentChange }) => {
                     }}>Custom</button>
                     {statsFilter === 'custom' && (
                         <>
-                            <input type="date" value={statsFrom} onChange={e => setStatsFrom(e.target.value)} style={{
+                            <input type="date" value={statsFrom} onChange={e => { setStatsFrom(e.target.value); setStatsPage(0); }} style={{
                                 background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)',
                                 borderRadius: '6px', padding: '0.3rem 0.5rem', color: '#fff', fontSize: '0.8rem', outline: 'none',
                             }} />
                             <span style={{ color: '#555' }}>-</span>
-                            <input type="date" value={statsTo} onChange={e => setStatsTo(e.target.value)} style={{
+                            <input type="date" value={statsTo} onChange={e => { setStatsTo(e.target.value); setStatsPage(0); }} style={{
                                 background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)',
                                 borderRadius: '6px', padding: '0.3rem 0.5rem', color: '#fff', fontSize: '0.8rem', outline: 'none',
                             }} />
@@ -873,7 +879,7 @@ const CoachDashboard = ({ studentId, onStudentChange }) => {
                 <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center', flexWrap: 'wrap', marginBottom: '0.8rem' }}>
                     <span style={{ color: '#666', fontSize: '0.75rem', marginRight: '0.2rem' }}>Category:</span>
                     {Object.entries(CATEGORY_GROUPS).map(([key, { label }]) => (
-                        <button key={key} onClick={() => setCategoryFilter(key)} style={{
+                        <button key={key} onClick={() => { setCategoryFilter(key); setStatsPage(0); }} style={{
                             background: categoryFilter === key ? 'rgba(102,126,234,0.2)' : 'rgba(255,255,255,0.04)',
                             border: `1px solid ${categoryFilter === key ? 'rgba(102,126,234,0.4)' : 'rgba(255,255,255,0.08)'}`,
                             color: categoryFilter === key ? '#667eea' : '#888',
@@ -894,9 +900,9 @@ const CoachDashboard = ({ studentId, onStudentChange }) => {
                             </tr>
                         </thead>
                         <tbody>
-                            {topCompetitors.map((p, i) => (
+                            {visibleCompetitors.map((p, i) => (
                                 <tr key={p.id}>
-                                    <td style={{ color: '#555', padding: '0.3rem 0.5rem', fontSize: '0.8rem', borderBottom: '1px solid rgba(255,255,255,0.03)' }}>{i + 1}</td>
+                                    <td style={{ color: '#555', padding: '0.3rem 0.5rem', fontSize: '0.8rem', borderBottom: '1px solid rgba(255,255,255,0.03)' }}>{safeStatsPage * STATS_PAGE_SIZE + i + 1}</td>
                                     <td style={{ padding: '0.3rem 0.5rem', fontSize: '0.85rem', fontWeight: 500, borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
                                         <span onClick={() => viewStudent(p.id)} style={{ color: '#667eea', cursor: 'pointer', textDecoration: 'none' }}
                                             onMouseOver={e => e.target.style.textDecoration = 'underline'}
@@ -915,6 +921,27 @@ const CoachDashboard = ({ studentId, onStudentChange }) => {
                 ) : (
                     <p style={{ color: '#555', fontSize: '0.8rem', fontStyle: 'italic', margin: '0.3rem 0' }}>No competition data for this period</p>
                 )}
+                {statsPageCount > 1 && (() => {
+                    const pagerBtn = (active, disabled) => ({
+                        background: active ? 'rgba(102,126,234,0.2)' : 'rgba(255,255,255,0.04)',
+                        border: `1px solid ${active ? 'rgba(102,126,234,0.4)' : 'rgba(255,255,255,0.08)'}`,
+                        color: active ? '#667eea' : (disabled ? '#444' : '#888'),
+                        borderRadius: '6px', padding: '0.25rem 0.55rem', fontSize: '0.75rem',
+                        cursor: disabled ? 'default' : 'pointer', minWidth: '2rem',
+                    });
+                    return (
+                        <div style={{ display: 'flex', gap: '0.3rem', alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap', marginTop: '0.8rem' }}>
+                            <button disabled={safeStatsPage === 0} onClick={() => setStatsPage(safeStatsPage - 1)} style={pagerBtn(false, safeStatsPage === 0)}>&lsaquo;</button>
+                            {Array.from({ length: statsPageCount }, (_, i) => (
+                                <button key={i} onClick={() => setStatsPage(i)} style={pagerBtn(i === safeStatsPage, false)}>{i + 1}</button>
+                            ))}
+                            <button disabled={safeStatsPage === statsPageCount - 1} onClick={() => setStatsPage(safeStatsPage + 1)} style={pagerBtn(false, safeStatsPage === statsPageCount - 1)}>&rsaquo;</button>
+                            <span style={{ color: '#555', fontSize: '0.7rem', marginLeft: '0.4rem' }}>
+                                {safeStatsPage * STATS_PAGE_SIZE + 1}-{Math.min((safeStatsPage + 1) * STATS_PAGE_SIZE, topCompetitors.length)} of {topCompetitors.length}
+                            </span>
+                        </div>
+                    );
+                })()}
             </Card>
 
             <Card>
